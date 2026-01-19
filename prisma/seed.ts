@@ -1,0 +1,480 @@
+import { PrismaClient, StockStatus } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+
+const prisma = new PrismaClient();
+
+async function main() {
+  console.log('🌱 Starting database seed...');
+
+  // 1. Create Admin User
+  console.log('Creating admin user...');
+  const adminPassword = await bcrypt.hash('admin123', 10);
+  
+  const admin = await prisma.user.upsert({
+    where: { email: 'admin@wscomputercity.com' },
+    update: {},
+    create: {
+      email: 'admin@wscomputercity.com',
+      name: 'Admin User',
+      password: adminPassword,
+      role: 'ADMIN',
+      emailVerified: new Date(),
+    },
+  });
+  console.log('✅ Admin user created:', admin.email);
+
+  // 2. Create Brands
+  console.log('Creating brands...');
+  const brands = await Promise.all([
+    prisma.brand.upsert({
+      where: { slug: 'intel' },
+      update: {},
+      create: {
+        name: 'Intel',
+        slug: 'intel',
+        description: 'Leading processor manufacturer',
+        isActive: true,
+      },
+    }),
+    prisma.brand.upsert({
+      where: { slug: 'amd' },
+      update: {},
+      create: {
+        name: 'AMD',
+        slug: 'amd',
+        description: 'Advanced Micro Devices',
+        isActive: true,
+      },
+    }),
+    prisma.brand.upsert({
+      where: { slug: 'nvidia' },
+      update: {},
+      create: {
+        name: 'NVIDIA',
+        slug: 'nvidia',
+        description: 'Graphics card leader',
+        isActive: true,
+      },
+    }),
+    prisma.brand.upsert({
+      where: { slug: 'samsung' },
+      update: {},
+      create: {
+        name: 'Samsung',
+        slug: 'samsung',
+        description: 'Memory and storage solutions',
+        isActive: true,
+      },
+    }),
+    prisma.brand.upsert({
+      where: { slug: 'asus' },
+      update: {},
+      create: {
+        name: 'ASUS',
+        slug: 'asus',
+        description: 'Computer hardware and electronics',
+        isActive: true,
+      },
+    }),
+  ]);
+  console.log('✅ Brands created:', brands.length);
+
+  // 3. Create Category Structure
+  console.log('Creating categories...');
+  
+  // Root categories
+  const desktopPC = await prisma.category.upsert({
+    where: { slug: 'desktop-pc' },
+    update: {},
+    create: {
+      name: 'Desktop PC',
+      slug: 'desktop-pc',
+      description: 'Complete desktop computer systems',
+      level: 0,
+      order: 1,
+      isActive: true,
+    },
+  });
+
+  const components = await prisma.category.upsert({
+    where: { slug: 'components' },
+    update: {},
+    create: {
+      name: 'Components',
+      slug: 'components',
+      description: 'Computer components and parts',
+      level: 0,
+      order: 2,
+      isActive: true,
+    },
+  });
+
+  const laptop = await prisma.category.upsert({
+    where: { slug: 'laptop' },
+    update: {},
+    create: {
+      name: 'Laptop',
+      slug: 'laptop',
+      description: 'Laptops and notebooks',
+      level: 0,
+      order: 3,
+      isActive: true,
+    },
+  });
+
+  // Sub-categories under Components
+  const processor = await prisma.category.upsert({
+    where: { slug: 'processor' },
+    update: {},
+    create: {
+      name: 'Processor',
+      slug: 'processor',
+      description: 'CPUs and processors',
+      parentId: components.id,
+      level: 1,
+      order: 1,
+      isActive: true,
+    },
+  });
+
+  const graphicsCard = await prisma.category.upsert({
+    where: { slug: 'graphics-card' },
+    update: {},
+    create: {
+      name: 'Graphics Card',
+      slug: 'graphics-card',
+      description: 'GPUs and graphics cards',
+      parentId: components.id,
+      level: 1,
+      order: 2,
+      isActive: true,
+    },
+  });
+
+  const ssd = await prisma.category.upsert({
+    where: { slug: 'ssd' },
+    update: {},
+    create: {
+      name: 'SSD',
+      slug: 'ssd',
+      description: 'Solid State Drives',
+      parentId: components.id,
+      level: 1,
+      order: 3,
+      isActive: true,
+    },
+  });
+
+  const ram = await prisma.category.upsert({
+    where: { slug: 'ram' },
+    update: {},
+    create: {
+      name: 'RAM',
+      slug: 'ram',
+      description: 'Memory modules',
+      parentId: components.id,
+      level: 1,
+      order: 4,
+      isActive: true,
+    },
+  });
+
+  console.log('✅ Categories created');
+
+  // 4. Create Specification Definitions for Processor Category
+  console.log('Creating specification definitions...');
+  
+  const processorSpecs = await Promise.all([
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: processor.id, 
+          key: 'socket_type' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: processor.id,
+        name: 'Socket Type',
+        key: 'socket_type',
+        dataType: 'TEXT',
+        isFilterable: true,
+        isRequired: true,
+        order: 1,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: processor.id, 
+          key: 'core_count' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: processor.id,
+        name: 'Core Count',
+        key: 'core_count',
+        dataType: 'NUMBER',
+        unit: 'cores',
+        isFilterable: true,
+        isRequired: true,
+        order: 2,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: processor.id, 
+          key: 'thread_count' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: processor.id,
+        name: 'Thread Count',
+        key: 'thread_count',
+        dataType: 'NUMBER',
+        unit: 'threads',
+        isFilterable: false,
+        isRequired: true,
+        order: 3,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: processor.id, 
+          key: 'base_clock' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: processor.id,
+        name: 'Base Clock',
+        key: 'base_clock',
+        dataType: 'NUMBER',
+        unit: 'GHz',
+        isFilterable: false,
+        isRequired: true,
+        order: 4,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: processor.id, 
+          key: 'boost_clock' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: processor.id,
+        name: 'Boost Clock',
+        key: 'boost_clock',
+        dataType: 'NUMBER',
+        unit: 'GHz',
+        isFilterable: false,
+        isRequired: false,
+        order: 5,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: processor.id, 
+          key: 'cache' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: processor.id,
+        name: 'Cache',
+        key: 'cache',
+        dataType: 'NUMBER',
+        unit: 'MB',
+        isFilterable: true,
+        isRequired: true,
+        order: 6,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: processor.id, 
+          key: 'tdp' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: processor.id,
+        name: 'TDP',
+        key: 'tdp',
+        dataType: 'NUMBER',
+        unit: 'W',
+        isFilterable: false,
+        isRequired: true,
+        order: 7,
+      },
+    }),
+  ]);
+
+  console.log('✅ Specification definitions created:', processorSpecs.length);
+
+  // 5. Create Sample Products
+  console.log('Creating sample products...');
+
+  const intelBrand = brands.find(b => b.slug === 'intel')!;
+  const amdBrand = brands.find(b => b.slug === 'amd')!;
+
+  // Intel Core i5-12400F
+  const i5Product = await prisma.product.create({
+    data: {
+      name: 'Intel Core i5-12400F 6 Core 12 Thread 12th Gen Processor',
+      slug: 'intel-core-i5-12400f',
+      sku: 'PROC-INTEL-12400F',
+      description: 'The Intel Core i5-12400F Desktop Processor comes with 6 cores and 12 threads. It has an 18MB Intel Smart Cache and the total L2 Cache is 7.5MB. This processor comes with a maximum turbo frequency of 4.40 GHz, and the processor base frequency is 2.50 GHz. It supports up to DDR5 4800 MT/s and DDR4 3200 MT/s memory types with a maximum memory size of 128 GB.',
+      shortDescription: '6 Cores, 12 Threads, up to 4.4 GHz, LGA1700 Socket',
+      price: 24100,
+      compareAtPrice: 27390,
+      stockStatus: StockStatus.IN_STOCK,
+      stockQuantity: 50,
+      categoryId: processor.id,
+      brandId: intelBrand.id,
+      metaTitle: 'Intel Core i5-12400F Processor Price in Bangladesh',
+      metaDescription: 'Buy Intel Core i5-12400F 6 Core 12 Thread 12th Gen Processor at best price in Bangladesh. In stock and ready to ship.',
+      isFeatured: true,
+      isActive: true,
+      publishedAt: new Date(),
+      images: {
+        create: [
+          {
+            url: 'https://placehold.co/600x600/4169E1/FFFFFF/png?text=Intel+i5-12400F',
+            alt: 'Intel Core i5-12400F',
+            order: 0,
+            isPrimary: true,
+          },
+        ],
+      },
+      specifications: {
+        create: [
+          {
+            specificationDefinitionId: processorSpecs[0].id, // socket_type
+            value: 'LGA1700',
+          },
+          {
+            specificationDefinitionId: processorSpecs[1].id, // core_count
+            value: '6',
+          },
+          {
+            specificationDefinitionId: processorSpecs[2].id, // thread_count
+            value: '12',
+          },
+          {
+            specificationDefinitionId: processorSpecs[3].id, // base_clock
+            value: '2.5',
+          },
+          {
+            specificationDefinitionId: processorSpecs[4].id, // boost_clock
+            value: '4.4',
+          },
+          {
+            specificationDefinitionId: processorSpecs[5].id, // cache
+            value: '18',
+          },
+          {
+            specificationDefinitionId: processorSpecs[6].id, // tdp
+            value: '65',
+          },
+        ],
+      },
+    },
+  });
+
+  // AMD Ryzen 5 5600X
+  const ryzenProduct = await prisma.product.create({
+    data: {
+      name: 'AMD Ryzen 5 5600X 6 Core 12 Thread Desktop Processor',
+      slug: 'amd-ryzen-5-5600x',
+      sku: 'PROC-AMD-5600X',
+      description: 'AMD Ryzen 5 5600X Desktop Processor comes with 6 cores and 12 threads. This 5th Generation processor has a base clock speed of 3.7 GHz and a maximum boost clock of up to 4.6 GHz. It features 35MB of combined cache and supports DDR4 memory.',
+      shortDescription: '6 Cores, 12 Threads, up to 4.6 GHz, AM4 Socket',
+      price: 22500,
+      compareAtPrice: 25000,
+      stockStatus: StockStatus.IN_STOCK,
+      stockQuantity: 30,
+      categoryId: processor.id,
+      brandId: amdBrand.id,
+      metaTitle: 'AMD Ryzen 5 5600X Processor Price in Bangladesh',
+      metaDescription: 'Buy AMD Ryzen 5 5600X 6 Core 12 Thread Processor at best price in Bangladesh.',
+      isFeatured: true,
+      isActive: true,
+      publishedAt: new Date(),
+      images: {
+        create: [
+          {
+            url: 'https://placehold.co/600x600/FF6B00/FFFFFF/png?text=AMD+5600X',
+            alt: 'AMD Ryzen 5 5600X',
+            order: 0,
+            isPrimary: true,
+          },
+        ],
+      },
+      specifications: {
+        create: [
+          {
+            specificationDefinitionId: processorSpecs[0].id, // socket_type
+            value: 'AM4',
+          },
+          {
+            specificationDefinitionId: processorSpecs[1].id, // core_count
+            value: '6',
+          },
+          {
+            specificationDefinitionId: processorSpecs[2].id, // thread_count
+            value: '12',
+          },
+          {
+            specificationDefinitionId: processorSpecs[3].id, // base_clock
+            value: '3.7',
+          },
+          {
+            specificationDefinitionId: processorSpecs[4].id, // boost_clock
+            value: '4.6',
+          },
+          {
+            specificationDefinitionId: processorSpecs[5].id, // cache
+            value: '35',
+          },
+          {
+            specificationDefinitionId: processorSpecs[6].id, // tdp
+            value: '65',
+          },
+        ],
+      },
+    },
+  });
+
+  console.log('✅ Sample products created:', 2);
+
+  console.log('');
+  console.log('🎉 Database seeded successfully!');
+  console.log('');
+  console.log('📝 Admin Login Credentials:');
+  console.log('   Email:', admin.email);
+  console.log('   Password: admin123');
+  console.log('');
+  console.log('🔗 Next steps:');
+  console.log('   1. Start dev server: npm run dev');
+  console.log('   2. Visit: http://localhost:3000');
+  console.log('   3. Admin panel: http://localhost:3000/admin/login');
+}
+
+main()
+  .catch((e) => {
+    console.error('❌ Error seeding database:', e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

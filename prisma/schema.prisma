@@ -1,0 +1,272 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER & AUTHENTICATION
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String?   // hashed
+  role          UserRole  @default(USER)
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
+// ============================================
+// CATEGORY MANAGEMENT (Self-Referencing Tree)
+// ============================================
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  image       String?
+  parentId    String?
+  level       Int      @default(0) // 0=root, 1=sub, 2=sub-sub, etc.
+  order       Int      @default(0) // for sorting
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Self-referencing relation for category tree
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children Category[] @relation("CategoryTree")
+
+  // Products in this category
+  products Product[]
+
+  // Specification definitions specific to this category
+  specificationDefinitions SpecificationDefinition[]
+
+  @@index([parentId])
+  @@index([slug])
+  @@map("categories")
+}
+
+// ============================================
+// BRAND MANAGEMENT
+// ============================================
+
+model Brand {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  logo        String?
+  description String?  @db.Text
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+
+  @@index([slug])
+  @@map("brands")
+}
+
+// ============================================
+// PRODUCT MANAGEMENT
+// ============================================
+
+model Product {
+  id               String        @id @default(cuid())
+  name             String
+  slug             String        @unique
+  sku              String        @unique
+  description      String?       @db.Text
+  shortDescription String?       @db.Text
+  
+  // Pricing
+  price            Decimal       @db.Decimal(10, 2)
+  compareAtPrice   Decimal?      @db.Decimal(10, 2) // original price for discount display
+  costPrice        Decimal?      @db.Decimal(10, 2) // for profit calculation
+  
+  // Stock
+  stockStatus      StockStatus   @default(IN_STOCK)
+  stockQuantity    Int           @default(0)
+  lowStockAlert    Int           @default(5)
+  
+  // Relations
+  categoryId       String
+  brandId          String
+  
+  // SEO
+  metaTitle        String?
+  metaDescription  String?
+  metaKeywords     String?
+  
+  // Features
+  isFeatured       Boolean       @default(false)
+  isActive         Boolean       @default(true)
+  
+  // Timestamps
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  publishedAt      DateTime?
+
+  category         Category      @relation(fields: [categoryId], references: [id])
+  brand            Brand         @relation(fields: [brandId], references: [id])
+  
+  images           ProductImage[]
+  specifications   ProductSpecification[]
+
+  @@index([slug])
+  @@index([sku])
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([stockStatus])
+  @@index([price])
+  @@map("products")
+}
+
+enum StockStatus {
+  IN_STOCK
+  OUT_OF_STOCK
+  PRE_ORDER
+  UPCOMING
+  DISCONTINUED
+}
+
+// ============================================
+// PRODUCT IMAGES
+// ============================================
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  url       String
+  alt       String?
+  order     Int      @default(0)
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_images")
+}
+
+// ============================================
+// DYNAMIC SPECIFICATIONS SYSTEM
+// ============================================
+
+// Defines what specifications are available for a category
+// Example: "Processor" category has specs like "Socket", "Cores", "Threads", "Base Clock"
+model SpecificationDefinition {
+  id          String   @id @default(cuid())
+  categoryId  String
+  name        String   // e.g., "Socket Type"
+  key         String   // e.g., "socket_type" (used as identifier)
+  dataType    DataType @default(TEXT)
+  unit        String?  // e.g., "GHz", "MB", "W"
+  isFilterable Boolean @default(false) // Can this be used as a filter?
+  isRequired  Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category              Category               @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  productSpecifications ProductSpecification[]
+
+  @@unique([categoryId, key])
+  @@index([categoryId])
+  @@map("specification_definitions")
+}
+
+enum DataType {
+  TEXT
+  NUMBER
+  BOOLEAN
+  SELECT
+}
+
+// Stores actual specification values for each product
+model ProductSpecification {
+  id                          String                  @id @default(cuid())
+  productId                   String
+  specificationDefinitionId   String
+  value                       String // Stored as string, parsed based on dataType
+  createdAt                   DateTime                @default(now())
+  updatedAt                   DateTime                @updatedAt
+
+  product                   Product                 @relation(fields: [productId], references: [id], onDelete: Cascade)
+  specificationDefinition   SpecificationDefinition @relation(fields: [specificationDefinitionId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, specificationDefinitionId])
+  @@index([productId])
+  @@index([specificationDefinitionId])
+  @@map("product_specifications")
+}
+
+// ============================================
+// OPTIONAL: For better filter performance
+// ============================================
+
+// Pre-computed filterable values for faster queries
+model FilterableSpecification {
+  id       String @id @default(cuid())
+  key      String // e.g., "brand", "socket_type", "core_count"
+  value    String // e.g., "Intel", "LGA1700", "8"
+  count    Int    @default(0) // Number of products with this value
+  categoryId String?
+
+  @@unique([key, value, categoryId])
+  @@index([key])
+  @@index([categoryId])
+  @@map("filterable_specifications")
+}
