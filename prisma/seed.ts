@@ -3,8 +3,21 @@ import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
+// Helper to ensure connection
+async function ensureConnection() {
+  try {
+    await prisma.$connect();
+    console.log('✅ Database connected');
+  } catch (error) {
+    console.error('❌ Database connection failed:', error);
+    throw error;
+  }
+}
+
 async function main() {
   console.log('🌱 Starting database seed...');
+  
+  await ensureConnection();
 
   // 1. Create Admin User
   console.log('Creating admin user...');
@@ -319,7 +332,188 @@ async function main() {
     }),
   ]);
 
-  console.log('✅ Specification definitions created:', processorSpecs.length);
+  console.log('✅ Processor specification definitions created:', processorSpecs.length);
+
+  // Create Specification Definitions for Graphics Card Category
+  const gpuSpecs = await Promise.all([
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: graphicsCard.id, 
+          key: 'gpu_chipset' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: graphicsCard.id,
+        name: 'GPU Chipset',
+        key: 'gpu_chipset',
+        dataType: 'TEXT',
+        isFilterable: true,
+        isRequired: true,
+        order: 1,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: graphicsCard.id, 
+          key: 'memory_size' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: graphicsCard.id,
+        name: 'Memory Size',
+        key: 'memory_size',
+        dataType: 'NUMBER',
+        unit: 'GB',
+        isFilterable: true,
+        isRequired: true,
+        order: 2,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: graphicsCard.id, 
+          key: 'memory_type' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: graphicsCard.id,
+        name: 'Memory Type',
+        key: 'memory_type',
+        dataType: 'TEXT',
+        isFilterable: true,
+        isRequired: true,
+        order: 3,
+      },
+    }),
+  ]);
+
+  // Create Specification Definitions for SSD Category
+  const ssdSpecs = await Promise.all([
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: ssd.id, 
+          key: 'capacity' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: ssd.id,
+        name: 'Capacity',
+        key: 'capacity',
+        dataType: 'NUMBER',
+        unit: 'GB',
+        isFilterable: true,
+        isRequired: true,
+        order: 1,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: ssd.id, 
+          key: 'interface' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: ssd.id,
+        name: 'Interface',
+        key: 'interface',
+        dataType: 'TEXT',
+        isFilterable: true,
+        isRequired: true,
+        order: 2,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: ssd.id, 
+          key: 'read_speed' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: ssd.id,
+        name: 'Read Speed',
+        key: 'read_speed',
+        dataType: 'NUMBER',
+        unit: 'MB/s',
+        isFilterable: false,
+        isRequired: false,
+        order: 3,
+      },
+    }),
+  ]);
+
+  // Create Specification Definitions for RAM Category
+  const ramSpecs = await Promise.all([
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: ram.id, 
+          key: 'capacity' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: ram.id,
+        name: 'Capacity',
+        key: 'capacity',
+        dataType: 'NUMBER',
+        unit: 'GB',
+        isFilterable: true,
+        isRequired: true,
+        order: 1,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: ram.id, 
+          key: 'memory_type' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: ram.id,
+        name: 'Memory Type',
+        key: 'memory_type',
+        dataType: 'TEXT',
+        isFilterable: true,
+        isRequired: true,
+        order: 2,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: ram.id, 
+          key: 'speed' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: ram.id,
+        name: 'Speed',
+        key: 'speed',
+        dataType: 'NUMBER',
+        unit: 'MHz',
+        isFilterable: true,
+        isRequired: true,
+        order: 3,
+      },
+    }),
+  ]);
+
+  console.log('✅ All specification definitions created');
 
   // 5. Create Sample Products
   console.log('Creating sample products...');

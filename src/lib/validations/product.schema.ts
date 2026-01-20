@@ -16,7 +16,7 @@ export const productSpecificationSchema = z.object({
 });
 
 // Create Product Schema
-export const createProductSchema = z.object({
+const baseProductSchema = z.object({
   name: z.string().min(3, 'Product name must be at least 3 characters').max(255),
   slug: z
     .string()
@@ -57,7 +57,9 @@ export const createProductSchema = z.object({
   // Nested
   images: z.array(productImageSchema).min(1, 'At least one image is required'),
   specifications: z.array(productSpecificationSchema).optional(),
-}).refine(
+});
+
+export const createProductSchema = baseProductSchema.refine(
   (data) => {
     // If compareAtPrice is provided, it must be greater than price
     if (data.compareAtPrice && data.compareAtPrice <= data.price) {
@@ -72,7 +74,7 @@ export const createProductSchema = z.object({
 );
 
 // Update Product Schema (all fields optional)
-export const updateProductSchema = createProductSchema.partial();
+export const updateProductSchema = baseProductSchema.partial();
 
 // Product Filter Schema
 export const productFilterSchema = z.object({
