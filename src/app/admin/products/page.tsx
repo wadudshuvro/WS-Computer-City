@@ -37,6 +37,29 @@ export default function AdminProductsPage() {
     }
   };
 
+  const handleDelete = async (productId: string) => {
+    if (!confirm('Are you sure you want to delete this product?')) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/admin/products/${productId}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to delete product');
+      }
+
+      // Remove from local state
+      setProducts(products.filter(p => p.id !== productId));
+      alert('Product deleted successfully');
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      alert('Failed to delete product');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
@@ -98,7 +121,7 @@ export default function AdminProductsPage() {
                     Stock
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                    Actions
                   </th>
                 </tr>
               </thead>
@@ -150,11 +173,22 @@ export default function AdminProductsPage() {
                       <Link
                         href={`/products/${product.slug}`}
                         className="text-blue-600 hover:text-blue-900 mr-3"
+                        target="_blank"
                       >
                         View
                       </Link>
                       <span className="text-gray-300">|</span>
-                      <button className="text-red-600 hover:text-red-900 ml-3">
+                      <Link
+                        href={`/admin/products/${product.id}/edit`}
+                        className="text-green-600 hover:text-green-900 mx-3"
+                      >
+                        Edit
+                      </Link>
+                      <span className="text-gray-300">|</span>
+                      <button 
+                        onClick={() => handleDelete(product.id)}
+                        className="text-red-600 hover:text-red-900 ml-3"
+                      >
                         Delete
                       </button>
                     </td>

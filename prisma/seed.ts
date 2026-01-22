@@ -150,6 +150,36 @@ async function main() {
     },
   });
 
+  // Intel Sub-category under Processor
+  const intelProcessor = await prisma.category.upsert({
+    where: { slug: 'intel' },
+    update: {},
+    create: {
+      name: 'Intel',
+      slug: 'intel',
+      description: 'Intel Processors',
+      parentId: processor.id,
+      level: 2,
+      order: 1,
+      isActive: true,
+    },
+  });
+
+  // AMD Sub-category under Processor
+  const amdProcessor = await prisma.category.upsert({
+    where: { slug: 'amd' },
+    update: {},
+    create: {
+      name: 'AMD',
+      slug: 'amd',
+      description: 'AMD Processors',
+      parentId: processor.id,
+      level: 2,
+      order: 2,
+      isActive: true,
+    },
+  });
+
   const graphicsCard = await prisma.category.upsert({
     where: { slug: 'graphics-card' },
     update: {},
@@ -194,20 +224,20 @@ async function main() {
 
   console.log('✅ Categories created');
 
-  // 4. Create Specification Definitions for Processor Category
+  // 4. Create Specification Definitions for Intel Processor Sub-Category
   console.log('Creating specification definitions...');
   
-  const processorSpecs = await Promise.all([
+  const intelProcessorSpecs = await Promise.all([
     prisma.specificationDefinition.upsert({
       where: { 
         categoryId_key: { 
-          categoryId: processor.id, 
+          categoryId: intelProcessor.id, 
           key: 'socket_type' 
         } 
       },
       update: {},
       create: {
-        categoryId: processor.id,
+        categoryId: intelProcessor.id,
         name: 'Socket Type',
         key: 'socket_type',
         dataType: 'TEXT',
@@ -219,13 +249,13 @@ async function main() {
     prisma.specificationDefinition.upsert({
       where: { 
         categoryId_key: { 
-          categoryId: processor.id, 
+          categoryId: intelProcessor.id, 
           key: 'core_count' 
         } 
       },
       update: {},
       create: {
-        categoryId: processor.id,
+        categoryId: intelProcessor.id,
         name: 'Core Count',
         key: 'core_count',
         dataType: 'NUMBER',
@@ -238,13 +268,13 @@ async function main() {
     prisma.specificationDefinition.upsert({
       where: { 
         categoryId_key: { 
-          categoryId: processor.id, 
+          categoryId: intelProcessor.id, 
           key: 'thread_count' 
         } 
       },
       update: {},
       create: {
-        categoryId: processor.id,
+        categoryId: intelProcessor.id,
         name: 'Thread Count',
         key: 'thread_count',
         dataType: 'NUMBER',
@@ -257,13 +287,13 @@ async function main() {
     prisma.specificationDefinition.upsert({
       where: { 
         categoryId_key: { 
-          categoryId: processor.id, 
+          categoryId: intelProcessor.id, 
           key: 'base_clock' 
         } 
       },
       update: {},
       create: {
-        categoryId: processor.id,
+        categoryId: intelProcessor.id,
         name: 'Base Clock',
         key: 'base_clock',
         dataType: 'NUMBER',
@@ -276,13 +306,13 @@ async function main() {
     prisma.specificationDefinition.upsert({
       where: { 
         categoryId_key: { 
-          categoryId: processor.id, 
+          categoryId: intelProcessor.id, 
           key: 'boost_clock' 
         } 
       },
       update: {},
       create: {
-        categoryId: processor.id,
+        categoryId: intelProcessor.id,
         name: 'Boost Clock',
         key: 'boost_clock',
         dataType: 'NUMBER',
@@ -295,13 +325,13 @@ async function main() {
     prisma.specificationDefinition.upsert({
       where: { 
         categoryId_key: { 
-          categoryId: processor.id, 
+          categoryId: intelProcessor.id, 
           key: 'cache' 
         } 
       },
       update: {},
       create: {
-        categoryId: processor.id,
+        categoryId: intelProcessor.id,
         name: 'Cache',
         key: 'cache',
         dataType: 'NUMBER',
@@ -314,13 +344,149 @@ async function main() {
     prisma.specificationDefinition.upsert({
       where: { 
         categoryId_key: { 
-          categoryId: processor.id, 
+          categoryId: intelProcessor.id, 
           key: 'tdp' 
         } 
       },
       update: {},
       create: {
-        categoryId: processor.id,
+        categoryId: intelProcessor.id,
+        name: 'TDP',
+        key: 'tdp',
+        dataType: 'NUMBER',
+        unit: 'W',
+        isFilterable: false,
+        isRequired: true,
+        order: 7,
+      },
+    }),
+  ]);
+  
+  // Create Specification Definitions for AMD Processor Sub-Category
+  const amdProcessorSpecs = await Promise.all([
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: amdProcessor.id, 
+          key: 'socket_type' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: amdProcessor.id,
+        name: 'Socket Type',
+        key: 'socket_type',
+        dataType: 'TEXT',
+        isFilterable: true,
+        isRequired: true,
+        order: 1,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: amdProcessor.id, 
+          key: 'core_count' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: amdProcessor.id,
+        name: 'Core Count',
+        key: 'core_count',
+        dataType: 'NUMBER',
+        unit: 'cores',
+        isFilterable: true,
+        isRequired: true,
+        order: 2,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: amdProcessor.id, 
+          key: 'thread_count' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: amdProcessor.id,
+        name: 'Thread Count',
+        key: 'thread_count',
+        dataType: 'NUMBER',
+        unit: 'threads',
+        isFilterable: false,
+        isRequired: true,
+        order: 3,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: amdProcessor.id, 
+          key: 'base_clock' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: amdProcessor.id,
+        name: 'Base Clock',
+        key: 'base_clock',
+        dataType: 'NUMBER',
+        unit: 'GHz',
+        isFilterable: false,
+        isRequired: true,
+        order: 4,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: amdProcessor.id, 
+          key: 'boost_clock' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: amdProcessor.id,
+        name: 'Boost Clock',
+        key: 'boost_clock',
+        dataType: 'NUMBER',
+        unit: 'GHz',
+        isFilterable: false,
+        isRequired: false,
+        order: 5,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: amdProcessor.id, 
+          key: 'cache' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: amdProcessor.id,
+        name: 'Cache',
+        key: 'cache',
+        dataType: 'NUMBER',
+        unit: 'MB',
+        isFilterable: true,
+        isRequired: true,
+        order: 6,
+      },
+    }),
+    prisma.specificationDefinition.upsert({
+      where: { 
+        categoryId_key: { 
+          categoryId: amdProcessor.id, 
+          key: 'tdp' 
+        } 
+      },
+      update: {},
+      create: {
+        categoryId: amdProcessor.id,
         name: 'TDP',
         key: 'tdp',
         dataType: 'NUMBER',
@@ -332,7 +498,8 @@ async function main() {
     }),
   ]);
 
-  console.log('✅ Processor specification definitions created:', processorSpecs.length);
+  console.log('✅ Intel processor specification definitions created:', intelProcessorSpecs.length);
+  console.log('✅ AMD processor specification definitions created:', amdProcessorSpecs.length);
 
   // Create Specification Definitions for Graphics Card Category
   const gpuSpecs = await Promise.all([
@@ -533,7 +700,7 @@ async function main() {
       compareAtPrice: 27390,
       stockStatus: StockStatus.IN_STOCK,
       stockQuantity: 50,
-      categoryId: processor.id,
+      categoryId: intelProcessor.id, // Use Intel sub-category
       brandId: intelBrand.id,
       metaTitle: 'Intel Core i5-12400F Processor Price in Bangladesh',
       metaDescription: 'Buy Intel Core i5-12400F 6 Core 12 Thread 12th Gen Processor at best price in Bangladesh. In stock and ready to ship.',
@@ -553,31 +720,31 @@ async function main() {
       specifications: {
         create: [
           {
-            specificationDefinitionId: processorSpecs[0].id, // socket_type
+            specificationDefinitionId: intelProcessorSpecs[0].id, // socket_type
             value: 'LGA1700',
           },
           {
-            specificationDefinitionId: processorSpecs[1].id, // core_count
+            specificationDefinitionId: intelProcessorSpecs[1].id, // core_count
             value: '6',
           },
           {
-            specificationDefinitionId: processorSpecs[2].id, // thread_count
+            specificationDefinitionId: intelProcessorSpecs[2].id, // thread_count
             value: '12',
           },
           {
-            specificationDefinitionId: processorSpecs[3].id, // base_clock
+            specificationDefinitionId: intelProcessorSpecs[3].id, // base_clock
             value: '2.5',
           },
           {
-            specificationDefinitionId: processorSpecs[4].id, // boost_clock
+            specificationDefinitionId: intelProcessorSpecs[4].id, // boost_clock
             value: '4.4',
           },
           {
-            specificationDefinitionId: processorSpecs[5].id, // cache
+            specificationDefinitionId: intelProcessorSpecs[5].id, // cache
             value: '18',
           },
           {
-            specificationDefinitionId: processorSpecs[6].id, // tdp
+            specificationDefinitionId: intelProcessorSpecs[6].id, // tdp
             value: '65',
           },
         ],
@@ -597,7 +764,7 @@ async function main() {
       compareAtPrice: 25000,
       stockStatus: StockStatus.IN_STOCK,
       stockQuantity: 30,
-      categoryId: processor.id,
+      categoryId: amdProcessor.id, // Use AMD sub-category
       brandId: amdBrand.id,
       metaTitle: 'AMD Ryzen 5 5600X Processor Price in Bangladesh',
       metaDescription: 'Buy AMD Ryzen 5 5600X 6 Core 12 Thread Processor at best price in Bangladesh.',
@@ -617,31 +784,31 @@ async function main() {
       specifications: {
         create: [
           {
-            specificationDefinitionId: processorSpecs[0].id, // socket_type
+            specificationDefinitionId: amdProcessorSpecs[0].id, // socket_type
             value: 'AM4',
           },
           {
-            specificationDefinitionId: processorSpecs[1].id, // core_count
+            specificationDefinitionId: amdProcessorSpecs[1].id, // core_count
             value: '6',
           },
           {
-            specificationDefinitionId: processorSpecs[2].id, // thread_count
+            specificationDefinitionId: amdProcessorSpecs[2].id, // thread_count
             value: '12',
           },
           {
-            specificationDefinitionId: processorSpecs[3].id, // base_clock
+            specificationDefinitionId: amdProcessorSpecs[3].id, // base_clock
             value: '3.7',
           },
           {
-            specificationDefinitionId: processorSpecs[4].id, // boost_clock
+            specificationDefinitionId: amdProcessorSpecs[4].id, // boost_clock
             value: '4.6',
           },
           {
-            specificationDefinitionId: processorSpecs[5].id, // cache
+            specificationDefinitionId: amdProcessorSpecs[5].id, // cache
             value: '35',
           },
           {
-            specificationDefinitionId: processorSpecs[6].id, // tdp
+            specificationDefinitionId: amdProcessorSpecs[6].id, // tdp
             value: '65',
           },
         ],

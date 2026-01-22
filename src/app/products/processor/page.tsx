@@ -3,9 +3,11 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Grid, List, ChevronRight, SlidersHorizontal, X, Heart, ShoppingCart, Eye } from 'lucide-react';
 import { ProcessorFilters } from '@/components/products/ProcessorFilters';
 import { processorSortOptions } from '@/lib/filterConfig';
+import { formatBDT } from '@/lib/utils';
 
 interface Product {
   id: string;
@@ -28,6 +30,13 @@ interface Product {
     alt?: string;
     isPrimary: boolean;
   }>;
+  specifications?: Array<{
+    specificationDefinition: {
+      key: string;
+      name: string;
+    };
+    value: string;
+  }>;
 }
 
 interface FilterCounts {
@@ -36,7 +45,7 @@ interface FilterCounts {
   };
 }
 
-function ProductsPageContent() {
+function ProcessorPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -50,15 +59,10 @@ function ProductsPageContent() {
   const [filterCounts, setFilterCounts] = useState<FilterCounts>({});
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 });
 
-  // Get current page, sort, and category from URL
+  // Get current page and sort from URL
   const currentPage = Number(searchParams.get('page')) || 1;
   const currentSort = searchParams.get('sort') || 'default';
-  const categoryParam = searchParams.get('category');
-  const subCategory = searchParams.get('sub');
   const itemsPerPage = 30;
-
-  // Check if we're on processor category
-  const isProcessorCategory = subCategory === 'processor' || categoryParam === 'processor';
 
   useEffect(() => {
     fetchProducts();
@@ -70,17 +74,13 @@ function ProductsPageContent() {
       
       // Build query string from URL params
       const params = new URLSearchParams(searchParams.toString());
+      params.set('category', 'processor');
       
       if (!params.has('limit')) {
         params.set('limit', itemsPerPage.toString());
       }
 
-      // Use processor-specific API if on processor category
-      const apiUrl = isProcessorCategory 
-        ? `/api/products/processor?${params.toString()}`
-        : `/api/admin/products?${params.toString()}`;
-
-      const res = await fetch(apiUrl);
+      const res = await fetch(`/api/products/processor?${params.toString()}`);
       
       if (!res.ok) {
         throw new Error('Failed to fetch products');
@@ -88,7 +88,7 @@ function ProductsPageContent() {
       
       const data = await res.json();
       setProducts(data.data || []);
-      setTotalProducts(data.pagination?.total || data.data?.length || 0);
+      setTotalProducts(data.pagination?.total || 0);
       setTotalPages(data.pagination?.pages || 1);
       
       if (data.filters) {
@@ -107,13 +107,13 @@ function ProductsPageContent() {
     const params = new URLSearchParams(searchParams.toString());
     params.set('sort', sort);
     params.set('page', '1');
-    router.push(`/products?${params.toString()}`);
+    router.push(`/products/processor?${params.toString()}`);
   };
 
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', page.toString());
-    router.push(`/products?${params.toString()}`);
+    router.push(`/products/processor?${params.toString()}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -157,12 +157,6 @@ function ProductsPageContent() {
     return pages;
   };
 
-  // Get page title based on category
-  const getPageTitle = () => {
-    if (isProcessorCategory) return 'Processor Price In BD 2026';
-    return 'All Products';
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Breadcrumb */}
@@ -173,17 +167,11 @@ function ProductsPageContent() {
               Home
             </Link>
             <ChevronRight className="w-4 h-4 text-gray-400" />
-            {categoryParam && (
-              <>
-                <Link href="/products" className="text-gray-500 hover:text-blue-600">
-                  {categoryParam === 'components' ? 'Components' : categoryParam}
-                </Link>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-              </>
-            )}
-            <span className="text-gray-900 font-medium">
-              {isProcessorCategory ? 'Processor' : 'Products'}
-            </span>
+            <Link href="/products" className="text-gray-500 hover:text-blue-600">
+              Components
+            </Link>
+            <ChevronRight className="w-4 h-4 text-gray-400" />
+            <span className="text-gray-900 font-medium">Processor</span>
           </nav>
         </div>
       </div>
@@ -192,56 +180,48 @@ function ProductsPageContent() {
       <div className="bg-white border-b">
         <div className="max-w-[1400px] mx-auto px-4 py-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            {getPageTitle()}
+            Processor Price In BD 2026
           </h1>
-          {isProcessorCategory && (
-            <>
-              <p className="text-sm text-gray-600 max-w-4xl">
-                Processor Price in BD 2026 begins at BDT 5,600/- and can go up to BDT 85,500/- depending on the brand and specifications. 
-                With a variety of 135 items available at WS Computer City, where 97 items are in stock now & 135 items offer you the best 
-                discount price in BD. Find the perfect Processor Components for your requirements.
-              </p>
-              
-              {/* Sub-category tabs */}
-              <div className="flex gap-4 mt-4">
-                <button className="px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600">
-                  Intel
-                </button>
-                <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
-                  AMD Ryzen
-                </button>
-              </div>
-            </>
-          )}
+          <p className="text-sm text-gray-600 max-w-4xl">
+            Processor Price in BD 2026 begins at BDT 5,600/- and can go up to BDT 85,500/- depending on the brand and specifications. 
+            With a variety of 135 items available at WS Computer City, where 97 items are in stock now & 135 items offer you the best 
+            discount price in BD. Find the perfect Processor Components for your requirements.
+          </p>
+          
+          {/* Sub-category tabs */}
+          <div className="flex gap-4 mt-4">
+            <button className="px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600">
+              Intel
+            </button>
+            <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+              AMD Ryzen
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="max-w-[1400px] mx-auto px-4 py-6">
         <div className="flex gap-6">
-          {/* Sidebar Filters - Desktop (Only for processor category) */}
-          {isProcessorCategory && (
-            <div className="hidden lg:block w-[280px] flex-shrink-0">
-              <ProcessorFilters
-                priceRange={priceRange}
-                filterCounts={filterCounts}
-              />
-            </div>
-          )}
+          {/* Sidebar Filters - Desktop */}
+          <div className="hidden lg:block w-[280px] flex-shrink-0">
+            <ProcessorFilters
+              priceRange={priceRange}
+              filterCounts={filterCounts}
+            />
+          </div>
 
-          {/* Mobile Filter Button (Only for processor category) */}
-          {isProcessorCategory && (
-            <button
-              onClick={() => setShowMobileFilters(true)}
-              className="lg:hidden fixed bottom-4 left-4 z-40 bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2"
-            >
-              <SlidersHorizontal className="w-5 h-5" />
-              Filters
-            </button>
-          )}
+          {/* Mobile Filter Button */}
+          <button
+            onClick={() => setShowMobileFilters(true)}
+            className="lg:hidden fixed bottom-4 left-4 z-40 bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2"
+          >
+            <SlidersHorizontal className="w-5 h-5" />
+            Filters
+          </button>
 
           {/* Mobile Filters Overlay */}
-          {isProcessorCategory && showMobileFilters && (
+          {showMobileFilters && (
             <div className="lg:hidden fixed inset-0 z-50 bg-black/50">
               <div className="absolute right-0 top-0 bottom-0 w-[320px] bg-white overflow-y-auto">
                 <div className="flex items-center justify-between p-4 border-b">
@@ -268,21 +248,19 @@ function ProductsPageContent() {
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   {/* Sort Dropdown */}
-                  {isProcessorCategory && (
-                    <div className="flex items-center gap-2">
-                      <select
-                        value={currentSort}
-                        onChange={(e) => handleSortChange(e.target.value)}
-                        className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        {processorSortOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={currentSort}
+                      onChange={(e) => handleSortChange(e.target.value)}
+                      className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      {processorSortOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   
                   {/* Items per page */}
                   <div className="flex items-center gap-2">
@@ -326,7 +304,7 @@ function ProductsPageContent() {
             {loading && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
                 <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading products...</p>
+                <p className="text-gray-600">Loading processors...</p>
               </div>
             )}
 
@@ -345,7 +323,7 @@ function ProductsPageContent() {
                   Try adjusting your filters or search criteria.
                 </p>
                 <Link
-                  href="/products"
+                  href="/products/processor"
                   className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
                 >
                   Clear Filters
@@ -362,7 +340,7 @@ function ProductsPageContent() {
                     : 'grid-cols-1'
                 }`}>
                   {products.map((product) => {
-                    const primaryImage = product.images?.find(img => img.isPrimary) || product.images?.[0];
+                    const primaryImage = product.images.find(img => img.isPrimary) || product.images[0];
                     const discount = product.compareAtPrice
                       ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
                       : 0;
@@ -372,7 +350,7 @@ function ProductsPageContent() {
                       // Grid View Card
                       <div
                         key={product.id}
-                        className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow group relative"
+                        className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow group"
                       >
                         {/* Discount Badge */}
                         {discount > 0 && (
@@ -568,52 +546,52 @@ function ProductsPageContent() {
         </div>
       </div>
 
-      {/* SEO Content Section (Only for processor category) */}
-      {isProcessorCategory && (
-        <div className="bg-white border-t mt-8">
-          <div className="max-w-[1400px] mx-auto px-4 py-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
-              Processor Price in Bangladesh
-            </h2>
-            <div className="prose prose-sm max-w-none text-gray-600">
-              <p>
-                A processor, also known as a microprocessor, is a small chip that acts as the brain of a computer and other electronic devices. 
-                The central processor of a computer is called the CPU (Central Processing Unit), and most desktop CPUs are developed by Intel or AMD. 
-                Modern processors include multiple cores that work together to execute instructions efficiently and improve multitasking performance.
-                When upgrading or building a new computer, checking local pricing is important, such as the processor price in BD, to understand 
-                the cost of modern and efficient hardware. WS Computer City BD offers a wide selection of Intel processors in Bangladesh, 
-                including Core i3, Core i5, Core i7, and Core i9 models.
-              </p>
-              
-              <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">Intel Processor</h3>
-              <p>
-                Intel Corporation develops Intel processors, which serve as central processing units (CPUs) in laptops, desktops, and servers. 
-                These processors deliver strong performance and reliable operation. Intel organizes them into families such as Core™ (i3, i5, i7, i9) 
-                for everyday and high-end use, Xeon™ for servers, and Pentium®, Celeron®, and Atom™ for basic computing tasks.
-              </p>
-              
-              <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">AMD Processor</h3>
-              <p>
-                AMD (Advanced Micro Devices) processors offer excellent performance and value for gaming, content creation, and professional workloads. 
-                The Ryzen series, including Ryzen 3, Ryzen 5, Ryzen 7, and Ryzen 9, provides options for every user from budget-conscious buyers to 
-                enthusiasts seeking top-tier performance.
-              </p>
-            </div>
+      {/* SEO Content Section */}
+      <div className="bg-white border-t mt-8">
+        <div className="max-w-[1400px] mx-auto px-4 py-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            Processor Price in Bangladesh
+          </h2>
+          <div className="prose prose-sm max-w-none text-gray-600">
+            <p>
+              A processor, also known as a microprocessor, is a small chip that acts as the brain of a computer and other electronic devices. 
+              The central processor of a computer is called the CPU (Central Processing Unit), and most desktop CPUs are developed by Intel or AMD. 
+              Modern processors include multiple cores that work together to execute instructions efficiently and improve multitasking performance.
+              When upgrading or building a new computer, checking local pricing is important, such as the processor price in BD, to understand 
+              the cost of modern and efficient hardware. WS Computer City BD offers a wide selection of Intel processors in Bangladesh, 
+              including Core i3, Core i5, Core i7, and Core i9 models.
+            </p>
+            
+            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">Intel Processor</h3>
+            <p>
+              Intel Corporation develops Intel processors, which serve as central processing units (CPUs) in laptops, desktops, and servers. 
+              These processors deliver strong performance and reliable operation. Intel organizes them into families such as Core™ (i3, i5, i7, i9) 
+              for everyday and high-end use, Xeon™ for servers, and Pentium®, Celeron®, and Atom™ for basic computing tasks. Intel processors 
+              include technologies like Turbo Boost, Hyper-Threading, and integrated graphics to improve multitasking and overall efficiency.
+            </p>
+            
+            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">AMD Processor</h3>
+            <p>
+              AMD (Advanced Micro Devices) processors offer excellent performance and value for gaming, content creation, and professional workloads. 
+              The Ryzen series, including Ryzen 3, Ryzen 5, Ryzen 7, and Ryzen 9, provides options for every user from budget-conscious buyers to 
+              enthusiasts seeking top-tier performance. AMD's innovative technologies like Precision Boost, 3D V-Cache, and excellent multi-threaded 
+              performance make them a popular choice among PC builders.
+            </p>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
 
-export default function ProductsPage() {
+export default function ProcessorPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div>
       </div>
     }>
-      <ProductsPageContent />
+      <ProcessorPageContent />
     </Suspense>
   );
 }

@@ -40,54 +40,174 @@ interface ProductImage {
   isPrimary: boolean;
 }
 
-export default function ProductEntryForm() {
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  sku: string;
+  description: string | null;
+  shortDescription: string | null;
+  price: number;
+  compareAtPrice: number | null;
+  costPrice: number | null;
+  stockStatus: string;
+  stockQuantity: number;
+  lowStockAlert: number;
+  categoryId: string;
+  brandId: string;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  metaKeywords: string | null;
+  isFeatured: boolean;
+  isActive: boolean;
+  category: {
+    id: string;
+    name: string;
+    slug: string;
+    parentId: string | null;
+    parent?: {
+      id: string;
+      name: string;
+      slug: string;
+    };
+  };
+  brand: {
+    id: string;
+    name: string;
+    slug: string;
+  };
+  images: Array<{
+    id: string;
+    url: string;
+    alt: string | null;
+    order: number;
+    isPrimary: boolean;
+  }>;
+  specifications: Array<{
+    id: string;
+    value: string;
+    specificationDefinition: {
+      id: string;
+      key: string;
+      name: string;
+      dataType: string;
+      unit: string | null;
+    };
+  }>;
+}
+
+interface ProductEditFormProps {
+  product: Product;
+}
+
+export default function ProductEditForm({ product }: ProductEditFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [specDefinitions, setSpecDefinitions] = useState<SpecDefinition[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [dbError, setDbError] = useState<string>('');
   const [dataLoading, setDataLoading] = useState(true);
 
+  // Determine main category from product's category
+  const determineMainCategory = () => {
+    const categorySlug = product.category.slug;
+    const parentSlug = product.category.parent?.slug;
+    
+    // Check if the category itself is a main category
+    if (categoryHierarchy[categorySlug]) {
+      return categorySlug;
+    }
+    
+    // Check if parent is a main category
+    if (parentSlug && categoryHierarchy[parentSlug]) {
+      return parentSlug;
+    }
+    
+    // Try to match by name
+    for (const [key, value] of Object.entries(categoryHierarchy)) {
+      if (value.subCategories.some(sub => sub.slug === categorySlug || sub.id === categorySlug)) {
+        return key;
+      }
+    }
+    
+    return '';
+  };
+
+  const determineSubCategory = (mainCat: string) => {
+    if (!mainCat || !categoryHierarchy[mainCat]) return '';
+    
+    const categorySlug = product.category.slug;
+    const subCats = categoryHierarchy[mainCat].subCategories;
+    
+    const match = subCats.find(sub => 
+      sub.slug === categorySlug || 
+      sub.id === categorySlug ||
+      product.category.name.toLowerCase().includes(sub.name.toLowerCase())
+    );
+    
+    return match?.id || '';
+  };
+
   // Category selection state
-  const [selectedMainCategory, setSelectedMainCategory] = useState<string>('');
+  const [selectedMainCategory, setSelectedMainCategory] = useState<string>(determineMainCategory());
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>('');
 
-  // Form state
+  // Form state - initialized with product data
   const [formData, setFormData] = useState({
-    // Basic Information
-    name: '',
-    slug: '',
-    sku: '',
-    shortDescription: '',
-    description: '',
-    
-    // Pricing & Stock
-    price: '',
-    compareAtPrice: '',
-    costPrice: '',
-    stockStatus: 'IN_STOCK',
-    stockQuantity: '0',
-    lowStockAlert: '5',
-    
-    // Relations
-    categoryId: '',
-    brandId: '',
-    
-    // SEO
-    metaTitle: '',
-    metaDescription: '',
-    metaKeywords: '',
-    
-    // Visibility
-    isFeatured: false,
-    isActive: true,
+    name: product.name,
+    slug: product.slug,
+    sku: product.sku,
+    shortDescription: product.shortDescription || '',
+    description: product.description || '',
+    price: product.price.toString(),
+    compareAtPrice: product.compareAtPrice?.toString() || '',
+    costPrice: product.costPrice?.toString() || '',
+    stockStatus: product.stockStatus,
+    stockQuantity: product.stockQuantity.toString(),
+    lowStockAlert: product.lowStockAlert.toString(),
+    categoryId: product.categoryId,
+    brandId: product.brandId,
+    metaTitle: product.metaTitle || '',
+    metaDescription: product.metaDescription || '',
+    metaKeywords: product.metaKeywords || '',
+    isFeatured: product.isFeatured,
+    isActive: product.isActive,
   });
 
-  const [images, setImages] = useState<ProductImage[]>([]);
-  const [specifications, setSpecifications] = useState<Record<string, string>>({});
-  const [categorySpecifications, setCategorySpecifications] = useState<Record<string, string | string[]>>({});
+  // Initialize images from product
+  const [images, setImages] = useState<ProductImage[]>(
+    product.images.map(img => ({
+      url: img.url,
+      alt: img.alt || '',
+      order: img.order,
+      isPrimary: img.isPrimary,
+    }))
+  );
+
+  // Initialize specifications from product
+  const [specifications, setSpecifications] = useState<Record<string, string>>(() => {
+    const specs: Record<string, string> = {};
+    product.specifications.forEach(spec => {
+      specs[spec.specificationDefinition.id] = spec.value;
+    });
+    return specs;
+  });
+
+  // Category specifications
+  const [categorySpecifications, setCategorySpecifications] = useState<Record<string, string | string[]>>(() => {
+    const catSpecs: Record<string, string | string[]> = {};
+    product.specifications.forEach(spec => {
+      const value = spec.value;
+      // Check if it's a comma-separated list (multiselect)
+      if (value.includes(', ')) {
+        catSpecs[spec.specificationDefinition.key] = value.split(', ');
+      } else {
+        catSpecs[spec.specificationDefinition.key] = value;
+      }
+    });
+    return catSpecs;
+  });
 
   // Get main categories from hierarchy
   const mainCategories = Object.entries(categoryHierarchy).map(([key, value]) => ({
@@ -113,6 +233,14 @@ export default function ProductEntryForm() {
     );
   }, [selectedMainCategory, selectedSubCategory]);
 
+  // Initialize sub-category after main category is set
+  useEffect(() => {
+    if (selectedMainCategory) {
+      const subCat = determineSubCategory(selectedMainCategory);
+      setSelectedSubCategory(subCat);
+    }
+  }, [selectedMainCategory]);
+
   // Fetch categories and brands on mount
   useEffect(() => {
     async function loadData() {
@@ -123,73 +251,32 @@ export default function ProductEntryForm() {
     loadData();
   }, []);
 
-  // Fetch spec definitions when category changes (from database)
+  // Fetch spec definitions when category changes
   useEffect(() => {
     if (formData.categoryId) {
       fetchSpecDefinitions(formData.categoryId);
-    } else {
-      setSpecDefinitions([]);
-      setSpecifications({});
     }
   }, [formData.categoryId]);
-
-  // Reset sub-category when main category changes
-  useEffect(() => {
-    setSelectedSubCategory('');
-    setCategorySpecifications({});
-  }, [selectedMainCategory]);
-
-  // Update categoryId based on sub-category selection (find matching category in DB)
-  useEffect(() => {
-    if (selectedSubCategory && categories.length > 0) {
-      // Find the category that matches the selected sub-category slug
-      const matchingCategory = categories.find(cat => 
-        cat.slug === selectedSubCategory || 
-        cat.name.toLowerCase().includes(selectedSubCategory.toLowerCase())
-      );
-      if (matchingCategory) {
-        setFormData(prev => ({ ...prev, categoryId: matchingCategory.id }));
-      }
-    }
-  }, [selectedSubCategory, categories]);
 
   const fetchCategories = async () => {
     try {
       const res = await fetch('/api/admin/categories');
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-      }
+      if (!res.ok) throw new Error('Failed to fetch categories');
       const data = await res.json();
-      const categoriesData = data.data || [];
-      setCategories(categoriesData);
-      
-      if (categoriesData.length === 0) {
-        setDbError('No categories found. Please run: npm run db:seed');
-      }
-    } catch (error: any) {
+      setCategories(data.data || []);
+    } catch (error) {
       console.error('Error fetching categories:', error);
-      setDbError(`Database Error: ${error.message}. Check DATABASE_SETUP_GUIDE.md`);
     }
   };
 
   const fetchBrands = async () => {
     try {
       const res = await fetch('/api/admin/brands');
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-      }
+      if (!res.ok) throw new Error('Failed to fetch brands');
       const data = await res.json();
-      const brandsData = data.data || [];
-      setBrands(brandsData);
-      
-      if (brandsData.length === 0 && !dbError) {
-        setDbError('No brands found. Please run: npm run db:seed');
-      }
-    } catch (error: any) {
+      setBrands(data.data || []);
+    } catch (error) {
       console.error('Error fetching brands:', error);
-      if (!dbError) {
-        setDbError(`Database Error: ${error.message}. Check DATABASE_SETUP_GUIDE.md`);
-      }
     }
   };
 
@@ -211,26 +298,14 @@ export default function ProductEntryForm() {
       setFormData(prev => ({ ...prev, [name]: checked }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
-      
-      // Auto-generate slug from name
-      if (name === 'name' && !formData.slug) {
-        const slug = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-        setFormData(prev => ({ ...prev, slug }));
-      }
-      
-      // Auto-generate SKU from name
-      if (name === 'name' && !formData.sku) {
-        const sku = value.toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 20);
-        setFormData(prev => ({ ...prev, sku }));
-      }
     }
   };
 
   const handleMainCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setSelectedMainCategory(value);
-    // Clear the categoryId when main category changes
-    setFormData(prev => ({ ...prev, categoryId: '' }));
+    setSelectedSubCategory('');
+    setCategorySpecifications({});
   };
 
   const handleSubCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -261,7 +336,6 @@ export default function ProductEntryForm() {
     setImages(prev => {
       const newImages = [...prev];
       if (field === 'isPrimary' && value === true) {
-        // Only one image can be primary
         newImages.forEach((img, i) => {
           img.isPrimary = i === index;
         });
@@ -287,25 +361,8 @@ export default function ProductEntryForm() {
     if (!formData.slug) newErrors.slug = 'Slug is required';
     if (!formData.sku) newErrors.sku = 'SKU is required';
     if (!formData.price || parseFloat(formData.price) <= 0) newErrors.price = 'Valid price is required';
-    if (!selectedMainCategory) newErrors.mainCategory = 'Main category is required';
-    if (!selectedSubCategory) newErrors.subCategory = 'Sub-category is required';
     if (!formData.categoryId) newErrors.categoryId = 'Category is required';
     if (!formData.brandId) newErrors.brandId = 'Brand is required';
-    if (images.length === 0) newErrors.images = 'At least one image is required';
-
-    // Validate required category specifications
-    categorySpecs.forEach(spec => {
-      if (spec.required && !categorySpecifications[spec.key]) {
-        newErrors[`catSpec_${spec.key}`] = `${spec.name} is required`;
-      }
-    });
-
-    // Validate required database specifications
-    specDefinitions.forEach(spec => {
-      if (spec.isRequired && !specifications[spec.id]) {
-        newErrors[`spec_${spec.id}`] = `${spec.name} is required`;
-      }
-    });
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -322,13 +379,12 @@ export default function ProductEntryForm() {
     setLoading(true);
 
     try {
-      // Combine database specs with category-specific specs
+      // Combine specifications
       const allSpecifications = [
         ...Object.entries(specifications).map(([specificationDefinitionId, value]) => ({
           specificationDefinitionId,
           value,
         })),
-        // Convert category specifications to the format expected by the API
         ...Object.entries(categorySpecifications).map(([key, value]) => ({
           key,
           value: Array.isArray(value) ? value.join(', ') : value,
@@ -344,14 +400,10 @@ export default function ProductEntryForm() {
         lowStockAlert: parseInt(formData.lowStockAlert),
         images: images.filter(img => img.url),
         specifications: allSpecifications,
-        // Include category info
-        mainCategory: selectedMainCategory,
-        subCategory: selectedSubCategory,
-        categorySpecifications,
       };
 
-      const res = await fetch('/api/admin/products', {
-        method: 'POST',
+      const res = await fetch(`/api/admin/products/${product.id}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
@@ -359,20 +411,20 @@ export default function ProductEntryForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error?.message || 'Failed to create product');
+        throw new Error(data.error?.message || 'Failed to update product');
       }
 
-      alert('Product created successfully!');
+      alert('Product updated successfully!');
       router.push('/admin/products');
     } catch (error: any) {
-      console.error('Error creating product:', error);
-      alert(error.message || 'Failed to create product');
+      console.error('Error updating product:', error);
+      alert(error.message || 'Failed to update product');
     } finally {
       setLoading(false);
     }
   };
 
-  // Render specification field based on type
+  // Render specification field
   const renderSpecField = (spec: SpecificationField) => {
     const value = categorySpecifications[spec.key];
     const error = errors[`catSpec_${spec.key}`];
@@ -483,40 +535,10 @@ export default function ProductEntryForm() {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-6xl mx-auto space-y-8">
-      {/* Database Error Alert */}
-      {dbError && (
-        <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg">
-          <div className="flex items-start">
-            <div className="flex-shrink-0">
-              <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-            <div className="ml-3 flex-1">
-              <h3 className="text-lg font-medium text-red-800 mb-2">
-                ⚠️ Database Not Set Up
-              </h3>
-              <p className="text-red-700 mb-3">{dbError}</p>
-              <div className="bg-white p-4 rounded border border-red-200 text-sm">
-                <p className="font-semibold text-red-900 mb-2">Quick Fix Options:</p>
-                <ol className="list-decimal list-inside space-y-1 text-red-800">
-                  <li><strong>Local PostgreSQL:</strong> Install from postgresql.org, then run: <code className="bg-red-100 px-2 py-1 rounded">npm run db:push && npm run db:seed</code></li>
-                  <li><strong>Cloud Database (Easiest):</strong> Sign up at supabase.com (free), get connection string, add to .env, then seed</li>
-                  <li><strong>Docker:</strong> Run: <code className="bg-red-100 px-2 py-1 rounded">docker run --name ws-postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=ws_computer_city -p 5432:5432 -d postgres</code></li>
-                </ol>
-                <p className="mt-3 text-red-700">
-                  📖 See <strong>DATABASE_SETUP_GUIDE.md</strong> in the project root for detailed instructions.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Loading State */}
-      {dataLoading && !dbError && (
+      {dataLoading && (
         <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
-          <p className="text-blue-700">Loading categories and brands...</p>
+          <p className="text-blue-700">Loading form data...</p>
         </div>
       )}
 
@@ -533,7 +555,6 @@ export default function ProductEntryForm() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Main Category */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Main Category <span className="text-red-500">*</span>
@@ -548,10 +569,8 @@ export default function ProductEntryForm() {
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </select>
-            {errors.mainCategory && <p className="text-red-500 text-sm mt-1">{errors.mainCategory}</p>}
           </div>
 
-          {/* Sub Category - Dynamic based on Main Category */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Sub-Category <span className="text-red-500">*</span>
@@ -559,23 +578,16 @@ export default function ProductEntryForm() {
             <select
               value={selectedSubCategory}
               onChange={handleSubCategoryChange}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white disabled:bg-gray-100"
               disabled={!selectedMainCategory}
             >
-              <option value="">
-                {selectedMainCategory ? 'Select Sub-Category' : 'Select Main Category First'}
-              </option>
+              <option value="">Select Sub-Category</option>
               {subCategories.map(cat => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </select>
-            {errors.subCategory && <p className="text-red-500 text-sm mt-1">{errors.subCategory}</p>}
-            {selectedMainCategory && subCategories.length === 0 && (
-              <p className="text-yellow-600 text-sm mt-1">No sub-categories available for this main category</p>
-            )}
           </div>
 
-          {/* Brand Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Brand <span className="text-red-500">*</span>
@@ -594,10 +606,9 @@ export default function ProductEntryForm() {
             {errors.brandId && <p className="text-red-500 text-sm mt-1">{errors.brandId}</p>}
           </div>
 
-          {/* Hidden field for actual category ID from database */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Database Category <span className="text-gray-400 text-xs">(Auto-selected)</span>
+              Database Category
             </label>
             <select
               name="categoryId"
@@ -605,7 +616,7 @@ export default function ProductEntryForm() {
               onChange={handleInputChange}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-gray-50"
             >
-              <option value="">Select Category from DB</option>
+              <option value="">Select Category</option>
               {categories.map(cat => (
                 <option key={cat.id} value={cat.id}>
                   {'\u00A0'.repeat(cat.level * 4)}{cat.name}
@@ -640,7 +651,6 @@ export default function ProductEntryForm() {
               value={formData.name}
               onChange={handleInputChange}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="e.g., Intel Core i5-14600K Processor"
             />
             {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
           </div>
@@ -655,7 +665,6 @@ export default function ProductEntryForm() {
               value={formData.slug}
               onChange={handleInputChange}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="intel-core-i5-14600k"
             />
             {errors.slug && <p className="text-red-500 text-sm mt-1">{errors.slug}</p>}
           </div>
@@ -670,7 +679,6 @@ export default function ProductEntryForm() {
               value={formData.sku}
               onChange={handleInputChange}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="INTEL-I5-14600K"
             />
             {errors.sku && <p className="text-red-500 text-sm mt-1">{errors.sku}</p>}
           </div>
@@ -683,7 +691,6 @@ export default function ProductEntryForm() {
               value={formData.shortDescription}
               onChange={handleInputChange}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Brief 1-2 line description"
               maxLength={500}
             />
           </div>
@@ -696,13 +703,12 @@ export default function ProductEntryForm() {
               onChange={handleInputChange}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               rows={4}
-              placeholder="Detailed product description..."
             />
           </div>
         </div>
       </div>
 
-      {/* ========== SECTION 3: Category-Specific Specifications (Dynamic) ========== */}
+      {/* ========== SECTION 3: Category-Specific Specifications ========== */}
       {categorySpecs.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center gap-3 mb-6">
@@ -713,9 +719,7 @@ export default function ProductEntryForm() {
               <h2 className="text-xl font-bold text-gray-900">
                 {categoryHierarchy[selectedMainCategory]?.name || 'Product'} Specifications
               </h2>
-              <p className="text-sm text-gray-500">
-                Specifications specific to {selectedSubCategory ? subCategories.find(s => s.id === selectedSubCategory)?.name : 'this category'}
-              </p>
+              <p className="text-sm text-gray-500">Category-specific specifications</p>
             </div>
           </div>
           
@@ -725,7 +729,7 @@ export default function ProductEntryForm() {
         </div>
       )}
 
-      {/* ========== SECTION 4: Pricing & Stock Management ========== */}
+      {/* ========== SECTION 4: Pricing & Stock ========== */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white font-bold">
@@ -750,7 +754,6 @@ export default function ProductEntryForm() {
                 value={formData.price}
                 onChange={handleInputChange}
                 className="w-full border border-gray-300 rounded-lg pl-8 pr-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                placeholder="25000"
                 step="0.01"
                 min="0"
               />
@@ -759,7 +762,7 @@ export default function ProductEntryForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Compare at Price (BDT)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Compare at Price</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">৳</span>
               <input
@@ -768,16 +771,14 @@ export default function ProductEntryForm() {
                 value={formData.compareAtPrice}
                 onChange={handleInputChange}
                 className="w-full border border-gray-300 rounded-lg pl-8 pr-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                placeholder="30000"
                 step="0.01"
                 min="0"
               />
             </div>
-            <p className="text-xs text-gray-500 mt-1">Original price for discount display</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Cost Price (BDT)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Cost Price</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">৳</span>
               <input
@@ -786,18 +787,14 @@ export default function ProductEntryForm() {
                 value={formData.costPrice}
                 onChange={handleInputChange}
                 className="w-full border border-gray-300 rounded-lg pl-8 pr-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                placeholder="20000"
                 step="0.01"
                 min="0"
               />
             </div>
-            <p className="text-xs text-gray-500 mt-1">For profit calculation</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Stock Status <span className="text-red-500">*</span>
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Stock Status</label>
             <select
               name="stockStatus"
               value={formData.stockStatus}
@@ -834,7 +831,6 @@ export default function ProductEntryForm() {
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
               min="0"
             />
-            <p className="text-xs text-gray-500 mt-1">Alert when stock is low</p>
           </div>
         </div>
       </div>
@@ -847,7 +843,7 @@ export default function ProductEntryForm() {
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-900">Product Media</h2>
-            <p className="text-sm text-gray-500">Add product images</p>
+            <p className="text-sm text-gray-500">Manage product images</p>
           </div>
         </div>
         
@@ -860,16 +856,21 @@ export default function ProductEntryForm() {
                   value={image.url}
                   onChange={(e) => handleImageChange(index, 'url', e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                  placeholder="Image URL (https://...)"
+                  placeholder="Image URL"
                 />
                 <input
                   type="text"
                   value={image.alt || ''}
                   onChange={(e) => handleImageChange(index, 'alt', e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                  placeholder="Alt text (optional)"
+                  placeholder="Alt text"
                 />
               </div>
+              {image.url && (
+                <div className="w-20 h-20 bg-white rounded border overflow-hidden">
+                  <img src={image.url} alt={image.alt || ''} className="w-full h-full object-contain" />
+                </div>
+              )}
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -882,7 +883,7 @@ export default function ProductEntryForm() {
               <button
                 type="button"
                 onClick={() => handleImageRemove(index)}
-                className="text-red-600 hover:text-red-800 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors"
+                className="text-red-600 hover:text-red-800 px-3 py-2 rounded-lg"
               >
                 Remove
               </button>
@@ -892,76 +893,18 @@ export default function ProductEntryForm() {
           <button
             type="button"
             onClick={handleImageAdd}
-            className="w-full border-2 border-dashed border-gray-300 text-gray-600 px-4 py-4 rounded-lg hover:border-pink-400 hover:text-pink-600 transition-colors"
+            className="w-full border-2 border-dashed border-gray-300 text-gray-600 px-4 py-4 rounded-lg hover:border-pink-400 hover:text-pink-600"
           >
             + Add Image
           </button>
-          {errors.images && <p className="text-red-500 text-sm mt-1">{errors.images}</p>}
         </div>
       </div>
 
-      {/* ========== SECTION 6: Database Specifications (if any) ========== */}
-      {specDefinitions.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white font-bold">
-              {categorySpecs.length > 0 ? '6' : '5'}
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">Additional Specifications</h2>
-              <p className="text-sm text-gray-500">Specifications from database for this category</p>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {specDefinitions.map(spec => (
-              <div key={spec.id}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {spec.name} {spec.isRequired && <span className="text-red-500">*</span>}
-                  {spec.unit && <span className="text-gray-500 text-xs ml-1">({spec.unit})</span>}
-                </label>
-                
-                {spec.dataType === 'BOOLEAN' ? (
-                  <select
-                    value={specifications[spec.id] || ''}
-                    onChange={(e) => handleSpecChange(spec.id, e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  >
-                    <option value="">Select</option>
-                    <option value="true">Yes</option>
-                    <option value="false">No</option>
-                  </select>
-                ) : spec.dataType === 'NUMBER' ? (
-                  <input
-                    type="number"
-                    value={specifications[spec.id] || ''}
-                    onChange={(e) => handleSpecChange(spec.id, e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    step="any"
-                  />
-                ) : (
-                  <input
-                    type="text"
-                    value={specifications[spec.id] || ''}
-                    onChange={(e) => handleSpecChange(spec.id, e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                )}
-                
-                {errors[`spec_${spec.id}`] && (
-                  <p className="text-red-500 text-sm mt-1">{errors[`spec_${spec.id}`]}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ========== SECTION 7: SEO & Meta Data ========== */}
+      {/* ========== SECTION 6: SEO & Meta Data ========== */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center text-white font-bold">
-            {categorySpecs.length > 0 ? (specDefinitions.length > 0 ? '7' : '6') : (specDefinitions.length > 0 ? '6' : '5')}
+            {categorySpecs.length > 0 ? '6' : '5'}
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-900">SEO & Meta Data</h2>
@@ -979,7 +922,6 @@ export default function ProductEntryForm() {
               onChange={handleInputChange}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
               maxLength={60}
-              placeholder="Leave empty to use product name"
             />
             <p className="text-xs text-gray-500 mt-1">{formData.metaTitle.length}/60 characters</p>
           </div>
@@ -993,7 +935,6 @@ export default function ProductEntryForm() {
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
               rows={2}
               maxLength={160}
-              placeholder="Leave empty to use short description"
             />
             <p className="text-xs text-gray-500 mt-1">{formData.metaDescription.length}/160 characters</p>
           </div>
@@ -1006,17 +947,16 @@ export default function ProductEntryForm() {
               value={formData.metaKeywords}
               onChange={handleInputChange}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
-              placeholder="processor, intel, gaming, cpu"
             />
           </div>
         </div>
       </div>
 
-      {/* ========== SECTION 8: Visibility & Control ========== */}
+      {/* ========== SECTION 7: Visibility ========== */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-white font-bold">
-            {categorySpecs.length > 0 ? (specDefinitions.length > 0 ? '8' : '7') : (specDefinitions.length > 0 ? '7' : '6')}
+            {categorySpecs.length > 0 ? '7' : '6'}
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-900">Visibility & Control</h2>
@@ -1025,7 +965,7 @@ export default function ProductEntryForm() {
         </div>
         
         <div className="space-y-4">
-          <label className="flex items-center gap-3 cursor-pointer p-3 rounded-lg hover:bg-gray-50 transition-colors">
+          <label className="flex items-center gap-3 cursor-pointer p-3 rounded-lg hover:bg-gray-50">
             <input
               type="checkbox"
               name="isFeatured"
@@ -1035,11 +975,11 @@ export default function ProductEntryForm() {
             />
             <div>
               <span className="text-sm font-medium text-gray-900">Featured Product</span>
-              <p className="text-xs text-gray-500">Show this product on the homepage featured section</p>
+              <p className="text-xs text-gray-500">Show on homepage featured section</p>
             </div>
           </label>
 
-          <label className="flex items-center gap-3 cursor-pointer p-3 rounded-lg hover:bg-gray-50 transition-colors">
+          <label className="flex items-center gap-3 cursor-pointer p-3 rounded-lg hover:bg-gray-50">
             <input
               type="checkbox"
               name="isActive"
@@ -1049,7 +989,7 @@ export default function ProductEntryForm() {
             />
             <div>
               <span className="text-sm font-medium text-gray-900">Product Active (Published)</span>
-              <p className="text-xs text-gray-500">Make this product visible on the store</p>
+              <p className="text-xs text-gray-500">Make visible on the store</p>
             </div>
           </label>
         </div>
@@ -1060,14 +1000,14 @@ export default function ProductEntryForm() {
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-8 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+          className="px-8 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium"
           disabled={loading}
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 font-medium disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
+          className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 font-medium disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
           disabled={loading}
         >
           {loading ? (
@@ -1076,10 +1016,10 @@ export default function ProductEntryForm() {
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
-              Creating...
+              Updating...
             </span>
           ) : (
-            'Create Product'
+            'Update Product'
           )}
         </button>
       </div>
