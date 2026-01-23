@@ -88,47 +88,29 @@ export async function GET(req: NextRequest) {
     }
 
     // Specification filters - build dynamic conditions
+    // Use AND logic between different spec types, OR logic within same spec type
     if (Object.keys(specFilters).length > 0) {
-      const specConditions: Prisma.ProductSpecificationWhereInput[] = [];
+      // Each spec type needs to have at least one matching value (AND between types)
+      // Within each spec type, any of the selected values can match (OR within type)
+      const specAndConditions: Prisma.ProductWhereInput[] = [];
 
       for (const [key, values] of Object.entries(specFilters)) {
         if (values.length > 0) {
-          // Handle clock speed range filters specially
-          if (key === 'base_clock') {
-            const clockConditions: Prisma.ProductSpecificationWhereInput[] = [];
-            
-            values.forEach((range) => {
-              if (range === '4.5+') {
-                clockConditions.push({
-                  specificationDefinition: { key: 'base_clock' },
-                  value: { gte: '4.5' },
-                });
-              } else {
-                const [min, max] = range.split('-').map(Number);
-                // For numeric comparisons, we need to handle this differently
-                // Since value is stored as string, we'll use contains for now
-                clockConditions.push({
-                  specificationDefinition: { key: 'base_clock' },
-                  // Simple approach: match values that start with the range
-                });
-              }
-            });
-          } else {
-            // Regular specification filters - match any of the selected values
-            specConditions.push({
-              specificationDefinition: { key },
-              value: { in: values },
-            });
-          }
+          // For each spec type, the product must have a matching specification
+          specAndConditions.push({
+            specifications: {
+              some: {
+                specificationDefinition: { key },
+                value: { in: values },
+              },
+            },
+          });
         }
       }
 
-      if (specConditions.length > 0) {
-        where.specifications = {
-          some: {
-            OR: specConditions,
-          },
-        };
+      // Apply AND logic between different specification types
+      if (specAndConditions.length > 0) {
+        where.AND = specAndConditions;
       }
     }
 
@@ -255,6 +237,7 @@ export async function GET(req: NextRequest) {
 
 /**
  * Get counts for each filter option
+ * These counts show how many products have each specification value
  */
 async function getFilterCounts(): Promise<Record<string, Record<string, number>>> {
   const counts: Record<string, Record<string, number>> = {};
@@ -267,6 +250,8 @@ async function getFilterCounts(): Promise<Record<string, Record<string, number>>
         OR: [
           { slug: 'processor' },
           { parent: { slug: 'processor' } },
+          { slug: 'intel' },
+          { slug: 'amd' },
         ],
       },
     };
@@ -303,7 +288,8 @@ async function getFilterCounts(): Promise<Record<string, Record<string, number>>
       counts['stockStatus'][sc.stockStatus] = sc._count;
     });
 
-    // Get specification value counts
+    // Get specification value counts for all filter-relevant specs
+    // These keys must match both the filter config and the specification definition keys
     const specKeys = [
       'number_of_cores',
       'processor_model',
@@ -311,6 +297,10 @@ async function getFilterCounts(): Promise<Record<string, Record<string, number>>
       'generation',
       'socket_type',
       'cache_size',
+      'tdp',
+      'processor_features',
+      'integrated_graphics',
+      'memory_type',
     ];
 
     for (const key of specKeys) {
@@ -325,7 +315,16 @@ async function getFilterCounts(): Promise<Record<string, Record<string, number>>
 
       counts[key] = {};
       specCounts.forEach((sc) => {
-        counts[key][sc.value] = sc._count;
+        // Handle multi-value specs (like processor_features which can be comma-separated)
+        if (key === 'processor_features' && sc.value.includes(',')) {
+          // Split comma-separated values and count each
+          const features = sc.value.split(',').map(f => f.trim());
+          features.forEach(feature => {
+            counts[key][feature] = (counts[key][feature] || 0) + sc._count;
+          });
+        } else {
+          counts[key][sc.value] = sc._count;
+        }
       });
     }
   } catch (error) {

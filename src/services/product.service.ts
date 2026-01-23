@@ -48,16 +48,27 @@ export class ProductService {
 
       // 3. Create product specifications
       if (data.specifications && data.specifications.length > 0) {
-        await tx.productSpecification.createMany({
-          data: data.specifications.map((spec) => ({
-            productId: product.id,
-            specificationDefinitionId: spec.specificationDefinitionId,
-            value: spec.value,
-          })),
-        });
+        // Filter to only include specs with valid specificationDefinitionId (database-defined specs)
+        // Category-based specs (with key only) are handled separately via categorySpecifications field
+        const dbSpecs = data.specifications.filter(
+          (spec) => spec.specificationDefinitionId && !spec.key
+        );
+        
+        if (dbSpecs.length > 0) {
+          await tx.productSpecification.createMany({
+            data: dbSpecs.map((spec) => ({
+              productId: product.id,
+              specificationDefinitionId: spec.specificationDefinitionId!,
+              value: spec.value,
+            })),
+          });
 
-        // 4. Update filterable specification cache
-        await this.updateFilterCache(tx, data.categoryId, data.specifications);
+          // 4. Update filterable specification cache
+          await this.updateFilterCache(tx, data.categoryId, dbSpecs.map(s => ({
+            specificationDefinitionId: s.specificationDefinitionId!,
+            value: s.value,
+          })));
+        }
       }
 
       // 5. Return product with all relations
@@ -125,14 +136,21 @@ export class ProductService {
         // Delete existing specifications
         await tx.productSpecification.deleteMany({ where: { productId: id } });
         
-        // Create new specifications
-        await tx.productSpecification.createMany({
-          data: data.specifications.map((spec) => ({
-            productId: id,
-            specificationDefinitionId: spec.specificationDefinitionId,
-            value: spec.value,
-          })),
-        });
+        // Filter to only include specs with valid specificationDefinitionId
+        const dbSpecs = data.specifications.filter(
+          (spec) => spec.specificationDefinitionId && !spec.key
+        );
+        
+        if (dbSpecs.length > 0) {
+          // Create new specifications
+          await tx.productSpecification.createMany({
+            data: dbSpecs.map((spec) => ({
+              productId: id,
+              specificationDefinitionId: spec.specificationDefinitionId!,
+              value: spec.value,
+            })),
+          });
+        }
       }
 
       return await tx.product.findUnique({

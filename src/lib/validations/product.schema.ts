@@ -9,11 +9,15 @@ export const productImageSchema = z.object({
   isPrimary: z.boolean().default(false),
 });
 
-// Product Specification Schema
+// Product Specification Schema - supports both database specs (with CUID) and category specs (with key)
 export const productSpecificationSchema = z.object({
-  specificationDefinitionId: z.string().cuid('Invalid specification definition ID'),
+  specificationDefinitionId: z.string().cuid('Invalid specification definition ID').optional(),
+  key: z.string().optional(),
   value: z.string().min(1, 'Specification value is required'),
-});
+}).refine(
+  (data) => data.specificationDefinitionId || data.key,
+  { message: 'Either specificationDefinitionId or key must be provided' }
+);
 
 // Create Product Schema
 const baseProductSchema = z.object({
