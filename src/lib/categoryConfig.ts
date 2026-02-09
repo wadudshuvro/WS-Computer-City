@@ -437,6 +437,336 @@ export function getProcessorSpecsForBrand(brand: 'intel' | 'amd'): Specification
   });
 }
 
+// GPU Specification Options
+export const gpuSpecOptions = {
+  nvidiaChipsets: [
+    'GeForce RTX 5090',
+    'GeForce RTX 5080',
+    'GeForce RTX 5070 Ti',
+    'GeForce RTX 5070',
+    'GeForce RTX 4090',
+    'GeForce RTX 4080 Super',
+    'GeForce RTX 4080',
+    'GeForce RTX 4070 Ti Super',
+    'GeForce RTX 4070 Ti',
+    'GeForce RTX 4070 Super',
+    'GeForce RTX 4070',
+    'GeForce RTX 4060 Ti',
+    'GeForce RTX 4060',
+    'GeForce RTX 3090 Ti',
+    'GeForce RTX 3090',
+    'GeForce RTX 3080 Ti',
+    'GeForce RTX 3080',
+    'GeForce RTX 3070 Ti',
+    'GeForce RTX 3070',
+    'GeForce RTX 3060 Ti',
+    'GeForce RTX 3060',
+    'GeForce RTX 3050',
+    'GeForce GTX 1660 Super',
+    'GeForce GTX 1660',
+    'GeForce GTX 1650',
+  ],
+
+  amdChipsets: [
+    'Radeon RX 9070 XT',
+    'Radeon RX 9070',
+    'Radeon RX 7900 XTX',
+    'Radeon RX 7900 XT',
+    'Radeon RX 7900 GRE',
+    'Radeon RX 7800 XT',
+    'Radeon RX 7700 XT',
+    'Radeon RX 7600 XT',
+    'Radeon RX 7600',
+    'Radeon RX 6950 XT',
+    'Radeon RX 6900 XT',
+    'Radeon RX 6800 XT',
+    'Radeon RX 6800',
+    'Radeon RX 6750 XT',
+    'Radeon RX 6700 XT',
+    'Radeon RX 6650 XT',
+    'Radeon RX 6600 XT',
+    'Radeon RX 6600',
+    'Radeon RX 6500 XT',
+    'Radeon RX 6400',
+  ],
+
+  memoryTypes: [
+    'GDDR7',
+    'GDDR6X',
+    'GDDR6',
+    'GDDR5X',
+    'GDDR5',
+    'HBM3',
+    'HBM2e',
+  ],
+
+  memorySizes: [
+    '4 GB',
+    '6 GB',
+    '8 GB',
+    '10 GB',
+    '12 GB',
+    '16 GB',
+    '20 GB',
+    '24 GB',
+    '32 GB',
+    '48 GB',
+  ],
+
+  busWidths: [
+    '64-bit',
+    '96-bit',
+    '128-bit',
+    '192-bit',
+    '256-bit',
+    '320-bit',
+    '384-bit',
+    '512-bit',
+  ],
+
+  coolingTypes: [
+    'Single Fan',
+    'Dual Fan',
+    'Triple Fan',
+    'Blower Style',
+    'Hybrid (Air + AIO)',
+    'Liquid Cooled',
+  ],
+
+  outputPorts: [
+    'HDMI 2.1',
+    'HDMI 2.0',
+    'DisplayPort 2.1',
+    'DisplayPort 1.4a',
+    'DisplayPort 1.4',
+    'USB-C (DisplayPort Alt Mode)',
+    'DVI-D',
+  ],
+
+  features: [
+    'Ray Tracing',
+    'DLSS 3',
+    'DLSS 2',
+    'FSR 3',
+    'FSR 2',
+    'AV1 Encoding',
+    'NVENC',
+    'VCE',
+    'G-Sync Compatible',
+    'FreeSync Premium Pro',
+    'FreeSync Premium',
+    'FreeSync',
+    'RGB Lighting',
+    'ARGB Lighting',
+    'Zero RPM Mode',
+    'Dual BIOS',
+    'Metal Backplate',
+    'PCIe 5.0',
+    'PCIe 4.0',
+    'DirectX 12 Ultimate',
+    'Vulkan',
+    'OpenGL 4.6',
+  ],
+
+  powerConnectors: [
+    '12VHPWR (16-pin)',
+    '12V-2x6',
+    '8-pin x3',
+    '8-pin x2',
+    '8-pin + 6-pin',
+    '8-pin',
+    '6-pin x2',
+    '6-pin',
+    'No External Power',
+  ],
+
+  tdpOptions: [
+    '75W',
+    '100W',
+    '120W',
+    '150W',
+    '170W',
+    '200W',
+    '220W',
+    '250W',
+    '285W',
+    '300W',
+    '320W',
+    '350W',
+    '450W',
+    '575W',
+  ],
+};
+
+// GPU Specifications
+export const gpuSpecifications: SpecificationField[] = [
+  {
+    key: 'gpu_chipset',
+    name: 'GPU Chipset',
+    type: 'select',
+    options: [...gpuSpecOptions.nvidiaChipsets, ...gpuSpecOptions.amdChipsets],
+    required: true,
+    helpText: 'Select the GPU model',
+  },
+  {
+    key: 'memory_size',
+    name: 'Memory Size',
+    type: 'select',
+    options: gpuSpecOptions.memorySizes,
+    required: true,
+  },
+  {
+    key: 'memory_type',
+    name: 'Memory Type',
+    type: 'select',
+    options: gpuSpecOptions.memoryTypes,
+    required: true,
+  },
+  {
+    key: 'memory_bus',
+    name: 'Memory Bus Width',
+    type: 'select',
+    options: gpuSpecOptions.busWidths,
+    required: false,
+  },
+  {
+    key: 'base_clock',
+    name: 'Base Clock',
+    type: 'number',
+    unit: 'MHz',
+    required: false,
+    placeholder: '1500',
+  },
+  {
+    key: 'boost_clock',
+    name: 'Boost Clock',
+    type: 'number',
+    unit: 'MHz',
+    required: false,
+    placeholder: '2500',
+  },
+  {
+    key: 'cuda_cores',
+    name: 'CUDA Cores / Stream Processors',
+    type: 'number',
+    required: false,
+    placeholder: '8704',
+    helpText: 'CUDA cores for NVIDIA, Stream Processors for AMD',
+  },
+  {
+    key: 'rt_cores',
+    name: 'RT Cores / Ray Accelerators',
+    type: 'number',
+    required: false,
+    placeholder: '68',
+  },
+  {
+    key: 'tensor_cores',
+    name: 'Tensor / AI Cores',
+    type: 'number',
+    required: false,
+    placeholder: '272',
+  },
+  {
+    key: 'tdp',
+    name: 'TDP / TGP',
+    type: 'select',
+    options: gpuSpecOptions.tdpOptions,
+    required: false,
+  },
+  {
+    key: 'power_connector',
+    name: 'Power Connector',
+    type: 'select',
+    options: gpuSpecOptions.powerConnectors,
+    required: false,
+  },
+  {
+    key: 'recommended_psu',
+    name: 'Recommended PSU',
+    type: 'text',
+    placeholder: 'e.g., 750W',
+    required: false,
+  },
+  {
+    key: 'cooling_type',
+    name: 'Cooling Type',
+    type: 'select',
+    options: gpuSpecOptions.coolingTypes,
+    required: false,
+  },
+  {
+    key: 'slot_size',
+    name: 'Slot Size',
+    type: 'select',
+    options: ['2 Slot', '2.5 Slot', '2.7 Slot', '3 Slot', '3.5 Slot', '4 Slot'],
+    required: false,
+  },
+  {
+    key: 'card_length',
+    name: 'Card Length',
+    type: 'text',
+    placeholder: 'e.g., 336mm',
+    required: false,
+  },
+  {
+    key: 'output_ports',
+    name: 'Output Ports',
+    type: 'multiselect',
+    options: gpuSpecOptions.outputPorts,
+    required: false,
+  },
+  {
+    key: 'gpu_features',
+    name: 'Features',
+    type: 'multiselect',
+    options: gpuSpecOptions.features,
+    required: false,
+    helpText: 'Select all applicable features',
+  },
+  {
+    key: 'warranty',
+    name: 'Warranty',
+    type: 'text',
+    placeholder: 'e.g., 3 Years',
+    required: false,
+  },
+];
+
+// Helper function to get GPU specifications by brand
+export function getGpuSpecsForBrand(brand: 'nvidia' | 'amd-gpu'): SpecificationField[] {
+  return gpuSpecifications.map(spec => {
+    if (spec.key === 'gpu_chipset') {
+      return {
+        ...spec,
+        options: brand === 'nvidia' 
+          ? gpuSpecOptions.nvidiaChipsets 
+          : gpuSpecOptions.amdChipsets,
+      };
+    }
+    // For NVIDIA, show CUDA/Tensor cores labels; for AMD, show Stream Processors
+    if (spec.key === 'cuda_cores') {
+      return {
+        ...spec,
+        name: brand === 'nvidia' ? 'CUDA Cores' : 'Stream Processors',
+      };
+    }
+    if (spec.key === 'rt_cores') {
+      return {
+        ...spec,
+        name: brand === 'nvidia' ? 'RT Cores' : 'Ray Accelerators',
+      };
+    }
+    if (spec.key === 'tensor_cores') {
+      return {
+        ...spec,
+        name: brand === 'nvidia' ? 'Tensor Cores' : 'AI Accelerators',
+      };
+    }
+    return spec;
+  });
+}
+
 // Map of main category to specification definitions
 export type MainCategorySlug = 'processor' | 'motherboard' | 'graphics_card' | 'ram' | 'storage';
 
@@ -447,6 +777,11 @@ export function getSpecificationsForCategory(mainCategory: MainCategorySlug, sub
         return getProcessorSpecsForBrand(subCategory);
       }
       return processorSpecifications;
+    case 'graphics_card':
+      if (subCategory === 'nvidia' || subCategory === 'amd-gpu') {
+        return getGpuSpecsForBrand(subCategory);
+      }
+      return gpuSpecifications;
     // Add more category-specific specs here as needed
     default:
       return [];

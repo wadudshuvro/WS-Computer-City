@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { Grid, List, ChevronRight, SlidersHorizontal, X, Heart, ShoppingCart, Eye } from 'lucide-react';
 import { ProcessorFilters } from '@/components/products/ProcessorFilters';
 import { processorSortOptions } from '@/lib/filterConfig';
+import { ChevronRight, Eye, Grid, Heart, List, ShoppingCart, SlidersHorizontal, X } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 
 interface Product {
   id: string;
@@ -50,15 +50,24 @@ function ProductsPageContent() {
   const [filterCounts, setFilterCounts] = useState<FilterCounts>({});
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 });
 
-  // Get current page, sort, and category from URL
+  // Get current page, sort, category, and brand tab from URL
   const currentPage = Number(searchParams.get('page')) || 1;
   const currentSort = searchParams.get('sort') || 'default';
   const categoryParam = searchParams.get('category');
   const subCategory = searchParams.get('sub');
+  const brandParam = searchParams.get('brand') || '';
   const itemsPerPage = 30;
 
   // Check if we're on processor category
   const isProcessorCategory = subCategory === 'processor' || categoryParam === 'processor';
+  
+  // Check if we're on graphics card category (including nvidia and amd-gpu subcategories)
+  const isGpuCategory = subCategory === 'graphics-card' || subCategory === 'nvidia' || subCategory === 'amd-gpu' || categoryParam === 'graphics-card';
+
+  // Active brand tab based on category type
+  const activeProcessorBrandTab = brandParam === 'amd' ? 'amd' : 'intel';
+  // For GPUs, active tab is based on sub-category (nvidia or amd-gpu)
+  const activeGpuBrandTab = subCategory === 'amd-gpu' ? 'amd' : 'nvidia';
 
   useEffect(() => {
     fetchProducts();
@@ -117,6 +126,27 @@ function ProductsPageContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleProcessorBrandTabChange = (brand: 'intel' | 'amd') => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('brand', brand);
+    params.set('page', '1');
+    if (!params.has('category') && !params.has('sub')) {
+      params.set('sub', 'processor');
+    }
+    router.push(`/products?${params.toString()}`);
+  };
+
+  const handleGpuBrandTabChange = (gpuType: 'nvidia' | 'amd') => {
+    const params = new URLSearchParams(searchParams.toString());
+    // For GPUs, we filter by sub-category (nvidia or amd-gpu) not brand
+    // Brand is the manufacturer (ASUS, MSI, etc.) while category is the chip maker
+    params.set('sub', gpuType === 'amd' ? 'amd-gpu' : 'nvidia');
+    params.delete('brand'); // Remove brand filter when switching GPU type
+    params.set('page', '1');
+    params.set('category', 'components');
+    router.push(`/products?${params.toString()}`);
+  };
+
   const getStockStatusBadge = (status: string) => {
     const badges: Record<string, { text: string; className: string }> = {
       IN_STOCK: { text: 'In Stock', className: 'bg-green-500' },
@@ -160,6 +190,7 @@ function ProductsPageContent() {
   // Get page title based on category
   const getPageTitle = () => {
     if (isProcessorCategory) return 'Processor Price In BD 2026';
+    if (isGpuCategory) return 'Graphics Card Price In BD 2026';
     return 'All Products';
   };
 
@@ -182,7 +213,7 @@ function ProductsPageContent() {
               </>
             )}
             <span className="text-gray-900 font-medium">
-              {isProcessorCategory ? 'Processor' : 'Products'}
+              {isProcessorCategory ? 'Processor' : isGpuCategory ? 'Graphics Card' : 'Products'}
             </span>
           </nav>
         </div>
@@ -202,13 +233,64 @@ function ProductsPageContent() {
                 discount price in BD. Find the perfect Processor Components for your requirements.
               </p>
               
-              {/* Sub-category tabs */}
+              {/* Sub-category tabs - filter by brand */}
               <div className="flex gap-4 mt-4">
-                <button className="px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600">
+                <button
+                  type="button"
+                  onClick={() => handleProcessorBrandTabChange('intel')}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    activeProcessorBrandTab === 'intel'
+                      ? 'text-blue-600 border-blue-600'
+                      : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
                   Intel
                 </button>
-                <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                <button
+                  type="button"
+                  onClick={() => handleProcessorBrandTabChange('amd')}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    activeProcessorBrandTab === 'amd'
+                      ? 'text-blue-600 border-blue-600'
+                      : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
                   AMD Ryzen
+                </button>
+              </div>
+            </>
+          )}
+          
+          {isGpuCategory && (
+            <>
+              <p className="text-sm text-gray-600 max-w-4xl">
+                Graphics Card Price in BD 2026 starts from BDT 8,500/- and can go up to BDT 250,000/- depending on the brand and specifications. 
+                WS Computer City offers a wide selection of NVIDIA GeForce and AMD Radeon graphics cards for gaming, content creation, and professional workloads.
+              </p>
+              
+              {/* Sub-category tabs - filter by GPU brand */}
+              <div className="flex gap-4 mt-4">
+                <button
+                  type="button"
+                  onClick={() => handleGpuBrandTabChange('nvidia')}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    activeGpuBrandTab === 'nvidia'
+                      ? 'text-blue-600 border-blue-600'
+                      : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  NVIDIA
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleGpuBrandTabChange('amd')}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    activeGpuBrandTab === 'amd'
+                      ? 'text-blue-600 border-blue-600'
+                      : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  AMD Radeon
                 </button>
               </div>
             </>
@@ -597,6 +679,39 @@ function ProductsPageContent() {
                 AMD (Advanced Micro Devices) processors offer excellent performance and value for gaming, content creation, and professional workloads. 
                 The Ryzen series, including Ryzen 3, Ryzen 5, Ryzen 7, and Ryzen 9, provides options for every user from budget-conscious buyers to 
                 enthusiasts seeking top-tier performance.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SEO Content Section (Only for GPU category) */}
+      {isGpuCategory && (
+        <div className="bg-white border-t mt-8">
+          <div className="max-w-[1400px] mx-auto px-4 py-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
+              Graphics Card Price in Bangladesh
+            </h2>
+            <div className="prose prose-sm max-w-none text-gray-600">
+              <p>
+                A graphics card (GPU) is a specialized electronic circuit designed to rapidly manipulate and alter memory to accelerate 
+                the creation of images for display. Modern graphics cards are essential for gaming, video editing, 3D rendering, and 
+                machine learning tasks. WS Computer City BD offers a comprehensive selection of graphics cards from leading manufacturers 
+                including NVIDIA and AMD.
+              </p>
+              
+              <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">NVIDIA Graphics Cards</h3>
+              <p>
+                NVIDIA GeForce graphics cards are renowned for their cutting-edge technology and exceptional gaming performance. 
+                The GeForce RTX series features real-time ray tracing and AI-powered DLSS technology for stunning visuals. 
+                From the entry-level GTX 1650 to the flagship RTX 4090, NVIDIA offers options for every budget and performance requirement.
+              </p>
+              
+              <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">AMD Graphics Cards</h3>
+              <p>
+                AMD Radeon graphics cards deliver excellent value and performance for gamers and content creators. 
+                The Radeon RX 7000 series offers competitive performance with features like AMD FidelityFX Super Resolution (FSR) 
+                for enhanced frame rates. AMD GPUs are known for their strong price-to-performance ratio.
               </p>
             </div>
           </div>

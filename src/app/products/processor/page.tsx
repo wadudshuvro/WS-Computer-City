@@ -1,13 +1,11 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Grid, List, ChevronRight, SlidersHorizontal, X, Heart, ShoppingCart, Eye } from 'lucide-react';
 import { ProcessorFilters } from '@/components/products/ProcessorFilters';
 import { processorSortOptions } from '@/lib/filterConfig';
-import { formatBDT } from '@/lib/utils';
+import { ChevronRight, Eye, Grid, Heart, List, ShoppingCart, SlidersHorizontal, X } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 
 interface Product {
   id: string;
@@ -59,10 +57,19 @@ function ProcessorPageContent() {
   const [filterCounts, setFilterCounts] = useState<FilterCounts>({});
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 });
 
-  // Get current page and sort from URL
+  // Get current page, sort, and brand tab from URL
   const currentPage = Number(searchParams.get('page')) || 1;
   const currentSort = searchParams.get('sort') || 'default';
+  const brandParam = searchParams.get('brand') || '';
+  const activeBrandTab = brandParam === 'amd' ? 'amd' : brandParam === 'intel' ? 'intel' : 'intel'; // default Intel when no brand
   const itemsPerPage = 30;
+
+  const handleBrandTabChange = (brand: 'intel' | 'amd') => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('brand', brand);
+    params.set('page', '1');
+    router.push(`/products/processor?${params.toString()}`);
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -188,12 +195,28 @@ function ProcessorPageContent() {
             discount price in BD. Find the perfect Processor Components for your requirements.
           </p>
           
-          {/* Sub-category tabs */}
+          {/* Sub-category tabs - filter by brand */}
           <div className="flex gap-4 mt-4">
-            <button className="px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600">
+            <button
+              type="button"
+              onClick={() => handleBrandTabChange('intel')}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeBrandTab === 'intel'
+                  ? 'text-blue-600 border-blue-600'
+                  : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
               Intel
             </button>
-            <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+            <button
+              type="button"
+              onClick={() => handleBrandTabChange('amd')}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeBrandTab === 'amd'
+                  ? 'text-blue-600 border-blue-600'
+                  : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
               AMD Ryzen
             </button>
           </div>

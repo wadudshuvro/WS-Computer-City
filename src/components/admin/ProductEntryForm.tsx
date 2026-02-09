@@ -287,6 +287,16 @@ export default function ProductEntryForm() {
     if (!formData.slug) newErrors.slug = 'Slug is required';
     if (!formData.sku) newErrors.sku = 'SKU is required';
     if (!formData.price || parseFloat(formData.price) <= 0) newErrors.price = 'Valid price is required';
+    
+    // Validate compare at price (must be greater than regular price if provided)
+    if (formData.compareAtPrice) {
+      const price = parseFloat(formData.price);
+      const comparePrice = parseFloat(formData.compareAtPrice);
+      if (comparePrice <= price) {
+        newErrors.compareAtPrice = 'Compare at Price must be greater than Regular Price (or leave empty)';
+      }
+    }
+    
     if (!selectedMainCategory) newErrors.mainCategory = 'Main category is required';
     if (!selectedSubCategory) newErrors.subCategory = 'Sub-category is required';
     if (!formData.categoryId) newErrors.categoryId = 'Category is required';
@@ -323,32 +333,65 @@ export default function ProductEntryForm() {
 
     try {
       // Combine database specs with category-specific specs
-      const allSpecifications = [
-        ...Object.entries(specifications).map(([specificationDefinitionId, value]) => ({
+      // Filter out empty values to prevent validation errors
+      const dbSpecifications = Object.entries(specifications)
+        .filter(([_, value]) => value && value.trim() !== '')
+        .map(([specificationDefinitionId, value]) => ({
           specificationDefinitionId,
-          value,
-        })),
-        // Convert category specifications to the format expected by the API
-        ...Object.entries(categorySpecifications).map(([key, value]) => ({
+          value: value.trim(),
+        }));
+
+      const categorySpecs = Object.entries(categorySpecifications)
+        .filter(([_, value]) => {
+          if (Array.isArray(value)) return value.length > 0;
+          return value && String(value).trim() !== '';
+        })
+        .map(([key, value]) => ({
           key,
-          value: Array.isArray(value) ? value.join(', ') : value,
-        })),
-      ];
+          value: Array.isArray(value) ? value.join(', ') : String(value).trim(),
+        }));
+
+      const allSpecifications = [...dbSpecifications, ...categorySpecs];
 
       const payload = {
-        ...formData,
+        name: formData.name,
+        slug: formData.slug,
+        sku: formData.sku,
+        description: formData.description || undefined,
+        shortDescription: formData.shortDescription || undefined,
         price: parseFloat(formData.price),
         compareAtPrice: formData.compareAtPrice ? parseFloat(formData.compareAtPrice) : undefined,
         costPrice: formData.costPrice ? parseFloat(formData.costPrice) : undefined,
+        stockStatus: formData.stockStatus,
         stockQuantity: parseInt(formData.stockQuantity),
         lowStockAlert: parseInt(formData.lowStockAlert),
-        images: images.filter(img => img.url),
-        specifications: allSpecifications,
-        // Include category info
-        mainCategory: selectedMainCategory,
-        subCategory: selectedSubCategory,
-        categorySpecifications,
+        categoryId: formData.categoryId,
+        brandId: formData.brandId,
+        metaTitle: formData.metaTitle || undefined,
+        metaDescription: formData.metaDescription || undefined,
+        metaKeywords: formData.metaKeywords || undefined,
+        isFeatured: formData.isFeatured,
+        isActive: formData.isActive,
+        images: images.filter(img => img.url).map(img => ({
+          url: img.url,
+          alt: img.alt || undefined,
+          order: img.order,
+          isPrimary: img.isPrimary,
+        })),
+        specifications: allSpecifications.length > 0 ? allSpecifications : undefined,
       };
+
+      // Debug: Log the payload
+      console.log('=== PRODUCT SUBMISSION DEBUG ===');
+      console.log('categoryId:', payload.categoryId);
+      console.log('brandId:', payload.brandId);
+      console.log('name:', payload.name);
+      console.log('slug:', payload.slug);
+      console.log('sku:', payload.sku);
+      console.log('price:', payload.price, typeof payload.price);
+      console.log('images:', payload.images);
+      console.log('Full payload:', JSON.stringify(payload, null, 2));
+      console.log('=================================');
 
       const res = await fetch('/api/admin/products', {
         method: 'POST',
@@ -359,13 +402,26 @@ export default function ProductEntryForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error?.message || 'Failed to create product');
+        // Show detailed validation errors
+        if (data.error?.details && Array.isArray(data.error.details)) {
+          console.error('Validation errors:', JSON.stringify(data.error.details, null, 2));
+          const errorMessages = data.error.details
+            .map((e: any) => {
+              const path = e.path?.join('.') || 'Field';
+              return `• ${path}: ${e.message}`;
+            })
+            .join('\n');
+          alert(`Validation failed:\n\n${errorMessages}`);
+          return;
+        }
+        alert(data.error?.message || 'Failed to create product');
+        return;
       }
 
       alert('Product created successfully!');
       router.push('/admin/products');
     } catch (error: any) {
-      console.error('Error creating product:', error);
+      console.error('Error creating product:', error.message || error);
       alert(error.message || 'Failed to create product');
     } finally {
       setLoading(false);
@@ -767,13 +823,17 @@ export default function ProductEntryForm() {
                 name="compareAtPrice"
                 value={formData.compareAtPrice}
                 onChange={handleInputChange}
-                className="w-full border border-gray-300 rounded-lg pl-8 pr-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className={`w-full border rounded-lg pl-8 pr-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 ${errors.compareAtPrice ? 'border-red-500' : 'border-gray-300'}`}
                 placeholder="30000"
                 step="0.01"
                 min="0"
               />
             </div>
-            <p className="text-xs text-gray-500 mt-1">Original price for discount display</p>
+            {errors.compareAtPrice ? (
+              <p className="text-red-500 text-sm mt-1">{errors.compareAtPrice}</p>
+            ) : (
+              <p className="text-xs text-gray-500 mt-1">Original/strikethrough price (must be higher than Regular Price)</p>
+            )}
           </div>
 
           <div>

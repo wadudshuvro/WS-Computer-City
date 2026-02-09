@@ -10,14 +10,21 @@ export const productImageSchema = z.object({
 });
 
 // Product Specification Schema - supports both database specs (with CUID) and category specs (with key)
-export const productSpecificationSchema = z.object({
-  specificationDefinitionId: z.string().cuid('Invalid specification definition ID').optional(),
-  key: z.string().optional(),
-  value: z.string().min(1, 'Specification value is required'),
-}).refine(
-  (data) => data.specificationDefinitionId || data.key,
-  { message: 'Either specificationDefinitionId or key must be provided' }
-);
+export const productSpecificationSchema = z.union([
+  // Database specification (with CUID)
+  z.object({
+    specificationDefinitionId: z.string().cuid('Invalid specification definition ID'),
+    value: z.string().min(1, 'Specification value is required'),
+  }),
+  // Category-based specification (with key)
+  z.object({
+    key: z.string().min(1, 'Specification key is required'),
+    value: z.string().min(1, 'Specification value is required'),
+  }),
+]);
+
+// Helper to transform empty strings to undefined
+const emptyStringToUndefined = z.string().transform((val) => val === '' ? undefined : val);
 
 // Create Product Schema
 const baseProductSchema = z.object({
@@ -32,13 +39,13 @@ const baseProductSchema = z.object({
     .min(3, 'SKU must be at least 3 characters')
     .max(100)
     .regex(/^[A-Z0-9-]+$/, 'SKU must be uppercase alphanumeric with hyphens'),
-  description: z.string().optional(),
-  shortDescription: z.string().max(500).optional(),
+  description: z.string().optional().nullable(),
+  shortDescription: z.string().max(500).optional().nullable(),
   
   // Pricing
   price: z.number().positive('Price must be positive'),
-  compareAtPrice: z.number().positive().optional(),
-  costPrice: z.number().positive().optional(),
+  compareAtPrice: z.number().positive().optional().nullable(),
+  costPrice: z.number().positive().optional().nullable(),
   
   // Stock
   stockStatus: z.nativeEnum(StockStatus),
@@ -50,9 +57,9 @@ const baseProductSchema = z.object({
   brandId: z.string().cuid('Invalid brand ID'),
   
   // SEO
-  metaTitle: z.string().max(60).optional(),
-  metaDescription: z.string().max(160).optional(),
-  metaKeywords: z.string().optional(),
+  metaTitle: z.string().max(60).optional().nullable(),
+  metaDescription: z.string().max(160).optional().nullable(),
+  metaKeywords: z.string().optional().nullable(),
   
   // Features
   isFeatured: z.boolean().default(false),

@@ -23,8 +23,13 @@ export async function GET(req: NextRequest) {
 
     // Parse and validate query parameters
     const searchParams = req.nextUrl.searchParams;
+    
+    // Use 'sub' parameter if provided, otherwise fall back to 'category'
+    // This handles URLs like: /products?category=components&sub=graphics-card
+    const categorySlug = searchParams.get('sub') || searchParams.get('category') || undefined;
+    
     const filters = {
-      category: searchParams.get('category') || undefined,
+      category: categorySlug,
       brand: searchParams.get('brand')?.split(',') || undefined,
       minPrice: searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined,
       maxPrice: searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined,
@@ -37,8 +42,8 @@ export async function GET(req: NextRequest) {
 
     const validated = productFilterSchema.parse(filters);
 
-    // Get products
-    const result = await ProductService.getFiltered(validated);
+    // Get products - include child category products
+    const result = await ProductService.getFilteredWithChildren(validated);
 
     return NextResponse.json({
       data: result.products,
@@ -89,6 +94,17 @@ export async function POST(req: NextRequest) {
 
     // Parse and validate request body
     const body = await req.json();
+    
+    // Debug: Log incoming request
+    console.log('=== INCOMING PRODUCT CREATE REQUEST ===');
+    console.log('categoryId:', body.categoryId);
+    console.log('brandId:', body.brandId);
+    console.log('slug:', body.slug);
+    console.log('sku:', body.sku);
+    console.log('price:', body.price, typeof body.price);
+    console.log('images count:', body.images?.length);
+    console.log('========================================');
+    
     const validated = createProductSchema.parse(body);
 
     // Create product
@@ -106,7 +122,7 @@ export async function POST(req: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof ZodError) {
       console.error('Validation Error:', JSON.stringify(error.errors, null, 2));
       return NextResponse.json(
@@ -122,7 +138,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Handle unique constraint errors (slug, sku)
-    if (error.code === 'P2002') {
+    if (error?.code === 'P2002') {
       return NextResponse.json(
         {
           error: {
@@ -134,12 +150,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Handle foreign key constraint errors (invalid categoryId or brandId)
+    if (error?.code === 'P2003') {
+      return NextResponse.json(
+        {
+          error: {
+            code: 'INVALID_REFERENCE',
+            message: `Invalid reference: The specified ${error.meta?.field_name || 'category or brand'} does not exist`,
+          },
+        },
+        { status: 400 }
+      );
+    }
+
     console.error('Error creating product:', error);
     return NextResponse.json(
       {
         error: {
           code: 'INTERNAL_ERROR',
-          message: 'An error occurred while creating the product',
+          message: error?.message || 'An error occurred while creating the product',
         },
       },
       { status: 500 }

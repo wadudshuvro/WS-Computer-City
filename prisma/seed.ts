@@ -194,6 +194,36 @@ async function main() {
     },
   });
 
+  // NVIDIA Sub-category under Graphics Card
+  const nvidiaGpu = await prisma.category.upsert({
+    where: { slug: 'nvidia' },
+    update: {},
+    create: {
+      name: 'NVIDIA',
+      slug: 'nvidia',
+      description: 'NVIDIA Graphics Cards',
+      parentId: graphicsCard.id,
+      level: 2,
+      order: 1,
+      isActive: true,
+    },
+  });
+
+  // AMD Sub-category under Graphics Card
+  const amdGpu = await prisma.category.upsert({
+    where: { slug: 'amd-gpu' },
+    update: {},
+    create: {
+      name: 'AMD',
+      slug: 'amd-gpu',
+      description: 'AMD Graphics Cards',
+      parentId: graphicsCard.id,
+      level: 2,
+      order: 2,
+      isActive: true,
+    },
+  });
+
   const ssd = await prisma.category.upsert({
     where: { slug: 'ssd' },
     update: {},
