@@ -38,7 +38,9 @@ async function main() {
 
   // 2. Create Brands
   console.log('Creating brands...');
-  const brands = await Promise.all([
+  
+  // Core brands
+  const coreBrands = await Promise.all([
     prisma.brand.upsert({
       where: { slug: 'intel' },
       update: {},
@@ -90,7 +92,74 @@ async function main() {
       },
     }),
   ]);
-  console.log('✅ Brands created:', brands.length);
+
+  // SSD Brands - from Tech Land reference
+  const ssdBrandsList = [
+    { name: 'Corsair', slug: 'corsair', description: 'Gaming peripherals and components' },
+    { name: 'Kingston', slug: 'kingston', description: 'Memory and storage products' },
+    { name: 'Team', slug: 'team', description: 'Memory and storage solutions' },
+    { name: 'XOC', slug: 'xoc', description: 'Storage solutions' },
+    { name: 'MiPhi', slug: 'miphi', description: 'Storage products' },
+    { name: 'OSCOO', slug: 'oscoo', description: 'SSD manufacturer' },
+    { name: 'Lexar', slug: 'lexar', description: 'Memory and storage products' },
+    { name: 'MSI', slug: 'msi', description: 'Gaming hardware manufacturer' },
+    { name: 'SanDisk', slug: 'sandisk', description: 'Flash storage solutions' },
+    { name: 'Seagate', slug: 'seagate', description: 'Data storage solutions' },
+    { name: 'Adata', slug: 'adata', description: 'Memory and storage manufacturer' },
+    { name: 'Ocpc', slug: 'ocpc', description: 'Gaming hardware' },
+    { name: 'Western Digital', slug: 'western-digital', description: 'Storage solutions' },
+    { name: 'Aitc', slug: 'aitc', description: 'Storage products' },
+    { name: 'Acer', slug: 'acer', description: 'Computer hardware' },
+    { name: 'Transcend', slug: 'transcend', description: 'Memory and storage' },
+    { name: 'Crucial', slug: 'crucial', description: 'Memory and storage by Micron' },
+    { name: 'Apacer', slug: 'apacer', description: 'Digital storage solutions' },
+    { name: 'Colorful', slug: 'colorful', description: 'Graphics cards and storage' },
+    { name: 'KingSpec', slug: 'kingspec', description: 'SSD manufacturer' },
+    { name: 'Netac', slug: 'netac', description: 'Flash memory products' },
+    { name: 'PNY', slug: 'pny', description: 'Memory and storage products' },
+    { name: 'Twinmos', slug: 'twinmos', description: 'Memory solutions' },
+    { name: 'Pc Power', slug: 'pc-power', description: 'Computer components' },
+    { name: 'Biwintech', slug: 'biwintech', description: 'Storage solutions' },
+    { name: 'Kingbox', slug: 'kingbox', description: 'Storage products' },
+    { name: 'GIGABYTE', slug: 'gigabyte', description: 'Computer hardware manufacturer' },
+    { name: 'NCX', slug: 'ncx', description: 'Storage products' },
+    { name: 'Orico', slug: 'orico', description: 'Digital accessories' },
+    { name: 'HP', slug: 'hp', description: 'Computing and printing solutions' },
+    { name: 'King Super', slug: 'king-super', description: 'Storage products' },
+    { name: 'Addlink', slug: 'addlink', description: 'Memory and storage' },
+    { name: 'NEO FORZA', slug: 'neo-forza', description: 'Memory and storage' },
+    { name: 'Hikvision', slug: 'hikvision', description: 'Security and storage' },
+    { name: 'Patriot', slug: 'patriot', description: 'Memory and storage' },
+    { name: 'Ramsta', slug: 'ramsta', description: 'Storage solutions' },
+    { name: 'Redragon', slug: 'redragon', description: 'Gaming peripherals' },
+    { name: 'Kimtigo', slug: 'kimtigo', description: 'Memory products' },
+    { name: 'AGI', slug: 'agi', description: 'Storage solutions' },
+    { name: 'Revenger', slug: 'revenger', description: 'Gaming storage' },
+    { name: 'Dahua', slug: 'dahua', description: 'Security and storage' },
+    { name: 'LENOVO', slug: 'lenovo', description: 'Computing solutions' },
+    { name: 'Smart', slug: 'smart', description: 'Storage products' },
+    { name: 'Walton', slug: 'walton', description: 'Electronics manufacturer' },
+    { name: 'Suneest', slug: 'suneest', description: 'Storage products' },
+    { name: 'Kingbank', slug: 'kingbank', description: 'Memory products' },
+  ];
+
+  // Create SSD brands in batches to avoid connection issues
+  console.log('Creating SSD brands...');
+  for (const brand of ssdBrandsList) {
+    await prisma.brand.upsert({
+      where: { slug: brand.slug },
+      update: {},
+      create: {
+        name: brand.name,
+        slug: brand.slug,
+        description: brand.description,
+        isActive: true,
+      },
+    });
+  }
+
+  const brands = coreBrands;
+  console.log('✅ Brands created:', coreBrands.length + ssdBrandsList.length);
 
   // 3. Create Category Structure
   console.log('Creating categories...');
