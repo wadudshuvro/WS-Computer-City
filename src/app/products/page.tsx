@@ -64,10 +64,24 @@ function ProductsPageContent() {
   // Check if we're on graphics card category (including nvidia and amd-gpu subcategories)
   const isGpuCategory = subCategory === 'graphics-card' || subCategory === 'nvidia' || subCategory === 'amd-gpu' || categoryParam === 'graphics-card';
 
+  // Check if we're on SSD/Storage category
+  const isSsdCategory = subCategory === 'ssd' || subCategory === 'nvme' || subCategory === 'storage' || categoryParam === 'ssd';
+
   // Active brand tab based on category type
   const activeProcessorBrandTab = brandParam === 'amd' ? 'amd' : 'intel';
   // For GPUs, active tab is based on sub-category (nvidia or amd-gpu)
   const activeGpuBrandTab = subCategory === 'amd-gpu' ? 'amd' : 'nvidia';
+  // For SSD, active brand from URL
+  const activeSsdBrand = brandParam || '';
+
+  // SSD Brands list (matching Tech Land design)
+  const ssdBrands = [
+    'Corsair', 'Kingston', 'Samsung', 'Team', 'XOC', 'MiPhi', 'OSCOO', 'Lexar', 'MSI', 'SanDisk',
+    'Seagate', 'Adata', 'Ocpc', 'Western Digital', 'Aitc', 'Acer', 'Transcend', 'Crucial', 'Apacer',
+    'Colorful', 'KingSpec', 'Netac', 'PNY', 'Twinmos', 'Pc Power', 'Biwintech', 'Kingbox', 'GIGABYTE',
+    'NCX', 'Orico', 'HP', 'King Super', 'Addlink', 'NEO FORZA', 'Hikvision', 'Patriot', 'Ramsta',
+    'Redragon', 'Kimtigo', 'AGI', 'Revenger', 'Dahua', 'LENOVO', 'Smart', 'Walton', 'Suneest', 'Kingbank'
+  ];
 
   useEffect(() => {
     fetchProducts();
@@ -147,6 +161,23 @@ function ProductsPageContent() {
     router.push(`/products?${params.toString()}`);
   };
 
+  const handleSsdBrandClick = (brand: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const brandSlug = brand.toLowerCase().replace(/\s+/g, '-');
+    
+    // Toggle brand filter - if already selected, clear it
+    if (brandParam === brandSlug) {
+      params.delete('brand');
+    } else {
+      params.set('brand', brandSlug);
+    }
+    params.set('page', '1');
+    if (!params.has('sub')) {
+      params.set('sub', 'ssd');
+    }
+    router.push(`/products?${params.toString()}`);
+  };
+
   const getStockStatusBadge = (status: string) => {
     const badges: Record<string, { text: string; className: string }> = {
       IN_STOCK: { text: 'In Stock', className: 'bg-green-500' },
@@ -191,6 +222,7 @@ function ProductsPageContent() {
   const getPageTitle = () => {
     if (isProcessorCategory) return 'Processor Price In BD 2026';
     if (isGpuCategory) return 'Graphics Card Price In BD 2026';
+    if (isSsdCategory) return 'SSD Best Price in BD 2026 | Tech Land BD';
     return 'All Products';
   };
 
@@ -213,7 +245,7 @@ function ProductsPageContent() {
               </>
             )}
             <span className="text-gray-900 font-medium">
-              {isProcessorCategory ? 'Processor' : isGpuCategory ? 'Graphics Card' : 'Products'}
+              {isProcessorCategory ? 'Processor' : isGpuCategory ? 'Graphics Card' : isSsdCategory ? 'SSD' : 'Products'}
             </span>
           </nav>
         </div>
@@ -292,6 +324,40 @@ function ProductsPageContent() {
                 >
                   AMD Radeon
                 </button>
+              </div>
+            </>
+          )}
+
+          {/* SSD Category Section */}
+          {isSsdCategory && (
+            <>
+              <p className="text-sm text-gray-600 max-w-4xl mb-4">
+                SSD Best Price in BD 2026 begins at BDT 3,150/- and can go up to BDT 85,000/- depending on the brand and specifications. 
+                With a variety of 1126 items available at WS Computer City, where 223 items are in stock now & 1076 items offer you the best 
+                discount price in BD. Find the perfect SSD Components for your requirements. Search for SSD price in bd, 1tb SSD price in bd, 
+                256 GB SSD price in bd, 512GB SSD price in bd, portable SSD price in bd, m.2 SSD price in bd, nvme SSD price in bd.
+              </p>
+              
+              {/* SSD Brands Grid - Similar to Tech Land design */}
+              <div className="flex flex-wrap gap-2 mt-4">
+                {ssdBrands.map((brand) => {
+                  const brandSlug = brand.toLowerCase().replace(/\s+/g, '-');
+                  const isActive = brandParam === brandSlug;
+                  return (
+                    <button
+                      key={brand}
+                      type="button"
+                      onClick={() => handleSsdBrandClick(brand)}
+                      className={`px-3 py-1.5 text-sm rounded border transition-colors ${
+                        isActive
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600'
+                      }`}
+                    >
+                      {brand}
+                    </button>
+                  );
+                })}
               </div>
             </>
           )}
@@ -712,6 +778,43 @@ function ProductsPageContent() {
                 AMD Radeon graphics cards deliver excellent value and performance for gamers and content creators. 
                 The Radeon RX 7000 series offers competitive performance with features like AMD FidelityFX Super Resolution (FSR) 
                 for enhanced frame rates. AMD GPUs are known for their strong price-to-performance ratio.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SEO Content Section (Only for SSD category) */}
+      {isSsdCategory && (
+        <div className="bg-white border-t mt-8">
+          <div className="max-w-[1400px] mx-auto px-4 py-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
+              SSD Price in Bangladesh
+            </h2>
+            <div className="prose prose-sm max-w-none text-gray-600">
+              <p>
+                A Solid State Drive (SSD) is a storage device that uses flash memory to store data permanently. Unlike traditional 
+                Hard Disk Drives (HDDs), SSDs have no moving parts, making them faster, more durable, and more energy-efficient. 
+                SSDs significantly improve system boot times, application loading speeds, and overall computer responsiveness. 
+                WS Computer City BD offers a wide selection of SSDs from leading brands including Samsung, Kingston, Crucial, 
+                Western Digital, and many more.
+              </p>
+              
+              <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">Types of SSDs</h3>
+              <p>
+                <strong>SATA SSD:</strong> These are the most common type, using the SATA III interface with speeds up to 550 MB/s. 
+                Available in 2.5-inch form factor, they're ideal for upgrading older laptops and desktops.
+              </p>
+              <p>
+                <strong>NVMe SSD:</strong> Using the PCIe interface, NVMe SSDs offer significantly faster speeds (up to 7,000 MB/s or more). 
+                Available in M.2 form factor, they're perfect for gaming, content creation, and professional workloads.
+              </p>
+              
+              <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">Popular SSD Brands</h3>
+              <p>
+                Samsung leads the market with their 980 PRO and 990 PRO series. Kingston offers reliable options with their A2000 and 
+                KC3000 series. Crucial provides excellent value with their MX500 and P5 Plus series. Western Digital's WD Blue and 
+                WD Black series are popular choices for both everyday use and gaming.
               </p>
             </div>
           </div>
