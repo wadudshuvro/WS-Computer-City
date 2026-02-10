@@ -214,13 +214,22 @@ export default function ProductEntryForm() {
       
       // Auto-generate slug from name
       if (name === 'name' && !formData.slug) {
-        const slug = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        const slug = value
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')  // Replace non-alphanumeric with hyphen
+          .replace(/-+/g, '-')           // Replace multiple hyphens with single hyphen
+          .replace(/^-|-$/g, '');        // Remove leading/trailing hyphens
         setFormData(prev => ({ ...prev, slug }));
       }
       
       // Auto-generate SKU from name
       if (name === 'name' && !formData.sku) {
-        const sku = value.toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 20);
+        const sku = value
+          .toUpperCase()
+          .replace(/[^A-Z0-9]+/g, '-')  // Replace non-alphanumeric with hyphen
+          .replace(/-+/g, '-')           // Replace multiple hyphens with single hyphen
+          .replace(/^-|-$/g, '')         // Remove leading/trailing hyphens
+          .slice(0, 20);
         setFormData(prev => ({ ...prev, sku }));
       }
     }
@@ -280,12 +289,38 @@ export default function ProductEntryForm() {
     setSpecifications(prev => ({ ...prev, [key]: value }));
   };
 
+  // Helper function to sanitize slug
+  const sanitizeSlug = (value: string): string => {
+    return value
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  };
+
+  // Helper function to sanitize SKU
+  const sanitizeSku = (value: string): string => {
+    return value
+      .toUpperCase()
+      .replace(/[^A-Z0-9]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  };
+
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name) newErrors.name = 'Product name is required';
-    if (!formData.slug) newErrors.slug = 'Slug is required';
-    if (!formData.sku) newErrors.sku = 'SKU is required';
+    if (!formData.slug) {
+      newErrors.slug = 'Slug is required';
+    } else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(formData.slug)) {
+      newErrors.slug = 'Slug must be lowercase letters/numbers with single hyphens (e.g., "my-product-name")';
+    }
+    if (!formData.sku) {
+      newErrors.sku = 'SKU is required';
+    } else if (!/^[A-Z0-9-]+$/.test(formData.sku)) {
+      newErrors.sku = 'SKU must be uppercase letters/numbers with hyphens (e.g., "PROD-001")';
+    }
     if (!formData.price || parseFloat(formData.price) <= 0) newErrors.price = 'Valid price is required';
     
     // Validate compare at price (must be greater than regular price if provided)
@@ -710,9 +745,17 @@ export default function ProductEntryForm() {
               name="slug"
               value={formData.slug}
               onChange={handleInputChange}
+              onBlur={(e) => {
+                // Auto-fix slug format on blur
+                const sanitized = sanitizeSlug(e.target.value);
+                if (sanitized !== e.target.value) {
+                  setFormData(prev => ({ ...prev, slug: sanitized }));
+                }
+              }}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="intel-core-i5-14600k"
             />
+            <p className="text-gray-500 text-xs mt-1">Lowercase letters, numbers, and hyphens only</p>
             {errors.slug && <p className="text-red-500 text-sm mt-1">{errors.slug}</p>}
           </div>
 
@@ -725,9 +768,17 @@ export default function ProductEntryForm() {
               name="sku"
               value={formData.sku}
               onChange={handleInputChange}
+              onBlur={(e) => {
+                // Auto-fix SKU format on blur
+                const sanitized = sanitizeSku(e.target.value);
+                if (sanitized !== e.target.value) {
+                  setFormData(prev => ({ ...prev, sku: sanitized }));
+                }
+              }}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="INTEL-I5-14600K"
             />
+            <p className="text-gray-500 text-xs mt-1">Uppercase letters, numbers, and hyphens only</p>
             {errors.sku && <p className="text-red-500 text-sm mt-1">{errors.sku}</p>}
           </div>
 
