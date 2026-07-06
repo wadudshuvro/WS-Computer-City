@@ -24,9 +24,11 @@ export async function GET(req: NextRequest) {
     // Parse and validate query parameters
     const searchParams = req.nextUrl.searchParams;
     
-    // Use 'sub' parameter if provided, otherwise fall back to 'category'
-    // This handles URLs like: /products?category=components&sub=graphics-card
-    const categorySlug = searchParams.get('sub') || searchParams.get('category') || undefined;
+    const categorySlug = ProductService.resolveCategorySlug(
+      searchParams.get('sub'),
+      searchParams.get('category'),
+      searchParams.get('type')
+    );
     
     const filters = {
       category: categorySlug,

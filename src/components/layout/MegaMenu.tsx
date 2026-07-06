@@ -180,7 +180,7 @@ export function MegaMenu() {
                               {subCat.children.map((child) => (
                                 <li key={child.slug}>
                                   <Link
-                                    href={`/products?category=${category.slug}&sub=${subCat.slug}&type=${child.slug}`}
+                                    href={`/products?category=${category.slug}&sub=${child.slug}`}
                                     className="block px-4 py-2 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                                   >
                                     {child.name}

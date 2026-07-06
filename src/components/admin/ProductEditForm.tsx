@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { 
   categoryHierarchy, 
   getSpecificationsForCategory, 
+  resolveCategoryFromDbSlug,
+  inferGpuSubCategory,
   SpecificationField,
   MainCategorySlug 
 } from '@/lib/categoryConfig';
@@ -109,49 +111,14 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [dataLoading, setDataLoading] = useState(true);
 
-  // Determine main category from product's category
-  const determineMainCategory = () => {
-    const categorySlug = product.category.slug;
-    const parentSlug = product.category.parent?.slug;
-    
-    // Check if the category itself is a main category
-    if (categoryHierarchy[categorySlug]) {
-      return categorySlug;
-    }
-    
-    // Check if parent is a main category
-    if (parentSlug && categoryHierarchy[parentSlug]) {
-      return parentSlug;
-    }
-    
-    // Try to match by name
-    for (const [key, value] of Object.entries(categoryHierarchy)) {
-      if (value.subCategories.some(sub => sub.slug === categorySlug || sub.id === categorySlug)) {
-        return key;
-      }
-    }
-    
-    return '';
-  };
+  const resolvedCategory = resolveCategoryFromDbSlug(
+    product.category.slug,
+    product.category.parent?.slug
+  );
 
-  const determineSubCategory = (mainCat: string) => {
-    if (!mainCat || !categoryHierarchy[mainCat]) return '';
-    
-    const categorySlug = product.category.slug;
-    const subCats = categoryHierarchy[mainCat].subCategories;
-    
-    const match = subCats.find(sub => 
-      sub.slug === categorySlug || 
-      sub.id === categorySlug ||
-      product.category.name.toLowerCase().includes(sub.name.toLowerCase())
-    );
-    
-    return match?.id || '';
-  };
-
-  // Category selection state
-  const [selectedMainCategory, setSelectedMainCategory] = useState<string>(determineMainCategory());
-  const [selectedSubCategory, setSelectedSubCategory] = useState<string>('');
+  // Category selection state — map DB slug (e.g. graphics-card) to form key (graphics_card)
+  const [selectedMainCategory, setSelectedMainCategory] = useState<string>(resolvedCategory.mainCategory);
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>(resolvedCategory.subCategory);
 
   // Form state - initialized with product data
   const [formData, setFormData] = useState({
@@ -227,19 +194,23 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
   // Get category-specific specifications
   const categorySpecs = useMemo(() => {
     if (!selectedMainCategory) return [];
+    const subCategory =
+      selectedMainCategory === 'graphics_card'
+        ? inferGpuSubCategory(selectedSubCategory, categorySpecifications)
+        : selectedSubCategory;
     return getSpecificationsForCategory(
-      selectedMainCategory as MainCategorySlug, 
-      selectedSubCategory
+      selectedMainCategory as MainCategorySlug,
+      subCategory
     );
-  }, [selectedMainCategory, selectedSubCategory]);
+  }, [selectedMainCategory, selectedSubCategory, categorySpecifications]);
 
-  // Initialize sub-category after main category is set
+  // Sync sub-category from product specs when on graphics-card without a sub
   useEffect(() => {
-    if (selectedMainCategory) {
-      const subCat = determineSubCategory(selectedMainCategory);
-      setSelectedSubCategory(subCat);
+    if (selectedMainCategory === 'graphics_card' && !selectedSubCategory) {
+      const inferred = inferGpuSubCategory('', categorySpecifications);
+      if (inferred) setSelectedSubCategory(inferred);
     }
-  }, [selectedMainCategory]);
+  }, [selectedMainCategory, selectedSubCategory, categorySpecifications]);
 
   // Fetch categories and brands on mount
   useEffect(() => {
@@ -380,15 +351,27 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
 
     try {
       // Combine specifications
+      const categorySpecKeys = new Set(categorySpecs.map((s) => s.key));
       const allSpecifications = [
-        ...Object.entries(specifications).map(([specificationDefinitionId, value]) => ({
-          specificationDefinitionId,
-          value,
-        })),
-        ...Object.entries(categorySpecifications).map(([key, value]) => ({
-          key,
-          value: Array.isArray(value) ? value.join(', ') : value,
-        })),
+        ...Object.entries(specifications)
+          .filter(([specId, value]) => {
+            if (!value?.trim()) return false;
+            const def = specDefinitions.find((d) => d.id === specId);
+            return !def || !categorySpecKeys.has(def.key);
+          })
+          .map(([specificationDefinitionId, value]) => ({
+            specificationDefinitionId,
+            value,
+          })),
+        ...Object.entries(categorySpecifications)
+          .filter(([_, value]) => {
+            if (Array.isArray(value)) return value.length > 0;
+            return value && String(value).trim() !== '';
+          })
+          .map(([key, value]) => ({
+            key,
+            value: Array.isArray(value) ? value.join(', ') : String(value),
+          })),
       ];
 
       const payload = {
@@ -415,7 +398,8 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
       }
 
       alert('Product updated successfully!');
-      router.push('/admin/products');
+      const categorySlug = product.category.slug;
+      router.push(`/admin/products/category/${categorySlug}`);
     } catch (error: any) {
       console.error('Error updating product:', error);
       alert(error.message || 'Failed to update product');
@@ -702,8 +686,10 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
               value={formData.description}
               onChange={handleInputChange}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              rows={4}
+              rows={8}
+              placeholder="Write your description here. Leave a blank line between paragraphs for better readability on the product page."
             />
+            <p className="text-xs text-gray-500 mt-1">Tip: Press Enter twice between paragraphs so they display separately on the storefront.</p>
           </div>
         </div>
       </div>

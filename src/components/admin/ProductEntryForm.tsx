@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   categoryHierarchy, 
@@ -8,6 +8,7 @@ import {
   SpecificationField,
   MainCategorySlug 
 } from '@/lib/categoryConfig';
+import { getContentTypeBySlug } from '@/lib/adminCategoryConfig';
 
 interface Category {
   id: string;
@@ -40,8 +41,14 @@ interface ProductImage {
   isPrimary: boolean;
 }
 
-export default function ProductEntryForm() {
+interface ProductEntryFormProps {
+  defaultCategorySlug?: string;
+}
+
+export default function ProductEntryForm({ defaultCategorySlug }: ProductEntryFormProps = {}) {
   const router = useRouter();
+  const defaultAppliedRef = useRef(false);
+  const skipSubResetRef = useRef(false);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -113,6 +120,12 @@ export default function ProductEntryForm() {
     );
   }, [selectedMainCategory, selectedSubCategory]);
 
+  // Avoid duplicate fields between category specs and DB definitions
+  const additionalSpecDefinitions = useMemo(() => {
+    const categorySpecKeys = new Set(categorySpecs.map((s) => s.key));
+    return specDefinitions.filter((s) => !categorySpecKeys.has(s.key));
+  }, [specDefinitions, categorySpecs]);
+
   // Fetch categories and brands on mount
   useEffect(() => {
     async function loadData() {
@@ -133,11 +146,47 @@ export default function ProductEntryForm() {
     }
   }, [formData.categoryId]);
 
-  // Reset sub-category when main category changes
+  // Reset sub-category when main category changes (skip when applying default category)
   useEffect(() => {
+    if (skipSubResetRef.current) {
+      skipSubResetRef.current = false;
+      return;
+    }
     setSelectedSubCategory('');
     setCategorySpecifications({});
   }, [selectedMainCategory]);
+
+  // Pre-select category when navigating from a content type page
+  useEffect(() => {
+    if (!defaultCategorySlug || categories.length === 0 || defaultAppliedRef.current) return;
+
+    const contentType = getContentTypeBySlug(defaultCategorySlug);
+    const mainKey = contentType?.formMainCategory;
+
+    if (mainKey && categoryHierarchy[mainKey]) {
+      const subMatch = categoryHierarchy[mainKey].subCategories.find(
+        (s) => s.slug === defaultCategorySlug || s.id === defaultCategorySlug
+      );
+
+      skipSubResetRef.current = true;
+      setSelectedMainCategory(mainKey);
+      if (subMatch) {
+        setSelectedSubCategory(subMatch.id);
+      } else {
+        const directMatch = categories.find((c) => c.slug === defaultCategorySlug);
+        if (directMatch) {
+          setFormData((prev) => ({ ...prev, categoryId: directMatch.id }));
+        }
+      }
+    } else {
+      const directMatch = categories.find((c) => c.slug === defaultCategorySlug);
+      if (directMatch) {
+        setFormData((prev) => ({ ...prev, categoryId: directMatch.id }));
+      }
+    }
+
+    defaultAppliedRef.current = true;
+  }, [defaultCategorySlug, categories]);
 
   // Update categoryId based on sub-category selection (find matching category in DB)
   useEffect(() => {
@@ -345,8 +394,8 @@ export default function ProductEntryForm() {
       }
     });
 
-    // Validate required database specifications
-    specDefinitions.forEach(spec => {
+    // Validate required database specifications (non-duplicate additional only)
+    additionalSpecDefinitions.forEach(spec => {
       if (spec.isRequired && !specifications[spec.id]) {
         newErrors[`spec_${spec.id}`] = `${spec.name} is required`;
       }
@@ -369,8 +418,13 @@ export default function ProductEntryForm() {
     try {
       // Combine database specs with category-specific specs
       // Filter out empty values to prevent validation errors
+      const categorySpecKeys = new Set(categorySpecs.map((s) => s.key));
       const dbSpecifications = Object.entries(specifications)
-        .filter(([_, value]) => value && value.trim() !== '')
+        .filter(([specId, value]) => {
+          if (!value || value.trim() === '') return false;
+          const def = specDefinitions.find((d) => d.id === specId);
+          return !def || !categorySpecKeys.has(def.key);
+        })
         .map(([specificationDefinitionId, value]) => ({
           specificationDefinitionId,
           value: value.trim(),
@@ -802,9 +856,10 @@ export default function ProductEntryForm() {
               value={formData.description}
               onChange={handleInputChange}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              rows={4}
-              placeholder="Detailed product description..."
+              rows={8}
+              placeholder="Write your description here. Leave a blank line between paragraphs for better readability on the product page."
             />
+            <p className="text-xs text-gray-500 mt-1">Tip: Press Enter twice between paragraphs so they display separately on the storefront.</p>
           </div>
         </div>
       </div>
@@ -1012,7 +1067,7 @@ export default function ProductEntryForm() {
       </div>
 
       {/* ========== SECTION 6: Database Specifications (if any) ========== */}
-      {specDefinitions.length > 0 && (
+      {additionalSpecDefinitions.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white font-bold">
@@ -1020,12 +1075,12 @@ export default function ProductEntryForm() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">Additional Specifications</h2>
-              <p className="text-sm text-gray-500">Specifications from database for this category</p>
+              <p className="text-sm text-gray-500">Extra specifications for this category</p>
             </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {specDefinitions.map(spec => (
+            {additionalSpecDefinitions.map(spec => (
               <div key={spec.id}>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   {spec.name} {spec.isRequired && <span className="text-red-500">*</span>}
@@ -1072,7 +1127,7 @@ export default function ProductEntryForm() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center text-white font-bold">
-            {categorySpecs.length > 0 ? (specDefinitions.length > 0 ? '7' : '6') : (specDefinitions.length > 0 ? '6' : '5')}
+            {categorySpecs.length > 0 ? (additionalSpecDefinitions.length > 0 ? '7' : '6') : (additionalSpecDefinitions.length > 0 ? '6' : '5')}
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-900">SEO & Meta Data</h2>
@@ -1127,7 +1182,7 @@ export default function ProductEntryForm() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-white font-bold">
-            {categorySpecs.length > 0 ? (specDefinitions.length > 0 ? '8' : '7') : (specDefinitions.length > 0 ? '7' : '6')}
+            {categorySpecs.length > 0 ? (additionalSpecDefinitions.length > 0 ? '8' : '7') : (additionalSpecDefinitions.length > 0 ? '7' : '6')}
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-900">Visibility & Control</h2>
