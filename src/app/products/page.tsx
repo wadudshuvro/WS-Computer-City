@@ -55,6 +55,7 @@ function ProductsPageContent() {
   const currentSort = searchParams.get('sort') || 'default';
   const categoryParam = searchParams.get('category');
   const subCategory = searchParams.get('sub');
+  const typeParam = searchParams.get('type');
   const brandParam = searchParams.get('brand') || '';
   const itemsPerPage = 30;
 
@@ -62,15 +63,21 @@ function ProductsPageContent() {
   const isProcessorCategory = subCategory === 'processor' || categoryParam === 'processor';
   
   // Check if we're on graphics card category (including nvidia and amd-gpu subcategories)
-  const isGpuCategory = subCategory === 'graphics-card' || subCategory === 'nvidia' || subCategory === 'amd-gpu' || categoryParam === 'graphics-card';
+  const isGpuCategory =
+    subCategory === 'graphics-card' ||
+    subCategory === 'nvidia' ||
+    subCategory === 'amd-gpu' ||
+    typeParam === 'nvidia' ||
+    typeParam === 'amd-gpu' ||
+    categoryParam === 'graphics-card';
 
   // Check if we're on SSD/Storage category
   const isSsdCategory = subCategory === 'ssd' || subCategory === 'nvme' || subCategory === 'storage' || categoryParam === 'ssd';
 
   // Active brand tab based on category type
   const activeProcessorBrandTab = brandParam === 'amd' ? 'amd' : 'intel';
-  // For GPUs, active tab is based on sub-category (nvidia or amd-gpu)
-  const activeGpuBrandTab = subCategory === 'amd-gpu' ? 'amd' : 'nvidia';
+  const activeGpuBrandTab =
+    subCategory === 'amd-gpu' || typeParam === 'amd-gpu' ? 'amd' : 'nvidia';
   // For SSD, active brand from URL
   const activeSsdBrand = brandParam || '';
 
@@ -98,10 +105,10 @@ function ProductsPageContent() {
         params.set('limit', itemsPerPage.toString());
       }
 
-      // Use processor-specific API if on processor category
+      // Use public products API with child-category + GPU type support
       const apiUrl = isProcessorCategory 
         ? `/api/products/processor?${params.toString()}`
-        : `/api/admin/products?${params.toString()}`;
+        : `/api/products?${params.toString()}`;
 
       const res = await fetch(apiUrl);
       
@@ -152,10 +159,9 @@ function ProductsPageContent() {
 
   const handleGpuBrandTabChange = (gpuType: 'nvidia' | 'amd') => {
     const params = new URLSearchParams(searchParams.toString());
-    // For GPUs, we filter by sub-category (nvidia or amd-gpu) not brand
-    // Brand is the manufacturer (ASUS, MSI, etc.) while category is the chip maker
     params.set('sub', gpuType === 'amd' ? 'amd-gpu' : 'nvidia');
-    params.delete('brand'); // Remove brand filter when switching GPU type
+    params.delete('type');
+    params.delete('brand');
     params.set('page', '1');
     params.set('category', 'components');
     router.push(`/products?${params.toString()}`);

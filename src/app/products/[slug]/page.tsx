@@ -18,6 +18,9 @@ import {
   Plus,
   Minus
 } from 'lucide-react';
+import { GPU_SPECIFICATION_GROUPS, isGpuCategory, getCategorySlugs } from '@/lib/gpuSpecDefinitions';
+import { GpuProductHighlights } from '@/components/products/GpuProductHighlights';
+import { ProductDescription } from '@/components/products/ProductDescription';
 
 interface ProductSpecification {
   specificationDefinition: {
@@ -140,6 +143,7 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     if (slug) {
+      setActiveTab('specification');
       fetchProduct();
     }
   }, [slug]);
@@ -193,9 +197,13 @@ export default function ProductDetailPage() {
   const groupedSpecifications = () => {
     if (!product) return [];
 
+    const groupsConfig = isGpuCategory(getCategorySlugs(product.category))
+      ? GPU_SPECIFICATION_GROUPS
+      : specificationGroups;
+
     const groups: { title: string; specs: { name: string; value: string }[] }[] = [];
 
-    Object.entries(specificationGroups).forEach(([, group]) => {
+    Object.entries(groupsConfig).forEach(([, group]) => {
       const specs = group.keys
         .map(key => {
           const value = getSpecValue(key);
@@ -212,7 +220,7 @@ export default function ProductDetailPage() {
     });
 
     // Add any remaining specifications that weren't in predefined groups
-    const allGroupKeys = Object.values(specificationGroups).flatMap(g => g.keys);
+    const allGroupKeys = Object.values(groupsConfig).flatMap(g => g.keys);
     const remainingSpecs = product.specifications
       .filter(s => !allGroupKeys.includes(s.specificationDefinition.key))
       .map(s => ({ name: s.specificationDefinition.name, value: s.value }));
@@ -253,6 +261,7 @@ export default function ProductDetailPage() {
   }
 
   const stockStatus = getStockStatus(product.stockStatus);
+  const isGpu = isGpuCategory(getCategorySlugs(product.category));
   const discount = product.compareAtPrice
     ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
     : 0;
@@ -383,35 +392,55 @@ export default function ProductDetailPage() {
 
                   {/* Product Info */}
                   <div>
-                    {/* Title & Meta */}
-                    <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                    {/* Title */}
+                    <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 leading-snug">
                       {product.name}
                     </h1>
 
-                    {/* Quick Info */}
-                    <div className="flex flex-wrap items-center gap-4 text-sm mb-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${stockStatus.bgColor} ${stockStatus.color}`}>
-                        {stockStatus.text}
-                      </span>
-                      <span className="text-gray-500">
-                        PID: <span className="text-gray-900">{product.sku}</span>
-                      </span>
-                      <span className="text-gray-500">
-                        Brand: <Link href={`/brands/${product.brand.slug}`} className="text-blue-600 hover:underline">{product.brand.name}</Link>
-                      </span>
-                    </div>
+                    {/* GPU: boxed feature points + short description */}
+                    {isGpu ? (
+                      <GpuProductHighlights
+                        sku={product.sku}
+                        stockStatus={product.stockStatus}
+                        stockLabel={stockStatus.text}
+                        brand={product.brand}
+                        productName={product.name}
+                        getSpecValue={getSpecValue}
+                      />
+                    ) : (
+                      <>
+                        {/* Quick Info — other categories */}
+                        <div className="flex flex-wrap items-center gap-4 text-sm mb-4">
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${stockStatus.bgColor} ${stockStatus.color}`}>
+                            {stockStatus.text}
+                          </span>
+                          <span className="text-gray-500">
+                            PID: <span className="text-gray-900">{product.sku}</span>
+                          </span>
+                          <span className="text-gray-500">
+                            Brand:{' '}
+                            <Link href={`/brands/${product.brand.slug}`} className="text-blue-600 hover:underline">
+                              {product.brand.name}
+                            </Link>
+                          </span>
+                        </div>
 
-                    {/* Key Specs Preview */}
-                    <div className="bg-gray-50 rounded-lg p-3 mb-4 text-sm text-gray-600">
-                      {getSpecValue('base_clock') && (
-                        <p>Clock Speed: {getSpecValue('base_clock')} GHz up to {getSpecValue('boost_clock') || 'N/A'} GHz</p>
-                      )}
-                      {getSpecValue('cache_size') && <p>Cache: {getSpecValue('cache_size')}</p>}
-                      {getSpecValue('socket_type') && <p>Socket: {getSpecValue('socket_type')}</p>}
-                      {getSpecValue('number_of_cores') && (
-                        <p>{getSpecValue('number_of_cores')} | {getSpecValue('number_of_threads') || 'N/A'}</p>
-                      )}
-                    </div>
+                        {/* Key Specs Preview — processors etc. */}
+                        <div className="bg-gray-50 rounded-lg p-3 mb-4 text-sm text-gray-600">
+                          {getSpecValue('base_clock') && (
+                            <p>Clock Speed: {getSpecValue('base_clock')} GHz up to {getSpecValue('boost_clock') || 'N/A'} GHz</p>
+                          )}
+                          {getSpecValue('cache_size') && <p>Cache: {getSpecValue('cache_size')}</p>}
+                          {getSpecValue('socket_type') && <p>Socket: {getSpecValue('socket_type')}</p>}
+                          {getSpecValue('number_of_cores') && (
+                            <p>{getSpecValue('number_of_cores')} | {getSpecValue('number_of_threads') || 'N/A'}</p>
+                          )}
+                          {!getSpecValue('base_clock') && product.shortDescription && (
+                            <p>{product.shortDescription}</p>
+                          )}
+                        </div>
+                      </>
+                    )}
 
                     {/* Reviews */}
                     <div className="flex items-center gap-2 mb-4">
@@ -527,16 +556,6 @@ export default function ProductDetailPage() {
               <div className="border-b border-gray-200">
                 <div className="flex">
                   <button
-                    onClick={() => setActiveTab('description')}
-                    className={`px-6 py-4 text-sm font-medium transition-colors ${
-                      activeTab === 'description'
-                        ? 'text-blue-600 border-b-2 border-blue-600'
-                        : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
-                    Description
-                  </button>
-                  <button
                     onClick={() => setActiveTab('specification')}
                     className={`px-6 py-4 text-sm font-medium transition-colors ${
                       activeTab === 'specification'
@@ -545,6 +564,16 @@ export default function ProductDetailPage() {
                     }`}
                   >
                     Specification
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('description')}
+                    className={`px-6 py-4 text-sm font-medium transition-colors ${
+                      activeTab === 'description'
+                        ? 'text-blue-600 border-b-2 border-blue-600'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    Description
                   </button>
                   <button
                     onClick={() => setActiveTab('reviews')}
@@ -563,11 +592,11 @@ export default function ProductDetailPage() {
               <div className="p-6">
                 {/* Description Tab */}
                 {activeTab === 'description' && (
-                  <div className="prose max-w-none">
+                  <div>
                     {product.description ? (
-                      <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                      <ProductDescription content={product.description} />
                     ) : product.shortDescription ? (
-                      <p>{product.shortDescription}</p>
+                      <ProductDescription content={product.shortDescription} />
                     ) : (
                       <p className="text-gray-500">No description available for this product.</p>
                     )}

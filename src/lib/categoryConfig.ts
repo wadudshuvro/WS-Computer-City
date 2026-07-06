@@ -444,6 +444,9 @@ export const gpuSpecOptions = {
     'GeForce RTX 5080',
     'GeForce RTX 5070 Ti',
     'GeForce RTX 5070',
+    'GeForce RTX 5060 Ti',
+    'GeForce RTX 5060',
+    'GeForce RTX 5050',
     'GeForce RTX 4090',
     'GeForce RTX 4080 Super',
     'GeForce RTX 4080',
@@ -598,22 +601,21 @@ export const gpuSpecOptions = {
   ],
 };
 
-// GPU Specifications
+// GPU Specifications (matches TechLand grouped specification layout)
 export const gpuSpecifications: SpecificationField[] = [
-  {
-    key: 'gpu_chipset',
-    name: 'GPU Chipset',
-    type: 'select',
-    options: [...gpuSpecOptions.nvidiaChipsets, ...gpuSpecOptions.amdChipsets],
-    required: true,
-    helpText: 'Select the GPU model',
-  },
   {
     key: 'memory_size',
     name: 'Memory Size',
     type: 'select',
     options: gpuSpecOptions.memorySizes,
     required: true,
+  },
+  {
+    key: 'bus_type',
+    name: 'Bus Type',
+    type: 'text',
+    placeholder: 'e.g., 28 Gbps',
+    required: false,
   },
   {
     key: 'memory_type',
@@ -623,55 +625,82 @@ export const gpuSpecifications: SpecificationField[] = [
     required: true,
   },
   {
+    key: 'memory_clock',
+    name: 'Memory Clock',
+    type: 'text',
+    placeholder: 'e.g., 2595 MHz',
+    required: false,
+  },
+  {
     key: 'memory_bus',
-    name: 'Memory Bus Width',
+    name: 'Memory Bus (Bit)',
     type: 'select',
-    options: gpuSpecOptions.busWidths,
+    options: gpuSpecOptions.busWidths.map((w) => w.replace('-bit', ' bit')),
     required: false,
   },
   {
-    key: 'base_clock',
-    name: 'Base Clock',
-    type: 'number',
-    unit: 'MHz',
+    key: 'resolution',
+    name: 'Resolution',
+    type: 'text',
+    placeholder: 'e.g., 7680x4320',
     required: false,
-    placeholder: '1500',
   },
   {
-    key: 'boost_clock',
-    name: 'Boost Clock',
+    key: 'multi_display',
+    name: 'Multi Display',
     type: 'number',
-    unit: 'MHz',
+    placeholder: '4',
     required: false,
-    placeholder: '2500',
+  },
+  {
+    key: 'gpu_chipset',
+    name: 'GPU Chipset',
+    type: 'select',
+    options: [...gpuSpecOptions.nvidiaChipsets, ...gpuSpecOptions.amdChipsets],
+    required: true,
+    helpText: 'Select the GPU model',
   },
   {
     key: 'cuda_cores',
-    name: 'CUDA Cores / Stream Processors',
+    name: 'CUDA Cores (Nvidia)',
     type: 'number',
     required: false,
-    placeholder: '8704',
+    placeholder: '3840',
     helpText: 'CUDA cores for NVIDIA, Stream Processors for AMD',
   },
   {
-    key: 'rt_cores',
-    name: 'RT Cores / Ray Accelerators',
-    type: 'number',
-    required: false,
-    placeholder: '68',
-  },
-  {
-    key: 'tensor_cores',
-    name: 'Tensor / AI Cores',
-    type: 'number',
-    required: false,
-    placeholder: '272',
-  },
-  {
-    key: 'tdp',
-    name: 'TDP / TGP',
+    key: 'pci_express',
+    name: 'Interface (PCI Express)',
     type: 'select',
-    options: gpuSpecOptions.tdpOptions,
+    options: ['PCI-E 3.0', 'PCI-E 4.0', 'PCI-E 5.0'],
+    required: false,
+  },
+  {
+    key: 'directx',
+    name: 'DirectX',
+    type: 'select',
+    options: ['DirectX 12 API', 'DirectX 12 Ultimate', 'DirectX 11'],
+    required: false,
+  },
+  {
+    key: 'opengl',
+    name: 'OpenGL',
+    type: 'select',
+    options: ['4.6', '4.5', '4.4'],
+    required: false,
+  },
+  {
+    key: 'recommended_psu',
+    name: 'Recommended Power',
+    type: 'text',
+    placeholder: 'e.g., 550W',
+    required: false,
+  },
+  {
+    key: 'display_port',
+    name: 'DisplayPort',
+    type: 'text',
+    placeholder: 'e.g., DisplayPort 2.1b *3',
     required: false,
   },
   {
@@ -682,47 +711,18 @@ export const gpuSpecifications: SpecificationField[] = [
     required: false,
   },
   {
-    key: 'recommended_psu',
-    name: 'Recommended PSU',
+    key: 'hdmi',
+    name: 'HDMI',
     type: 'text',
-    placeholder: 'e.g., 750W',
+    placeholder: 'e.g., HDMI 2.1b *1',
     required: false,
   },
   {
-    key: 'cooling_type',
-    name: 'Cooling Type',
-    type: 'select',
-    options: gpuSpecOptions.coolingTypes,
-    required: false,
-  },
-  {
-    key: 'slot_size',
-    name: 'Slot Size',
-    type: 'select',
-    options: ['2 Slot', '2.5 Slot', '2.7 Slot', '3 Slot', '3.5 Slot', '4 Slot'],
-    required: false,
-  },
-  {
-    key: 'card_length',
-    name: 'Card Length',
+    key: 'dimension',
+    name: 'Dimension',
     type: 'text',
-    placeholder: 'e.g., 336mm',
+    placeholder: 'e.g., L=281 W=117 H=40',
     required: false,
-  },
-  {
-    key: 'output_ports',
-    name: 'Output Ports',
-    type: 'multiselect',
-    options: gpuSpecOptions.outputPorts,
-    required: false,
-  },
-  {
-    key: 'gpu_features',
-    name: 'Features',
-    type: 'multiselect',
-    options: gpuSpecOptions.features,
-    required: false,
-    helpText: 'Select all applicable features',
   },
   {
     key: 'warranty',
@@ -748,19 +748,7 @@ export function getGpuSpecsForBrand(brand: 'nvidia' | 'amd-gpu'): SpecificationF
     if (spec.key === 'cuda_cores') {
       return {
         ...spec,
-        name: brand === 'nvidia' ? 'CUDA Cores' : 'Stream Processors',
-      };
-    }
-    if (spec.key === 'rt_cores') {
-      return {
-        ...spec,
-        name: brand === 'nvidia' ? 'RT Cores' : 'Ray Accelerators',
-      };
-    }
-    if (spec.key === 'tensor_cores') {
-      return {
-        ...spec,
-        name: brand === 'nvidia' ? 'Tensor Cores' : 'AI Accelerators',
+        name: brand === 'nvidia' ? 'CUDA Cores (Nvidia)' : 'Stream Processors (AMD)',
       };
     }
     return spec;
@@ -1177,6 +1165,75 @@ export const hddSpecifications: SpecificationField[] = [
 
 // Map of main category to specification definitions
 export type MainCategorySlug = 'processor' | 'motherboard' | 'graphics_card' | 'ram' | 'storage';
+
+/** Maps database category slugs (with hyphens) to form hierarchy main keys */
+const DB_SLUG_TO_MAIN: Record<string, MainCategorySlug> = {
+  processor: 'processor',
+  motherboard: 'motherboard',
+  'graphics-card': 'graphics_card',
+  ram: 'ram',
+  'desktop-ram': 'ram',
+  'laptop-ram': 'ram',
+  'ddr4-ram': 'ram',
+  'ddr5-ram': 'ram',
+  storage: 'storage',
+  ssd: 'storage',
+  hdd: 'storage',
+  nvme: 'storage',
+};
+
+/**
+ * Resolve a database category slug to the form's main/sub category keys.
+ * DB uses slugs like "graphics-card"; the form hierarchy uses "graphics_card".
+ */
+export function resolveCategoryFromDbSlug(
+  categorySlug: string,
+  parentSlug?: string | null
+): { mainCategory: MainCategorySlug | ''; subCategory: string } {
+  // Check if slug matches a known sub-category (e.g. nvidia, intel, desktop-ram)
+  for (const [mainKey, mainValue] of Object.entries(categoryHierarchy)) {
+    const subMatch = mainValue.subCategories.find(
+      (s) => s.slug === categorySlug || s.id === categorySlug
+    );
+    if (subMatch) {
+      return { mainCategory: mainKey as MainCategorySlug, subCategory: subMatch.id };
+    }
+  }
+
+  // Direct match on hierarchy key (e.g. processor, graphics_card)
+  if (categorySlug in categoryHierarchy) {
+    return { mainCategory: categorySlug as MainCategorySlug, subCategory: '' };
+  }
+
+  // Alias map for parent-level DB slugs (e.g. graphics-card → graphics_card)
+  const mainFromAlias = DB_SLUG_TO_MAIN[categorySlug];
+  if (mainFromAlias) {
+    return { mainCategory: mainFromAlias, subCategory: '' };
+  }
+
+  // Walk up to parent category
+  if (parentSlug) {
+    return resolveCategoryFromDbSlug(parentSlug);
+  }
+
+  return { mainCategory: '', subCategory: '' };
+}
+
+/** Infer NVIDIA/AMD GPU sub-category from chipset name when not stored on the product */
+export function inferGpuSubCategory(
+  subCategory: string,
+  specs: Record<string, string | string[]>
+): string {
+  if (subCategory) return subCategory;
+  const chipset = String(specs.gpu_chipset || '').toLowerCase();
+  if (chipset.includes('geforce') || chipset.includes('rtx') || chipset.includes('gtx')) {
+    return 'nvidia';
+  }
+  if (chipset.includes('radeon') || chipset.includes('rx')) {
+    return 'amd-gpu';
+  }
+  return '';
+}
 
 export function getSpecificationsForCategory(mainCategory: MainCategorySlug, subCategory?: string): SpecificationField[] {
   switch (mainCategory) {

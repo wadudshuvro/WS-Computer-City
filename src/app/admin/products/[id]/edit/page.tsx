@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { AdminShell } from '@/components/admin/AdminShell';
 import ProductEditForm from '@/components/admin/ProductEditForm';
 
 interface Product {
@@ -63,7 +63,6 @@ interface Product {
 }
 
 export default function EditProductPage() {
-  const router = useRouter();
   const params = useParams();
   const productId = params.id as string;
 
@@ -81,19 +80,18 @@ export default function EditProductPage() {
     try {
       setLoading(true);
       const res = await fetch(`/api/admin/products/${productId}`);
-      
+
       if (!res.ok) {
-        if (res.status === 404) {
-          throw new Error('Product not found');
-        }
+        if (res.status === 404) throw new Error('Product not found');
         throw new Error('Failed to fetch product');
       }
 
       const data = await res.json();
       setProduct(data.data);
-    } catch (error: any) {
-      console.error('Error fetching product:', error);
-      setError(error.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      console.error('Error fetching product:', err);
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -101,62 +99,49 @@ export default function EditProductPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading product...</p>
-          </div>
+      <AdminShell title="Loading…" breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'Products', href: '/admin/products' }]}>
+        <div className="bg-white border border-gray-200 rounded-xl p-12 text-center shadow-sm">
+          <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
+          <p className="text-gray-500 text-sm">Loading product…</p>
         </div>
-      </div>
+      </AdminShell>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-red-800 mb-2">Error</h2>
-            <p className="text-red-600 mb-4">{error}</p>
-            <Link
-              href="/admin/products"
-              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Products
-            </Link>
-          </div>
+      <AdminShell title="Error" breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'Products', href: '/admin/products' }]}>
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-red-800 mb-2">Could not load product</h2>
+          <p className="text-red-600 text-sm mb-4">{error}</p>
+          <Link href="/admin/products" className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+            ← Back to products
+          </Link>
         </div>
-      </div>
+      </AdminShell>
     );
   }
 
-  if (!product) {
-    return null;
-  }
+  if (!product) return null;
+
+  const categoryBackHref = product.category?.slug
+    ? `/admin/products/category/${product.category.slug}`
+    : '/admin/products';
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
-          <Link
-            href="/admin/products"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Products
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Edit Product
-          </h1>
-          <p className="text-gray-600">
-            Editing: <span className="font-medium">{product.name}</span>
-          </p>
-        </div>
-
+    <AdminShell
+      title="Edit entry"
+      subtitle={product.name}
+      breadcrumbs={[
+        { label: 'Admin', href: '/admin' },
+        { label: 'Products', href: '/admin/products' },
+        { label: product.category.name, href: categoryBackHref },
+        { label: 'Edit' },
+      ]}
+    >
+      <div className="max-w-5xl">
         <ProductEditForm product={product} />
       </div>
-    </div>
+    </AdminShell>
   );
 }

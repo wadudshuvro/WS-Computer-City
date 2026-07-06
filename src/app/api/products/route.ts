@@ -9,11 +9,16 @@ import { ZodError } from 'zod';
  */
 export async function GET(req: NextRequest) {
   try {
-    // Parse query parameters
     const searchParams = req.nextUrl.searchParams;
+
+    const categorySlug = ProductService.resolveCategorySlug(
+      searchParams.get('sub'),
+      searchParams.get('category'),
+      searchParams.get('type')
+    );
     
-    const filters = {
-      category: searchParams.get('category') || undefined,
+    const filters: Record<string, unknown> = {
+      category: categorySlug,
       brand: searchParams.get('brand')?.split(',') || undefined,
       minPrice: searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined,
       maxPrice: searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined,
@@ -26,9 +31,8 @@ export async function GET(req: NextRequest) {
 
     // Parse dynamic specification filters (e.g., ?socket_type=LGA1700&cores=8)
     const specs: Record<string, string> = {};
+    const knownKeys = ['category', 'sub', 'type', 'brand', 'minPrice', 'maxPrice', 'stockStatus', 'search', 'sort', 'page', 'limit'];
     searchParams.forEach((value, key) => {
-      // Skip known filter keys
-      const knownKeys = ['category', 'brand', 'minPrice', 'maxPrice', 'stockStatus', 'search', 'sort', 'page', 'limit'];
       if (!knownKeys.includes(key)) {
         specs[key] = value;
       }
@@ -38,14 +42,11 @@ export async function GET(req: NextRequest) {
       filters.specs = specs;
     }
 
-    // Validate filters
     const validated = productFilterSchema.parse(filters);
 
-    // Get products
-    const result = await ProductService.getFiltered(validated);
+    const result = await ProductService.getFilteredWithChildren(validated);
 
-    // Get available filters for sidebar
-    const availableFilters = await this.getAvailableFilters(validated.category);
+    const availableFilters = await getAvailableFilters(validated.category);
 
     return NextResponse.json({
       data: result.products,

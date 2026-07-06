@@ -1,5 +1,6 @@
 import { PrismaClient, StockStatus } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { GPU_SPEC_DEFINITIONS } from '../src/lib/gpuSpecDefinitions';
 
 const prisma = new PrismaClient();
 
@@ -846,63 +847,36 @@ async function main() {
   console.log('✅ AMD processor specification definitions created:', amdProcessorSpecs.length);
 
   // Create Specification Definitions for Graphics Card Category
-  const gpuSpecs = await Promise.all([
-    prisma.specificationDefinition.upsert({
-      where: { 
-        categoryId_key: { 
-          categoryId: graphicsCard.id, 
-          key: 'gpu_chipset' 
-        } 
-      },
-      update: {},
-      create: {
-        categoryId: graphicsCard.id,
-        name: 'GPU Chipset',
-        key: 'gpu_chipset',
-        dataType: 'TEXT',
-        isFilterable: true,
-        isRequired: true,
-        order: 1,
-      },
-    }),
-    prisma.specificationDefinition.upsert({
-      where: { 
-        categoryId_key: { 
-          categoryId: graphicsCard.id, 
-          key: 'memory_size' 
-        } 
-      },
-      update: {},
-      create: {
-        categoryId: graphicsCard.id,
-        name: 'Memory Size',
-        key: 'memory_size',
-        dataType: 'NUMBER',
-        unit: 'GB',
-        isFilterable: true,
-        isRequired: true,
-        order: 2,
-      },
-    }),
-    prisma.specificationDefinition.upsert({
-      where: { 
-        categoryId_key: { 
-          categoryId: graphicsCard.id, 
-          key: 'memory_type' 
-        } 
-      },
-      update: {},
-      create: {
-        categoryId: graphicsCard.id,
-        name: 'Memory Type',
-        key: 'memory_type',
-        dataType: 'TEXT',
-        isFilterable: true,
-        isRequired: true,
-        order: 3,
-      },
-    }),
-  ]);
+  const gpuSpecs = await Promise.all(
+    GPU_SPEC_DEFINITIONS.map((spec) =>
+      prisma.specificationDefinition.upsert({
+        where: {
+          categoryId_key: {
+            categoryId: graphicsCard.id,
+            key: spec.key,
+          },
+        },
+        update: {
+          name: spec.name,
+          dataType: spec.dataType,
+          unit: spec.unit,
+          isFilterable: spec.isFilterable ?? false,
+          isRequired: spec.isRequired ?? false,
+          order: spec.order,
+        },
+        create: {
+          categoryId: graphicsCard.id,
+          name: spec.name,
+          key: spec.key,
+          dataType: spec.dataType,
+          unit: spec.unit,
+          isFilterable: spec.isFilterable ?? false,
+          isRequired: spec.isRequired ?? false,
+          order: spec.order,
+        },
+      })
+    )
+  );
 
   // Create Specification Definitions for SSD Category
   const ssdSpecs = await Promise.all([

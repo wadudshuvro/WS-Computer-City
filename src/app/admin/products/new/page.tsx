@@ -1,20 +1,37 @@
+import { AdminShell } from '@/components/admin/AdminShell';
 import ProductEntryForm from '@/components/admin/ProductEntryForm';
+import { getContentTypeBySlug } from '@/lib/adminCategoryConfig';
 
-export default function NewProductPage() {
+interface NewProductPageProps {
+  searchParams: Promise<{ category?: string }>;
+}
+
+export default async function NewProductPage({ searchParams }: NewProductPageProps) {
+  const { category: categorySlug } = await searchParams;
+  const contentType = categorySlug ? getContentTypeBySlug(categorySlug) : undefined;
+
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Add New Product
-          </h1>
-          <p className="text-gray-600">
-            Create a new product entry with complete specifications
-          </p>
-        </div>
-
-        <ProductEntryForm />
+    <AdminShell
+      title="Add entry"
+      subtitle={
+        contentType
+          ? `Create a new ${contentType.name} product`
+          : 'Create a new product entry with complete specifications'
+      }
+      breadcrumbs={[
+        { label: 'Admin', href: '/admin' },
+        { label: 'Products', href: '/admin/products' },
+        ...(contentType
+          ? [
+              { label: contentType.name, href: `/admin/products/category/${categorySlug}` },
+            ]
+          : []),
+        { label: 'Add entry' },
+      ]}
+    >
+      <div className="max-w-5xl">
+        <ProductEntryForm defaultCategorySlug={categorySlug} />
       </div>
-    </div>
+    </AdminShell>
   );
 }

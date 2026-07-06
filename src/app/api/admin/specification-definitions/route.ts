@@ -1,9 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+async function getCategoryAncestorIds(categoryId: string): Promise<string[]> {
+  const ids: string[] = [];
+  let currentId: string | null = categoryId;
+
+  while (currentId) {
+    ids.push(currentId);
+    const category = await prisma.category.findUnique({
+      where: { id: currentId },
+      select: { parentId: true },
+    });
+    currentId = category?.parentId ?? null;
+  }
+
+  return ids;
+}
+
 /**
  * GET /api/admin/specification-definitions?categoryId=xxx
- * Get specification definitions for a specific category
+ * Get specification definitions for a category (includes parent category specs)
  */
 export async function GET(req: NextRequest) {
   try {
@@ -17,12 +33,25 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    const categoryIds = await getCategoryAncestorIds(categoryId);
+
     const specDefinitions = await prisma.specificationDefinition.findMany({
-      where: { categoryId },
+      where: { categoryId: { in: categoryIds } },
       orderBy: { order: 'asc' },
     });
 
-    return NextResponse.json({ data: specDefinitions });
+    // Prefer definitions on the exact category over parent definitions
+    const byKey = new Map<string, (typeof specDefinitions)[0]>();
+    for (const spec of specDefinitions) {
+      const existing = byKey.get(spec.key);
+      if (!existing || spec.categoryId === categoryId) {
+        byKey.set(spec.key, spec);
+      }
+    }
+
+    const deduped = Array.from(byKey.values()).sort((a, b) => a.order - b.order);
+
+    return NextResponse.json({ data: deduped });
   } catch (error) {
     console.error('Error fetching specification definitions:', error);
     return NextResponse.json(
