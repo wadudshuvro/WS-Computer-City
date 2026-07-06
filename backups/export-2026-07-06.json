@@ -1,0 +1,2094 @@
+{
+  "exportedAt": "2026-07-06T21:39:11.412Z",
+  "counts": {
+    "users": 1,
+    "categories": 11,
+    "brands": 51,
+    "products": 3,
+    "specificationDefinitions": 52
+  },
+  "data": {
+    "users": [
+      {
+        "id": "cmr9bvrye0000njjljech7ze8",
+        "email": "admin@wscomputercity.com",
+        "name": "Admin User",
+        "role": "ADMIN",
+        "createdAt": "2026-07-06T14:41:27.109Z",
+        "updatedAt": "2026-07-06T14:41:27.109Z"
+      }
+    ],
+    "categories": [
+      {
+        "id": "cmr9bvs3a001gnjjlt52ef84a",
+        "name": "Desktop PC",
+        "slug": "desktop-pc",
+        "description": "Complete desktop computer systems",
+        "image": null,
+        "parentId": null,
+        "level": 0,
+        "order": 1,
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.287Z",
+        "updatedAt": "2026-07-06T14:41:27.287Z",
+        "parent": null
+      },
+      {
+        "id": "cmr9bvs3f001hnjjl01z95nzo",
+        "name": "Components",
+        "slug": "components",
+        "description": "Computer components and parts",
+        "image": null,
+        "parentId": null,
+        "level": 0,
+        "order": 2,
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.291Z",
+        "updatedAt": "2026-07-06T14:41:27.291Z",
+        "parent": null
+      },
+      {
+        "id": "cmr9bvs3g001injjl7l96ngta",
+        "name": "Laptop",
+        "slug": "laptop",
+        "description": "Laptops and notebooks",
+        "image": null,
+        "parentId": null,
+        "level": 0,
+        "order": 3,
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.293Z",
+        "updatedAt": "2026-07-06T14:41:27.293Z",
+        "parent": null
+      },
+      {
+        "id": "cmr9bvs3i001knjjlqcd26aib",
+        "name": "Processor",
+        "slug": "processor",
+        "description": "CPUs and processors",
+        "image": null,
+        "parentId": "cmr9bvs3f001hnjjl01z95nzo",
+        "level": 1,
+        "order": 1,
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.295Z",
+        "updatedAt": "2026-07-06T14:41:27.295Z",
+        "parent": {
+          "id": "cmr9bvs3f001hnjjl01z95nzo",
+          "slug": "components"
+        }
+      },
+      {
+        "id": "cmr9bvs3l001mnjjlqu2ps65y",
+        "name": "Intel",
+        "slug": "intel",
+        "description": "Intel Processors",
+        "image": null,
+        "parentId": "cmr9bvs3i001knjjlqcd26aib",
+        "level": 2,
+        "order": 1,
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.298Z",
+        "updatedAt": "2026-07-06T14:41:27.298Z",
+        "parent": {
+          "id": "cmr9bvs3i001knjjlqcd26aib",
+          "slug": "processor"
+        }
+      },
+      {
+        "id": "cmr9bvs3n001onjjl46q890qi",
+        "name": "AMD",
+        "slug": "amd",
+        "description": "AMD Processors",
+        "image": null,
+        "parentId": "cmr9bvs3i001knjjlqcd26aib",
+        "level": 2,
+        "order": 2,
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.299Z",
+        "updatedAt": "2026-07-06T14:41:27.299Z",
+        "parent": {
+          "id": "cmr9bvs3i001knjjlqcd26aib",
+          "slug": "processor"
+        }
+      },
+      {
+        "id": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "Graphics Card",
+        "slug": "graphics-card",
+        "description": "GPUs and graphics cards",
+        "image": null,
+        "parentId": "cmr9bvs3f001hnjjl01z95nzo",
+        "level": 1,
+        "order": 2,
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.301Z",
+        "updatedAt": "2026-07-06T14:41:27.301Z",
+        "parent": {
+          "id": "cmr9bvs3f001hnjjl01z95nzo",
+          "slug": "components"
+        }
+      },
+      {
+        "id": "cmr9bvs3q001snjjl5bz9ep3j",
+        "name": "NVIDIA",
+        "slug": "nvidia",
+        "description": "NVIDIA Graphics Cards",
+        "image": null,
+        "parentId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "level": 2,
+        "order": 1,
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.302Z",
+        "updatedAt": "2026-07-06T14:41:27.302Z",
+        "parent": {
+          "id": "cmr9bvs3p001qnjjlnzrmtdrs",
+          "slug": "graphics-card"
+        }
+      },
+      {
+        "id": "cmr9bvs3r001unjjlz6a3qh23",
+        "name": "AMD",
+        "slug": "amd-gpu",
+        "description": "AMD Graphics Cards",
+        "image": null,
+        "parentId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "level": 2,
+        "order": 2,
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.304Z",
+        "updatedAt": "2026-07-06T14:41:27.304Z",
+        "parent": {
+          "id": "cmr9bvs3p001qnjjlnzrmtdrs",
+          "slug": "graphics-card"
+        }
+      },
+      {
+        "id": "cmr9bvs3u001wnjjl81hph6nx",
+        "name": "SSD",
+        "slug": "ssd",
+        "description": "Solid State Drives",
+        "image": null,
+        "parentId": "cmr9bvs3f001hnjjl01z95nzo",
+        "level": 1,
+        "order": 3,
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.306Z",
+        "updatedAt": "2026-07-06T14:41:27.306Z",
+        "parent": {
+          "id": "cmr9bvs3f001hnjjl01z95nzo",
+          "slug": "components"
+        }
+      },
+      {
+        "id": "cmr9bvs3w001ynjjlz6a42lgs",
+        "name": "RAM",
+        "slug": "ram",
+        "description": "Memory modules",
+        "image": null,
+        "parentId": "cmr9bvs3f001hnjjl01z95nzo",
+        "level": 1,
+        "order": 4,
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.308Z",
+        "updatedAt": "2026-07-06T14:41:27.308Z",
+        "parent": {
+          "id": "cmr9bvs3f001hnjjl01z95nzo",
+          "slug": "components"
+        }
+      }
+    ],
+    "brands": [
+      {
+        "id": "cmr9bvrz90001njjljsucapm3",
+        "name": "NVIDIA",
+        "slug": "nvidia",
+        "logo": null,
+        "description": "Graphics card leader",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.141Z",
+        "updatedAt": "2026-07-06T14:41:27.141Z"
+      },
+      {
+        "id": "cmr9bvs0u0002njjlrpqvkmbi",
+        "name": "AMD",
+        "slug": "amd",
+        "logo": null,
+        "description": "Advanced Micro Devices",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.141Z",
+        "updatedAt": "2026-07-06T14:41:27.141Z"
+      },
+      {
+        "id": "cmr9bvs0z0003njjlsrhhfag8",
+        "name": "Samsung",
+        "slug": "samsung",
+        "logo": null,
+        "description": "Memory and storage solutions",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.141Z",
+        "updatedAt": "2026-07-06T14:41:27.141Z"
+      },
+      {
+        "id": "cmr9bvs140004njjlq3f0ltgt",
+        "name": "Intel",
+        "slug": "intel",
+        "logo": null,
+        "description": "Leading processor manufacturer",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.141Z",
+        "updatedAt": "2026-07-06T14:41:27.141Z"
+      },
+      {
+        "id": "cmr9bvs160005njjlpsmet0fp",
+        "name": "ASUS",
+        "slug": "asus",
+        "logo": null,
+        "description": "Computer hardware and electronics",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.141Z",
+        "updatedAt": "2026-07-06T14:41:27.141Z"
+      },
+      {
+        "id": "cmr9bvs190006njjl0etcmten",
+        "name": "Corsair",
+        "slug": "corsair",
+        "logo": null,
+        "description": "Gaming peripherals and components",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.214Z",
+        "updatedAt": "2026-07-06T14:41:27.214Z"
+      },
+      {
+        "id": "cmr9bvs1c0007njjliydjdegy",
+        "name": "Kingston",
+        "slug": "kingston",
+        "logo": null,
+        "description": "Memory and storage products",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.216Z",
+        "updatedAt": "2026-07-06T14:41:27.216Z"
+      },
+      {
+        "id": "cmr9bvs1e0008njjldd9yn8gy",
+        "name": "Team",
+        "slug": "team",
+        "logo": null,
+        "description": "Memory and storage solutions",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.219Z",
+        "updatedAt": "2026-07-06T14:41:27.219Z"
+      },
+      {
+        "id": "cmr9bvs1g0009njjlxlcnxd7x",
+        "name": "XOC",
+        "slug": "xoc",
+        "logo": null,
+        "description": "Storage solutions",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.221Z",
+        "updatedAt": "2026-07-06T14:41:27.221Z"
+      },
+      {
+        "id": "cmr9bvs1i000anjjlofuysxcv",
+        "name": "MiPhi",
+        "slug": "miphi",
+        "logo": null,
+        "description": "Storage products",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.223Z",
+        "updatedAt": "2026-07-06T14:41:27.223Z"
+      },
+      {
+        "id": "cmr9bvs1k000bnjjl4cavdy9l",
+        "name": "OSCOO",
+        "slug": "oscoo",
+        "logo": null,
+        "description": "SSD manufacturer",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.224Z",
+        "updatedAt": "2026-07-06T14:41:27.224Z"
+      },
+      {
+        "id": "cmr9bvs1l000cnjjlf6abi45d",
+        "name": "Lexar",
+        "slug": "lexar",
+        "logo": null,
+        "description": "Memory and storage products",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.225Z",
+        "updatedAt": "2026-07-06T14:41:27.225Z"
+      },
+      {
+        "id": "cmr9bvs1n000dnjjlcwqqzlt2",
+        "name": "MSI",
+        "slug": "msi",
+        "logo": null,
+        "description": "Gaming hardware manufacturer",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.227Z",
+        "updatedAt": "2026-07-06T14:41:27.227Z"
+      },
+      {
+        "id": "cmr9bvs1p000enjjltzj0jtog",
+        "name": "SanDisk",
+        "slug": "sandisk",
+        "logo": null,
+        "description": "Flash storage solutions",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.229Z",
+        "updatedAt": "2026-07-06T14:41:27.229Z"
+      },
+      {
+        "id": "cmr9bvs1r000fnjjlexhh71q3",
+        "name": "Seagate",
+        "slug": "seagate",
+        "logo": null,
+        "description": "Data storage solutions",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.231Z",
+        "updatedAt": "2026-07-06T14:41:27.231Z"
+      },
+      {
+        "id": "cmr9bvs1s000gnjjlrepfjl63",
+        "name": "Adata",
+        "slug": "adata",
+        "logo": null,
+        "description": "Memory and storage manufacturer",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.232Z",
+        "updatedAt": "2026-07-06T14:41:27.232Z"
+      },
+      {
+        "id": "cmr9bvs1t000hnjjllhkj3m9h",
+        "name": "Ocpc",
+        "slug": "ocpc",
+        "logo": null,
+        "description": "Gaming hardware",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.234Z",
+        "updatedAt": "2026-07-06T14:41:27.234Z"
+      },
+      {
+        "id": "cmr9bvs1u000injjlydlokmi4",
+        "name": "Western Digital",
+        "slug": "western-digital",
+        "logo": null,
+        "description": "Storage solutions",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.235Z",
+        "updatedAt": "2026-07-06T14:41:27.235Z"
+      },
+      {
+        "id": "cmr9bvs1w000jnjjl4karmtf7",
+        "name": "Aitc",
+        "slug": "aitc",
+        "logo": null,
+        "description": "Storage products",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.236Z",
+        "updatedAt": "2026-07-06T14:41:27.236Z"
+      },
+      {
+        "id": "cmr9bvs1y000knjjlah0rj635",
+        "name": "Acer",
+        "slug": "acer",
+        "logo": null,
+        "description": "Computer hardware",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.239Z",
+        "updatedAt": "2026-07-06T14:41:27.239Z"
+      },
+      {
+        "id": "cmr9bvs20000lnjjljsh2985w",
+        "name": "Transcend",
+        "slug": "transcend",
+        "logo": null,
+        "description": "Memory and storage",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.240Z",
+        "updatedAt": "2026-07-06T14:41:27.240Z"
+      },
+      {
+        "id": "cmr9bvs21000mnjjlfy16ibyn",
+        "name": "Crucial",
+        "slug": "crucial",
+        "logo": null,
+        "description": "Memory and storage by Micron",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.242Z",
+        "updatedAt": "2026-07-06T14:41:27.242Z"
+      },
+      {
+        "id": "cmr9bvs22000nnjjltuvxe04m",
+        "name": "Apacer",
+        "slug": "apacer",
+        "logo": null,
+        "description": "Digital storage solutions",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.243Z",
+        "updatedAt": "2026-07-06T14:41:27.243Z"
+      },
+      {
+        "id": "cmr9bvs24000onjjll00hq9a9",
+        "name": "Colorful",
+        "slug": "colorful",
+        "logo": null,
+        "description": "Graphics cards and storage",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.244Z",
+        "updatedAt": "2026-07-06T14:41:27.244Z"
+      },
+      {
+        "id": "cmr9bvs25000pnjjlv8x188gl",
+        "name": "KingSpec",
+        "slug": "kingspec",
+        "logo": null,
+        "description": "SSD manufacturer",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.245Z",
+        "updatedAt": "2026-07-06T14:41:27.245Z"
+      },
+      {
+        "id": "cmr9bvs26000qnjjlhrbbplxh",
+        "name": "Netac",
+        "slug": "netac",
+        "logo": null,
+        "description": "Flash memory products",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.247Z",
+        "updatedAt": "2026-07-06T14:41:27.247Z"
+      },
+      {
+        "id": "cmr9bvs27000rnjjlpj0622kg",
+        "name": "PNY",
+        "slug": "pny",
+        "logo": null,
+        "description": "Memory and storage products",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.248Z",
+        "updatedAt": "2026-07-06T14:41:27.248Z"
+      },
+      {
+        "id": "cmr9bvs29000snjjlcu8q19no",
+        "name": "Twinmos",
+        "slug": "twinmos",
+        "logo": null,
+        "description": "Memory solutions",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.249Z",
+        "updatedAt": "2026-07-06T14:41:27.249Z"
+      },
+      {
+        "id": "cmr9bvs2a000tnjjlgf4ozydd",
+        "name": "Pc Power",
+        "slug": "pc-power",
+        "logo": null,
+        "description": "Computer components",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.251Z",
+        "updatedAt": "2026-07-06T14:41:27.251Z"
+      },
+      {
+        "id": "cmr9bvs2b000unjjlcpum54gp",
+        "name": "Biwintech",
+        "slug": "biwintech",
+        "logo": null,
+        "description": "Storage solutions",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.252Z",
+        "updatedAt": "2026-07-06T14:41:27.252Z"
+      },
+      {
+        "id": "cmr9bvs2d000vnjjl4w4taofp",
+        "name": "Kingbox",
+        "slug": "kingbox",
+        "logo": null,
+        "description": "Storage products",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.254Z",
+        "updatedAt": "2026-07-06T14:41:27.254Z"
+      },
+      {
+        "id": "cmr9bvs2f000wnjjlhveyideo",
+        "name": "GIGABYTE",
+        "slug": "gigabyte",
+        "logo": null,
+        "description": "Computer hardware manufacturer",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.255Z",
+        "updatedAt": "2026-07-06T14:41:27.255Z"
+      },
+      {
+        "id": "cmr9bvs2g000xnjjlq6cg2c0l",
+        "name": "NCX",
+        "slug": "ncx",
+        "logo": null,
+        "description": "Storage products",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.256Z",
+        "updatedAt": "2026-07-06T14:41:27.256Z"
+      },
+      {
+        "id": "cmr9bvs2h000ynjjlow55tox4",
+        "name": "Orico",
+        "slug": "orico",
+        "logo": null,
+        "description": "Digital accessories",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.258Z",
+        "updatedAt": "2026-07-06T14:41:27.258Z"
+      },
+      {
+        "id": "cmr9bvs2j000znjjliyv1sc4m",
+        "name": "HP",
+        "slug": "hp",
+        "logo": null,
+        "description": "Computing and printing solutions",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.259Z",
+        "updatedAt": "2026-07-06T14:41:27.259Z"
+      },
+      {
+        "id": "cmr9bvs2k0010njjlu958m2rd",
+        "name": "King Super",
+        "slug": "king-super",
+        "logo": null,
+        "description": "Storage products",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.261Z",
+        "updatedAt": "2026-07-06T14:41:27.261Z"
+      },
+      {
+        "id": "cmr9bvs2m0011njjlho8s259o",
+        "name": "Addlink",
+        "slug": "addlink",
+        "logo": null,
+        "description": "Memory and storage",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.262Z",
+        "updatedAt": "2026-07-06T14:41:27.262Z"
+      },
+      {
+        "id": "cmr9bvs2n0012njjldwoed7p1",
+        "name": "NEO FORZA",
+        "slug": "neo-forza",
+        "logo": null,
+        "description": "Memory and storage",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.264Z",
+        "updatedAt": "2026-07-06T14:41:27.264Z"
+      },
+      {
+        "id": "cmr9bvs2p0013njjllkbpbnva",
+        "name": "Hikvision",
+        "slug": "hikvision",
+        "logo": null,
+        "description": "Security and storage",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.266Z",
+        "updatedAt": "2026-07-06T14:41:27.266Z"
+      },
+      {
+        "id": "cmr9bvs2r0014njjlz6pepre3",
+        "name": "Patriot",
+        "slug": "patriot",
+        "logo": null,
+        "description": "Memory and storage",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.268Z",
+        "updatedAt": "2026-07-06T14:41:27.268Z"
+      },
+      {
+        "id": "cmr9bvs2t0015njjlg51gja4h",
+        "name": "Ramsta",
+        "slug": "ramsta",
+        "logo": null,
+        "description": "Storage solutions",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.269Z",
+        "updatedAt": "2026-07-06T14:41:27.269Z"
+      },
+      {
+        "id": "cmr9bvs2u0016njjlss5t7fwy",
+        "name": "Redragon",
+        "slug": "redragon",
+        "logo": null,
+        "description": "Gaming peripherals",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.271Z",
+        "updatedAt": "2026-07-06T14:41:27.271Z"
+      },
+      {
+        "id": "cmr9bvs2w0017njjlb0niwu01",
+        "name": "Kimtigo",
+        "slug": "kimtigo",
+        "logo": null,
+        "description": "Memory products",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.272Z",
+        "updatedAt": "2026-07-06T14:41:27.272Z"
+      },
+      {
+        "id": "cmr9bvs2x0018njjlgob85pwv",
+        "name": "AGI",
+        "slug": "agi",
+        "logo": null,
+        "description": "Storage solutions",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.273Z",
+        "updatedAt": "2026-07-06T14:41:27.273Z"
+      },
+      {
+        "id": "cmr9bvs2y0019njjllkoa9c2z",
+        "name": "Revenger",
+        "slug": "revenger",
+        "logo": null,
+        "description": "Gaming storage",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.275Z",
+        "updatedAt": "2026-07-06T14:41:27.275Z"
+      },
+      {
+        "id": "cmr9bvs30001anjjllga9jbta",
+        "name": "Dahua",
+        "slug": "dahua",
+        "logo": null,
+        "description": "Security and storage",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.276Z",
+        "updatedAt": "2026-07-06T14:41:27.276Z"
+      },
+      {
+        "id": "cmr9bvs32001bnjjlwdt9w53v",
+        "name": "LENOVO",
+        "slug": "lenovo",
+        "logo": null,
+        "description": "Computing solutions",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.278Z",
+        "updatedAt": "2026-07-06T14:41:27.278Z"
+      },
+      {
+        "id": "cmr9bvs34001cnjjlx7v4l8qw",
+        "name": "Smart",
+        "slug": "smart",
+        "logo": null,
+        "description": "Storage products",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.280Z",
+        "updatedAt": "2026-07-06T14:41:27.280Z"
+      },
+      {
+        "id": "cmr9bvs35001dnjjlv2qqi2o9",
+        "name": "Walton",
+        "slug": "walton",
+        "logo": null,
+        "description": "Electronics manufacturer",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.281Z",
+        "updatedAt": "2026-07-06T14:41:27.281Z"
+      },
+      {
+        "id": "cmr9bvs37001enjjlk5ngzmtq",
+        "name": "Suneest",
+        "slug": "suneest",
+        "logo": null,
+        "description": "Storage products",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.283Z",
+        "updatedAt": "2026-07-06T14:41:27.283Z"
+      },
+      {
+        "id": "cmr9bvs38001fnjjly085bwns",
+        "name": "Kingbank",
+        "slug": "kingbank",
+        "logo": null,
+        "description": "Memory products",
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.284Z",
+        "updatedAt": "2026-07-06T14:41:27.284Z"
+      }
+    ],
+    "products": [
+      {
+        "id": "cmr9bvs9s0042njjlfqeg1cdv",
+        "name": "Intel Core i5-12400F 6 Core 12 Thread 12th Gen Processor",
+        "slug": "intel-core-i5-12400f",
+        "sku": "PROC-INTEL-12400F",
+        "description": "The Intel Core i5-12400F Desktop Processor comes with 6 cores and 12 threads. It has an 18MB Intel Smart Cache and the total L2 Cache is 7.5MB. This processor comes with a maximum turbo frequency of 4.40 GHz, and the processor base frequency is 2.50 GHz. It supports up to DDR5 4800 MT/s and DDR4 3200 MT/s memory types with a maximum memory size of 128 GB.",
+        "shortDescription": "6 Cores, 12 Threads, up to 4.4 GHz, LGA1700 Socket",
+        "price": "24100",
+        "compareAtPrice": "27390",
+        "costPrice": null,
+        "stockStatus": "IN_STOCK",
+        "stockQuantity": 50,
+        "lowStockAlert": 5,
+        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
+        "brandId": "cmr9bvs140004njjlq3f0ltgt",
+        "metaTitle": "Intel Core i5-12400F Processor Price in Bangladesh",
+        "metaDescription": "Buy Intel Core i5-12400F 6 Core 12 Thread 12th Gen Processor at best price in Bangladesh. In stock and ready to ship.",
+        "metaKeywords": null,
+        "isFeatured": true,
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.520Z",
+        "updatedAt": "2026-07-06T14:41:27.520Z",
+        "publishedAt": "2026-07-06T14:41:27.518Z",
+        "brand": {
+          "id": "cmr9bvs140004njjlq3f0ltgt",
+          "name": "Intel",
+          "slug": "intel"
+        },
+        "category": {
+          "id": "cmr9bvs3l001mnjjlqu2ps65y",
+          "name": "Intel",
+          "slug": "intel"
+        },
+        "images": [
+          {
+            "id": "cmr9bvs9s0043njjl9963fodo",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "url": "https://placehold.co/600x600/4169E1/FFFFFF/png?text=Intel+i5-12400F",
+            "alt": "Intel Core i5-12400F",
+            "order": 0,
+            "isPrimary": true,
+            "createdAt": "2026-07-06T14:41:27.520Z"
+          }
+        ],
+        "specifications": [
+          {
+            "id": "cmr9bvs9s0045njjllwzdazhl",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs3y0023njjljhlzuud0",
+            "value": "LGA 1700",
+            "createdAt": "2026-07-06T14:41:27.520Z",
+            "updatedAt": "2026-07-06T14:41:27.520Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs3y0023njjljhlzuud0",
+              "name": "CPU Socket",
+              "key": "socket_type"
+            }
+          },
+          {
+            "id": "cmr9bvs9s0046njjlznuqd6rj",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs3z0028njjl78cbu80i",
+            "value": "6 Core",
+            "createdAt": "2026-07-06T14:41:27.520Z",
+            "updatedAt": "2026-07-06T14:41:27.520Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs3z0028njjl78cbu80i",
+              "name": "Number Of Cores",
+              "key": "number_of_cores"
+            }
+          },
+          {
+            "id": "cmr9bvs9s0047njjl7zy140fz",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs3y0027njjlmnphc78d",
+            "value": "12 Threads",
+            "createdAt": "2026-07-06T14:41:27.520Z",
+            "updatedAt": "2026-07-06T14:41:27.520Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs3y0027njjlmnphc78d",
+              "name": "Number Of Threads",
+              "key": "number_of_threads"
+            }
+          },
+          {
+            "id": "cmr9bvs9s0048njjls3hxafva",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs3y0026njjlozqqv8z0",
+            "value": "2.5",
+            "createdAt": "2026-07-06T14:41:27.520Z",
+            "updatedAt": "2026-07-06T14:41:27.520Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs3y0026njjlozqqv8z0",
+              "name": "Base Frequency",
+              "key": "base_clock"
+            }
+          },
+          {
+            "id": "cmr9bvs9s0049njjlpab06oys",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs3y0024njjl9e3ah51v",
+            "value": "4.4",
+            "createdAt": "2026-07-06T14:41:27.520Z",
+            "updatedAt": "2026-07-06T14:41:27.520Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs3y0024njjl9e3ah51v",
+              "name": "Maximum Turbo Frequency",
+              "key": "boost_clock"
+            }
+          },
+          {
+            "id": "cmr9bvs9s004anjjla0gn62gj",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs6g002injjlwouuh804",
+            "value": "18 MB",
+            "createdAt": "2026-07-06T14:41:27.520Z",
+            "updatedAt": "2026-07-06T14:41:27.520Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs6g002injjlwouuh804",
+              "name": "Cache",
+              "key": "cache_size"
+            }
+          },
+          {
+            "id": "cmr9bvs9s004bnjjlc7s8feym",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs5i002anjjlcuk2lj5u",
+            "value": "65W",
+            "createdAt": "2026-07-06T14:41:27.520Z",
+            "updatedAt": "2026-07-06T14:41:27.520Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs5i002anjjlcuk2lj5u",
+              "name": "TDP (Thermal Design Power)",
+              "key": "tdp"
+            }
+          },
+          {
+            "id": "cmr9bvs9s004cnjjlqzybawzc",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs6u002mnjjl4mw9r2r4",
+            "value": "Intel Core i5",
+            "createdAt": "2026-07-06T14:41:27.520Z",
+            "updatedAt": "2026-07-06T14:41:27.520Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs6u002mnjjl4mw9r2r4",
+              "name": "Processor Brand",
+              "key": "processor_model"
+            }
+          },
+          {
+            "id": "cmr9bvs9s004dnjjlqkoi8hk3",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs69002enjjlzzee8gs4",
+            "value": "Core i5-12400F",
+            "createdAt": "2026-07-06T14:41:27.520Z",
+            "updatedAt": "2026-07-06T14:41:27.520Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs69002enjjlzzee8gs4",
+              "name": "Processor Model",
+              "key": "model_number"
+            }
+          },
+          {
+            "id": "cmr9bvs9s004enjjleq7np278",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs6f002hnjjl1x3olffk",
+            "value": "12th Gen (Alder Lake)",
+            "createdAt": "2026-07-06T14:41:27.520Z",
+            "updatedAt": "2026-07-06T14:41:27.520Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs6f002hnjjl1x3olffk",
+              "name": "Processor Series",
+              "key": "generation"
+            }
+          },
+          {
+            "id": "cmr9bvs9s004fnjjl4z79n27w",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs6x002onjjln15z5srx",
+            "value": "DDR5",
+            "createdAt": "2026-07-06T14:41:27.520Z",
+            "updatedAt": "2026-07-06T14:41:27.520Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs6x002onjjln15z5srx",
+              "name": "Memory Type",
+              "key": "memory_type"
+            }
+          },
+          {
+            "id": "cmr9bvs9s004gnjjlvoy1hm2l",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs6i002knjjlemi601rt",
+            "value": "DDR5-4800",
+            "createdAt": "2026-07-06T14:41:27.520Z",
+            "updatedAt": "2026-07-06T14:41:27.520Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs6i002knjjlemi601rt",
+              "name": "Max Memory Speed",
+              "key": "max_memory_speed"
+            }
+          },
+          {
+            "id": "cmr9bvs9s004hnjjlzqy9q8r1",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs91002qnjjlspy1ptf2",
+            "value": "128 GB",
+            "createdAt": "2026-07-06T14:41:27.520Z",
+            "updatedAt": "2026-07-06T14:41:27.520Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs91002qnjjlspy1ptf2",
+              "name": "Max. Memory Size",
+              "key": "max_memory_size"
+            }
+          }
+        ]
+      },
+      {
+        "id": "cmr9bvsa7004jnjjlzqzyt643",
+        "name": "AMD Ryzen 5 5600X 6 Core 12 Thread Desktop Processor",
+        "slug": "amd-ryzen-5-5600x",
+        "sku": "PROC-AMD-5600X",
+        "description": "AMD Ryzen 5 5600X Desktop Processor comes with 6 cores and 12 threads. This 5th Generation processor has a base clock speed of 3.7 GHz and a maximum boost clock of up to 4.6 GHz. It features 35MB of combined cache and supports DDR4 memory.",
+        "shortDescription": "6 Cores, 12 Threads, up to 4.6 GHz, AM4 Socket",
+        "price": "22500",
+        "compareAtPrice": "25000",
+        "costPrice": null,
+        "stockStatus": "IN_STOCK",
+        "stockQuantity": 30,
+        "lowStockAlert": 5,
+        "categoryId": "cmr9bvs3n001onjjl46q890qi",
+        "brandId": "cmr9bvs0u0002njjlrpqvkmbi",
+        "metaTitle": "AMD Ryzen 5 5600X Processor Price in Bangladesh",
+        "metaDescription": "Buy AMD Ryzen 5 5600X 6 Core 12 Thread Processor at best price in Bangladesh.",
+        "metaKeywords": null,
+        "isFeatured": true,
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.536Z",
+        "updatedAt": "2026-07-06T14:41:27.536Z",
+        "publishedAt": "2026-07-06T14:41:27.534Z",
+        "brand": {
+          "id": "cmr9bvs0u0002njjlrpqvkmbi",
+          "name": "AMD",
+          "slug": "amd"
+        },
+        "category": {
+          "id": "cmr9bvs3n001onjjl46q890qi",
+          "name": "AMD",
+          "slug": "amd"
+        },
+        "images": [
+          {
+            "id": "cmr9bvsa8004knjjl9cv1os55",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "url": "https://placehold.co/600x600/FF6B00/FFFFFF/png?text=AMD+5600X",
+            "alt": "AMD Ryzen 5 5600X",
+            "order": 0,
+            "isPrimary": true,
+            "createdAt": "2026-07-06T14:41:27.536Z"
+          }
+        ],
+        "specifications": [
+          {
+            "id": "cmr9bvsa8004mnjjlo5llh7f0",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs97002vnjjluf76j46i",
+            "value": "AM4",
+            "createdAt": "2026-07-06T14:41:27.536Z",
+            "updatedAt": "2026-07-06T14:41:27.536Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs97002vnjjluf76j46i",
+              "name": "CPU Socket",
+              "key": "socket_type"
+            }
+          },
+          {
+            "id": "cmr9bvsa8004nnjjlflde6g3g",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs97002unjjlkze12d8e",
+            "value": "6 Core",
+            "createdAt": "2026-07-06T14:41:27.536Z",
+            "updatedAt": "2026-07-06T14:41:27.536Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs97002unjjlkze12d8e",
+              "name": "Number Of Cores",
+              "key": "number_of_cores"
+            }
+          },
+          {
+            "id": "cmr9bvsa8004onjjlbr6mja9q",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs97003cnjjlsdpfrbzc",
+            "value": "12 Threads",
+            "createdAt": "2026-07-06T14:41:27.536Z",
+            "updatedAt": "2026-07-06T14:41:27.536Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs97003cnjjlsdpfrbzc",
+              "name": "Number Of Threads",
+              "key": "number_of_threads"
+            }
+          },
+          {
+            "id": "cmr9bvsa8004pnjjl48f6ovgj",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs97002xnjjlbgm11wr2",
+            "value": "3.7",
+            "createdAt": "2026-07-06T14:41:27.536Z",
+            "updatedAt": "2026-07-06T14:41:27.536Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs97002xnjjlbgm11wr2",
+              "name": "Base Frequency",
+              "key": "base_clock"
+            }
+          },
+          {
+            "id": "cmr9bvsa8004qnjjlu0q0ky73",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs970038njjlxvru0024",
+            "value": "4.6",
+            "createdAt": "2026-07-06T14:41:27.536Z",
+            "updatedAt": "2026-07-06T14:41:27.536Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs970038njjlxvru0024",
+              "name": "Maximum Turbo Frequency",
+              "key": "boost_clock"
+            }
+          },
+          {
+            "id": "cmr9bvsa8004rnjjlo6rb4u51",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs99003injjlawntuhv3",
+            "value": "32 MB",
+            "createdAt": "2026-07-06T14:41:27.536Z",
+            "updatedAt": "2026-07-06T14:41:27.536Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs99003injjlawntuhv3",
+              "name": "Cache",
+              "key": "cache_size"
+            }
+          },
+          {
+            "id": "cmr9bvsa8004snjjlx7db2inz",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs970031njjlxjwmui6s",
+            "value": "65W",
+            "createdAt": "2026-07-06T14:41:27.536Z",
+            "updatedAt": "2026-07-06T14:41:27.536Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs970031njjlxjwmui6s",
+              "name": "TDP (Thermal Design Power)",
+              "key": "tdp"
+            }
+          },
+          {
+            "id": "cmr9bvsa8004tnjjlxikngh2l",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs970032njjll06wzb1c",
+            "value": "Ryzen 5",
+            "createdAt": "2026-07-06T14:41:27.536Z",
+            "updatedAt": "2026-07-06T14:41:27.536Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs970032njjll06wzb1c",
+              "name": "Processor Brand",
+              "key": "processor_model"
+            }
+          },
+          {
+            "id": "cmr9bvsa8004unjjlqut2fubp",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs97003anjjly8pgyejf",
+            "value": "Ryzen 5 5600X",
+            "createdAt": "2026-07-06T14:41:27.536Z",
+            "updatedAt": "2026-07-06T14:41:27.536Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs97003anjjly8pgyejf",
+              "name": "Processor Model",
+              "key": "model_number"
+            }
+          },
+          {
+            "id": "cmr9bvsa8004vnjjlm49j6wan",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs970039njjl7x3qpa9y",
+            "value": "Ryzen 5000 Series",
+            "createdAt": "2026-07-06T14:41:27.536Z",
+            "updatedAt": "2026-07-06T14:41:27.536Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs970039njjl7x3qpa9y",
+              "name": "Processor Series",
+              "key": "generation"
+            }
+          },
+          {
+            "id": "cmr9bvsa8004wnjjlova1pojy",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs970034njjlup59w81g",
+            "value": "DDR4",
+            "createdAt": "2026-07-06T14:41:27.536Z",
+            "updatedAt": "2026-07-06T14:41:27.536Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs970034njjlup59w81g",
+              "name": "Memory Type",
+              "key": "memory_type"
+            }
+          },
+          {
+            "id": "cmr9bvsa8004xnjjlg7g6d8df",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs970035njjlw0stdb9f",
+            "value": "DDR4-3200",
+            "createdAt": "2026-07-06T14:41:27.536Z",
+            "updatedAt": "2026-07-06T14:41:27.536Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs970035njjlw0stdb9f",
+              "name": "Max Memory Speed",
+              "key": "max_memory_speed"
+            }
+          },
+          {
+            "id": "cmr9bvsa8004ynjjledk9ci3r",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs98003gnjjlh7t4qtax",
+            "value": "128 GB",
+            "createdAt": "2026-07-06T14:41:27.536Z",
+            "updatedAt": "2026-07-06T14:41:27.536Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs98003gnjjlh7t4qtax",
+              "name": "Max. Memory Size",
+              "key": "max_memory_size"
+            }
+          }
+        ]
+      },
+      {
+        "id": "cmr9esnv10002t1wvup6a0f8w",
+        "name": "Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card",
+        "slug": "gigabyte-geforce-rtx-5060-aero-oc-8g-gddr7-graphics-card",
+        "sku": "GIGABYTE-GEFORCE-RTX",
+        "description": "Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card\nThe Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card is a stylish mid-range dynamo that fuses aerodynamic elegance with blistering speed, making the Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card a dream upgrade for gamers, video editors, and AI enthusiasts who want immersive visuals and whisper-quiet operation in a compact powerhouse. Powered by NVIDIA's Ada Lovelace architecture with 3840 CUDA cores overclocked for that extra punch, this card harnesses 8GB of cutting-edge GDDR7 memory at 28 Gbps on a 128-bit bus to conquer 7680x4320 8K resolutions and multi-monitor setups up to four displays with ease, perfect for the Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card's role in elevating 1440p gaming to 120+ FPS in titles like Forza Horizon 5 with ray tracing enabled or accelerating 4K renders in DaVinci Resolve by 35% via AV1 encoding. Whether you're dominating competitive arenas in Apex Legends with NVIDIA Reflex for sub-5ms latency or upscaling frames 3x via DLSS 3.5 for buttery-smooth 4K at 60 FPS in The Last of Us Part II, the Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card shines with DirectX 12 Ultimate and OpenGL 4.6 support for seamless compatibility across Windows, Linux, and creative tools like Maya or Unity. Its AERO OC cooling system—boasting triple fans with alternate spinning, a massive vapor chamber, and composite copper pipes—keeps temps under 68°C and noise below 42dB during marathon sessions, while the 0dB idle mode ensures total silence for office builds, and the premium metal backplate with thermal pads adds structural fortitude for enduring builds. The slim ATX form factor (dimensions: 281mm length x 117mm width x 40mm height in a premium black finish) slots into any mid-tower case effortlessly, powered by a single 8-pin connector and 550W PSU recommendation for efficient surges, with PCIe 5.0 interface future-proofing against bandwidth chokepoints. Connectivity is premium with three DisplayPort 2.1b ports for 8K@60Hz multi-streaming and one HDMI 2.1b for 4K@144Hz with VRR, enabling the Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card to drive VR headsets or ultrawide panoramas that expand your creative canvas. For digital artists, the 8GB VRAM tames high-res textures in Substance Painter or 3D sculpting in ZBrush without stuttering, while gamers love the revolutionary Frame Generation for 1440p at 100 FPS in demanding shooters. As a value champion under $500, the Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card isn't just a card—it's a aerodynamic revolution in mid-range graphics, backed by a 3-year warranty and Gigabyte's rigorous validation, empowering you to soar through pixels with precision and poise in 2025's high-stakes digital realm, whether battling in Battlefield or modeling in Modo.\n\n\n\nWhy Buy the Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card from Tech Land BD?\nTech Land BD is your top choice for the Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card, with genuine 3-year warranty, free Bangladesh-wide delivery, and 0% interest EMI to suit your budget. Our pros offer free compatibility checks, secure packaging, and 24/7 support for flawless setup. With thousands of thrilled gamers, we ensure authenticity—seize yours now at Tech Land BD for exclusive deals and seamless upgrades!\n\n\n\nFrequently Asked Questions (FAQs) for Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card\n\n1. What PSU is required for the Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card?\nThe Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card recommends a 550W PSU with one 8-pin connector for stable operation. Opt for an 80+ Bronze or Gold certified unit to manage overclocks and avoid instability during gaming or rendering sessions.\n\n2. Does the Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card support 4K gaming?\nYes, the Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card handles 4K gaming brilliantly with DLSS 3.5, achieving 60+ FPS in AAA titles like Elden Ring on high settings. Its 8GB GDDR7 VRAM and 3840 CUDA cores support ray tracing and textures for smooth, immersive 4K play.\n\n3. How quiet is the Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card under load?\nThe Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card's AERO OC cooling operates below 42dB during intense use, with triple fans and 0dB idle mode for complete silence. Temperatures stay under 68°C, ideal for quiet gaming or content creation in shared spaces.",
+        "shortDescription": "Memory Clock: 28 Gbps Memory Size: 8 GB Memory Type: GDDR7 Card Bus: PCI-E 5.0",
+        "price": "56000",
+        "compareAtPrice": "58000",
+        "costPrice": "2000",
+        "stockStatus": "IN_STOCK",
+        "stockQuantity": 10,
+        "lowStockAlert": 5,
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "brandId": "cmr9bvs2f000wnjjlhveyideo",
+        "metaTitle": "",
+        "metaDescription": "",
+        "metaKeywords": "",
+        "isFeatured": false,
+        "isActive": true,
+        "createdAt": "2026-07-06T16:03:00.683Z",
+        "updatedAt": "2026-07-06T18:09:28.845Z",
+        "publishedAt": "2026-07-06T16:03:00.679Z",
+        "brand": {
+          "id": "cmr9bvs2f000wnjjlhveyideo",
+          "name": "GIGABYTE",
+          "slug": "gigabyte"
+        },
+        "category": {
+          "id": "cmr9bvs3p001qnjjlnzrmtdrs",
+          "name": "Graphics Card",
+          "slug": "graphics-card"
+        },
+        "images": [
+          {
+            "id": "cmr9jbaxd000nt1wvndp217jt",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "url": "https://www.techlandbd.com/cache/images/uploads/products/P0322511005/gigabyte-graphics-card-geforce-rtx-5060-aero-oc-8g-cover.webp",
+            "alt": "Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card",
+            "order": 0,
+            "isPrimary": true,
+            "createdAt": "2026-07-06T18:09:28.850Z"
+          }
+        ],
+        "specifications": [
+          {
+            "id": "cmr9jbaxw000ot1wvuq3u7tky",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "specificationDefinitionId": "cmr9bvs9c003mnjjl66ggue09",
+            "value": "8 GB",
+            "createdAt": "2026-07-06T18:09:28.868Z",
+            "updatedAt": "2026-07-06T18:09:28.868Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs9c003mnjjl66ggue09",
+              "name": "Memory Size",
+              "key": "memory_size"
+            }
+          },
+          {
+            "id": "cmr9jbaxw000pt1wv715ntcyz",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "specificationDefinitionId": "cmr9fdu2i0003znc8m0i2htvy",
+            "value": "28 GBPs",
+            "createdAt": "2026-07-06T18:09:28.868Z",
+            "updatedAt": "2026-07-06T18:09:28.868Z",
+            "specificationDefinition": {
+              "id": "cmr9fdu2i0003znc8m0i2htvy",
+              "name": "Bus Type",
+              "key": "bus_type"
+            }
+          },
+          {
+            "id": "cmr9jbaxw000qt1wvqx3909qn",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "specificationDefinitionId": "cmr9bvs9c003nnjjldprfoq71",
+            "value": "GDDR7",
+            "createdAt": "2026-07-06T18:09:28.868Z",
+            "updatedAt": "2026-07-06T18:09:28.868Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs9c003nnjjldprfoq71",
+              "name": "Memory Type",
+              "key": "memory_type"
+            }
+          },
+          {
+            "id": "cmr9jbaxw000rt1wvanwgba4i",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "specificationDefinitionId": "cmr9fdu2m0007znc8kc698wgu",
+            "value": "2595",
+            "createdAt": "2026-07-06T18:09:28.868Z",
+            "updatedAt": "2026-07-06T18:09:28.868Z",
+            "specificationDefinition": {
+              "id": "cmr9fdu2m0007znc8kc698wgu",
+              "name": "Memory Clock",
+              "key": "memory_clock"
+            }
+          },
+          {
+            "id": "cmr9jbaxw000st1wvynn9dcsj",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "specificationDefinitionId": "cmr9fdu2p0009znc81h27hava",
+            "value": "128 bit",
+            "createdAt": "2026-07-06T18:09:28.868Z",
+            "updatedAt": "2026-07-06T18:09:28.868Z",
+            "specificationDefinition": {
+              "id": "cmr9fdu2p0009znc81h27hava",
+              "name": "Memory Bus (Bit)",
+              "key": "memory_bus"
+            }
+          },
+          {
+            "id": "cmr9jbaxw000tt1wv3je6qkdf",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "specificationDefinitionId": "cmr9fdu2q000bznc8nqnk6n3y",
+            "value": "7680x2540",
+            "createdAt": "2026-07-06T18:09:28.868Z",
+            "updatedAt": "2026-07-06T18:09:28.868Z",
+            "specificationDefinition": {
+              "id": "cmr9fdu2q000bznc8nqnk6n3y",
+              "name": "Resolution",
+              "key": "resolution"
+            }
+          },
+          {
+            "id": "cmr9jbaxw000ut1wvclmxg5vp",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "specificationDefinitionId": "cmr9fdu2s000dznc862mxbzdr",
+            "value": "4",
+            "createdAt": "2026-07-06T18:09:28.868Z",
+            "updatedAt": "2026-07-06T18:09:28.868Z",
+            "specificationDefinition": {
+              "id": "cmr9fdu2s000dznc862mxbzdr",
+              "name": "Multi Display",
+              "key": "multi_display"
+            }
+          },
+          {
+            "id": "cmr9jbaxw000vt1wvo854keod",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "specificationDefinitionId": "cmr9bvs9c003onjjl73rcf6jj",
+            "value": "GeForce RTX 5060 Ti",
+            "createdAt": "2026-07-06T18:09:28.868Z",
+            "updatedAt": "2026-07-06T18:09:28.868Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs9c003onjjl73rcf6jj",
+              "name": "GPU Chipset",
+              "key": "gpu_chipset"
+            }
+          },
+          {
+            "id": "cmr9jbaxw000wt1wv5n4qt4el",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "specificationDefinitionId": "cmr9fdu2v000hznc8hqkuplm8",
+            "value": "3840",
+            "createdAt": "2026-07-06T18:09:28.868Z",
+            "updatedAt": "2026-07-06T18:09:28.868Z",
+            "specificationDefinition": {
+              "id": "cmr9fdu2v000hznc8hqkuplm8",
+              "name": "CUDA Cores (Nvidia)",
+              "key": "cuda_cores"
+            }
+          },
+          {
+            "id": "cmr9jbaxw000xt1wvk2pet7gu",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "specificationDefinitionId": "cmr9fdu2x000jznc8fy1302of",
+            "value": "PCI-E 5.0",
+            "createdAt": "2026-07-06T18:09:28.868Z",
+            "updatedAt": "2026-07-06T18:09:28.868Z",
+            "specificationDefinition": {
+              "id": "cmr9fdu2x000jznc8fy1302of",
+              "name": "Interface (PCI Express)",
+              "key": "pci_express"
+            }
+          },
+          {
+            "id": "cmr9jbaxw000yt1wv5zx0hqk7",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "specificationDefinitionId": "cmr9fdu2z000lznc8a23p949m",
+            "value": "DirectX 12 API",
+            "createdAt": "2026-07-06T18:09:28.868Z",
+            "updatedAt": "2026-07-06T18:09:28.868Z",
+            "specificationDefinition": {
+              "id": "cmr9fdu2z000lznc8a23p949m",
+              "name": "DirectX",
+              "key": "directx"
+            }
+          },
+          {
+            "id": "cmr9jbaxw000zt1wve1l74s1a",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "specificationDefinitionId": "cmr9fdu30000nznc8r71v4upj",
+            "value": "4.6",
+            "createdAt": "2026-07-06T18:09:28.868Z",
+            "updatedAt": "2026-07-06T18:09:28.868Z",
+            "specificationDefinition": {
+              "id": "cmr9fdu30000nznc8r71v4upj",
+              "name": "OpenGL",
+              "key": "opengl"
+            }
+          },
+          {
+            "id": "cmr9jbaxw0010t1wvla7x3w4s",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "specificationDefinitionId": "cmr9fdu34000tznc8rgc4pj4c",
+            "value": "8-pin x3",
+            "createdAt": "2026-07-06T18:09:28.868Z",
+            "updatedAt": "2026-07-06T18:09:28.868Z",
+            "specificationDefinition": {
+              "id": "cmr9fdu34000tznc8rgc4pj4c",
+              "name": "Power Connector",
+              "key": "power_connector"
+            }
+          },
+          {
+            "id": "cmr9jbaxw0011t1wvj4uzy9l3",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "specificationDefinitionId": "cmr9fdu31000pznc8qjtoyzrk",
+            "value": "550",
+            "createdAt": "2026-07-06T18:09:28.868Z",
+            "updatedAt": "2026-07-06T18:09:28.868Z",
+            "specificationDefinition": {
+              "id": "cmr9fdu31000pznc8qjtoyzrk",
+              "name": "Recommended Power",
+              "key": "recommended_psu"
+            }
+          },
+          {
+            "id": "cmr9jbaxw0012t1wvqz7p9nmk",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "specificationDefinitionId": "cmr9fdu33000rznc8knkdzgst",
+            "value": "2.1",
+            "createdAt": "2026-07-06T18:09:28.868Z",
+            "updatedAt": "2026-07-06T18:09:28.868Z",
+            "specificationDefinition": {
+              "id": "cmr9fdu33000rznc8knkdzgst",
+              "name": "DisplayPort",
+              "key": "display_port"
+            }
+          },
+          {
+            "id": "cmr9jbaxw0013t1wv5iak651k",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "specificationDefinitionId": "cmr9fdu35000vznc86eleam5x",
+            "value": "2.1",
+            "createdAt": "2026-07-06T18:09:28.868Z",
+            "updatedAt": "2026-07-06T18:09:28.868Z",
+            "specificationDefinition": {
+              "id": "cmr9fdu35000vznc86eleam5x",
+              "name": "HDMI",
+              "key": "hdmi"
+            }
+          },
+          {
+            "id": "cmr9jbaxw0014t1wv8giubfvk",
+            "productId": "cmr9esnv10002t1wvup6a0f8w",
+            "specificationDefinitionId": "cmr9fdu38000zznc8rwpfa7k5",
+            "value": "3",
+            "createdAt": "2026-07-06T18:09:28.868Z",
+            "updatedAt": "2026-07-06T18:09:28.868Z",
+            "specificationDefinition": {
+              "id": "cmr9fdu38000zznc8rwpfa7k5",
+              "name": "Warranty",
+              "key": "warranty"
+            }
+          }
+        ]
+      }
+    ],
+    "specificationDefinitions": [
+      {
+        "id": "cmr9bvs3y0027njjlmnphc78d",
+        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
+        "name": "Number Of Threads",
+        "key": "number_of_threads",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 3,
+        "createdAt": "2026-07-06T14:41:27.310Z",
+        "updatedAt": "2026-07-06T14:41:27.310Z"
+      },
+      {
+        "id": "cmr9bvs3z0028njjl78cbu80i",
+        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
+        "name": "Number Of Cores",
+        "key": "number_of_cores",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 2,
+        "createdAt": "2026-07-06T14:41:27.310Z",
+        "updatedAt": "2026-07-06T14:41:27.310Z"
+      },
+      {
+        "id": "cmr9bvs3y0026njjlozqqv8z0",
+        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
+        "name": "Base Frequency",
+        "key": "base_clock",
+        "dataType": "NUMBER",
+        "unit": "GHz",
+        "isFilterable": false,
+        "isRequired": true,
+        "order": 4,
+        "createdAt": "2026-07-06T14:41:27.310Z",
+        "updatedAt": "2026-07-06T14:41:27.310Z"
+      },
+      {
+        "id": "cmr9bvs3y0023njjljhlzuud0",
+        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
+        "name": "CPU Socket",
+        "key": "socket_type",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 1,
+        "createdAt": "2026-07-06T14:41:27.310Z",
+        "updatedAt": "2026-07-06T14:41:27.310Z"
+      },
+      {
+        "id": "cmr9bvs3y0024njjl9e3ah51v",
+        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
+        "name": "Maximum Turbo Frequency",
+        "key": "boost_clock",
+        "dataType": "NUMBER",
+        "unit": "GHz",
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 5,
+        "createdAt": "2026-07-06T14:41:27.310Z",
+        "updatedAt": "2026-07-06T14:41:27.310Z"
+      },
+      {
+        "id": "cmr9bvs5i002anjjlcuk2lj5u",
+        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
+        "name": "TDP (Thermal Design Power)",
+        "key": "tdp",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": true,
+        "order": 7,
+        "createdAt": "2026-07-06T14:41:27.311Z",
+        "updatedAt": "2026-07-06T14:41:27.311Z"
+      },
+      {
+        "id": "cmr9bvs64002cnjjl2ip49dn5",
+        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
+        "name": "Processor Graphics",
+        "key": "integrated_graphics",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": false,
+        "order": 14,
+        "createdAt": "2026-07-06T14:41:27.311Z",
+        "updatedAt": "2026-07-06T14:41:27.311Z"
+      },
+      {
+        "id": "cmr9bvs69002enjjlzzee8gs4",
+        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
+        "name": "Processor Model",
+        "key": "model_number",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": true,
+        "order": 9,
+        "createdAt": "2026-07-06T14:41:27.311Z",
+        "updatedAt": "2026-07-06T14:41:27.311Z"
+      },
+      {
+        "id": "cmr9bvs6f002hnjjl1x3olffk",
+        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
+        "name": "Processor Series",
+        "key": "generation",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 10,
+        "createdAt": "2026-07-06T14:41:27.311Z",
+        "updatedAt": "2026-07-06T14:41:27.311Z"
+      },
+      {
+        "id": "cmr9bvs6g002injjlwouuh804",
+        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
+        "name": "Cache",
+        "key": "cache_size",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 6,
+        "createdAt": "2026-07-06T14:41:27.311Z",
+        "updatedAt": "2026-07-06T14:41:27.311Z"
+      },
+      {
+        "id": "cmr9bvs6i002knjjlemi601rt",
+        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
+        "name": "Max Memory Speed",
+        "key": "max_memory_speed",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 12,
+        "createdAt": "2026-07-06T14:41:27.311Z",
+        "updatedAt": "2026-07-06T14:41:27.311Z"
+      },
+      {
+        "id": "cmr9bvs6u002mnjjl4mw9r2r4",
+        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
+        "name": "Processor Brand",
+        "key": "processor_model",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 8,
+        "createdAt": "2026-07-06T14:41:27.311Z",
+        "updatedAt": "2026-07-06T14:41:27.311Z"
+      },
+      {
+        "id": "cmr9bvs6x002onjjln15z5srx",
+        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
+        "name": "Memory Type",
+        "key": "memory_type",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": false,
+        "order": 11,
+        "createdAt": "2026-07-06T14:41:27.311Z",
+        "updatedAt": "2026-07-06T14:41:27.311Z"
+      },
+      {
+        "id": "cmr9bvs91002qnjjlspy1ptf2",
+        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
+        "name": "Max. Memory Size",
+        "key": "max_memory_size",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 13,
+        "createdAt": "2026-07-06T14:41:27.311Z",
+        "updatedAt": "2026-07-06T14:41:27.311Z"
+      },
+      {
+        "id": "cmr9bvs970039njjl7x3qpa9y",
+        "categoryId": "cmr9bvs3n001onjjl46q890qi",
+        "name": "Processor Series",
+        "key": "generation",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 10,
+        "createdAt": "2026-07-06T14:41:27.499Z",
+        "updatedAt": "2026-07-06T14:41:27.499Z"
+      },
+      {
+        "id": "cmr9bvs97002unjjlkze12d8e",
+        "categoryId": "cmr9bvs3n001onjjl46q890qi",
+        "name": "Number Of Cores",
+        "key": "number_of_cores",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 2,
+        "createdAt": "2026-07-06T14:41:27.499Z",
+        "updatedAt": "2026-07-06T14:41:27.499Z"
+      },
+      {
+        "id": "cmr9bvs970032njjll06wzb1c",
+        "categoryId": "cmr9bvs3n001onjjl46q890qi",
+        "name": "Processor Brand",
+        "key": "processor_model",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 8,
+        "createdAt": "2026-07-06T14:41:27.499Z",
+        "updatedAt": "2026-07-06T14:41:27.499Z"
+      },
+      {
+        "id": "cmr9bvs97002vnjjluf76j46i",
+        "categoryId": "cmr9bvs3n001onjjl46q890qi",
+        "name": "CPU Socket",
+        "key": "socket_type",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 1,
+        "createdAt": "2026-07-06T14:41:27.499Z",
+        "updatedAt": "2026-07-06T14:41:27.499Z"
+      },
+      {
+        "id": "cmr9bvs970034njjlup59w81g",
+        "categoryId": "cmr9bvs3n001onjjl46q890qi",
+        "name": "Memory Type",
+        "key": "memory_type",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": false,
+        "order": 11,
+        "createdAt": "2026-07-06T14:41:27.499Z",
+        "updatedAt": "2026-07-06T14:41:27.499Z"
+      },
+      {
+        "id": "cmr9bvs97003anjjly8pgyejf",
+        "categoryId": "cmr9bvs3n001onjjl46q890qi",
+        "name": "Processor Model",
+        "key": "model_number",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": true,
+        "order": 9,
+        "createdAt": "2026-07-06T14:41:27.499Z",
+        "updatedAt": "2026-07-06T14:41:27.499Z"
+      },
+      {
+        "id": "cmr9bvs97002xnjjlbgm11wr2",
+        "categoryId": "cmr9bvs3n001onjjl46q890qi",
+        "name": "Base Frequency",
+        "key": "base_clock",
+        "dataType": "NUMBER",
+        "unit": "GHz",
+        "isFilterable": false,
+        "isRequired": true,
+        "order": 4,
+        "createdAt": "2026-07-06T14:41:27.499Z",
+        "updatedAt": "2026-07-06T14:41:27.499Z"
+      },
+      {
+        "id": "cmr9bvs970035njjlw0stdb9f",
+        "categoryId": "cmr9bvs3n001onjjl46q890qi",
+        "name": "Max Memory Speed",
+        "key": "max_memory_speed",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 12,
+        "createdAt": "2026-07-06T14:41:27.499Z",
+        "updatedAt": "2026-07-06T14:41:27.499Z"
+      },
+      {
+        "id": "cmr9bvs970031njjlxjwmui6s",
+        "categoryId": "cmr9bvs3n001onjjl46q890qi",
+        "name": "TDP (Thermal Design Power)",
+        "key": "tdp",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": true,
+        "order": 7,
+        "createdAt": "2026-07-06T14:41:27.499Z",
+        "updatedAt": "2026-07-06T14:41:27.499Z"
+      },
+      {
+        "id": "cmr9bvs970038njjlxvru0024",
+        "categoryId": "cmr9bvs3n001onjjl46q890qi",
+        "name": "Maximum Turbo Frequency",
+        "key": "boost_clock",
+        "dataType": "NUMBER",
+        "unit": "GHz",
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 5,
+        "createdAt": "2026-07-06T14:41:27.499Z",
+        "updatedAt": "2026-07-06T14:41:27.499Z"
+      },
+      {
+        "id": "cmr9bvs98003gnjjlh7t4qtax",
+        "categoryId": "cmr9bvs3n001onjjl46q890qi",
+        "name": "Max. Memory Size",
+        "key": "max_memory_size",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 13,
+        "createdAt": "2026-07-06T14:41:27.500Z",
+        "updatedAt": "2026-07-06T14:41:27.500Z"
+      },
+      {
+        "id": "cmr9bvs98003fnjjl9qgz7y19",
+        "categoryId": "cmr9bvs3n001onjjl46q890qi",
+        "name": "Processor Graphics",
+        "key": "integrated_graphics",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": false,
+        "order": 14,
+        "createdAt": "2026-07-06T14:41:27.500Z",
+        "updatedAt": "2026-07-06T14:41:27.500Z"
+      },
+      {
+        "id": "cmr9bvs99003injjlawntuhv3",
+        "categoryId": "cmr9bvs3n001onjjl46q890qi",
+        "name": "Cache",
+        "key": "cache_size",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 6,
+        "createdAt": "2026-07-06T14:41:27.499Z",
+        "updatedAt": "2026-07-06T14:41:27.499Z"
+      },
+      {
+        "id": "cmr9bvs97003cnjjlsdpfrbzc",
+        "categoryId": "cmr9bvs3n001onjjl46q890qi",
+        "name": "Number Of Threads",
+        "key": "number_of_threads",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 3,
+        "createdAt": "2026-07-06T14:41:27.499Z",
+        "updatedAt": "2026-07-06T14:41:27.499Z"
+      },
+      {
+        "id": "cmr9bvs9f003unjjlakeb3cd1",
+        "categoryId": "cmr9bvs3u001wnjjl81hph6nx",
+        "name": "Interface",
+        "key": "interface",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 2,
+        "createdAt": "2026-07-06T14:41:27.508Z",
+        "updatedAt": "2026-07-06T14:41:27.508Z"
+      },
+      {
+        "id": "cmr9bvs9f003tnjjl91abqfrv",
+        "categoryId": "cmr9bvs3u001wnjjl81hph6nx",
+        "name": "Capacity",
+        "key": "capacity",
+        "dataType": "NUMBER",
+        "unit": "GB",
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 1,
+        "createdAt": "2026-07-06T14:41:27.508Z",
+        "updatedAt": "2026-07-06T14:41:27.508Z"
+      },
+      {
+        "id": "cmr9bvs9f003snjjldgshk08i",
+        "categoryId": "cmr9bvs3u001wnjjl81hph6nx",
+        "name": "Read Speed",
+        "key": "read_speed",
+        "dataType": "NUMBER",
+        "unit": "MB/s",
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 3,
+        "createdAt": "2026-07-06T14:41:27.508Z",
+        "updatedAt": "2026-07-06T14:41:27.508Z"
+      },
+      {
+        "id": "cmr9bvs9k003ynjjlu0sjqf2r",
+        "categoryId": "cmr9bvs3w001ynjjlz6a42lgs",
+        "name": "Speed",
+        "key": "speed",
+        "dataType": "NUMBER",
+        "unit": "MHz",
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 3,
+        "createdAt": "2026-07-06T14:41:27.512Z",
+        "updatedAt": "2026-07-06T14:41:27.512Z"
+      },
+      {
+        "id": "cmr9bvs9k003znjjlfy2zoou4",
+        "categoryId": "cmr9bvs3w001ynjjlz6a42lgs",
+        "name": "Memory Type",
+        "key": "memory_type",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 2,
+        "createdAt": "2026-07-06T14:41:27.512Z",
+        "updatedAt": "2026-07-06T14:41:27.512Z"
+      },
+      {
+        "id": "cmr9bvs9k0040njjlyqse70bu",
+        "categoryId": "cmr9bvs3w001ynjjlz6a42lgs",
+        "name": "Capacity",
+        "key": "capacity",
+        "dataType": "NUMBER",
+        "unit": "GB",
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 1,
+        "createdAt": "2026-07-06T14:41:27.512Z",
+        "updatedAt": "2026-07-06T14:41:27.512Z"
+      },
+      {
+        "id": "cmr9bvs9c003mnjjl66ggue09",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "Memory Size",
+        "key": "memory_size",
+        "dataType": "TEXT",
+        "unit": "GB",
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 1,
+        "createdAt": "2026-07-06T14:41:27.505Z",
+        "updatedAt": "2026-07-06T16:19:28.502Z"
+      },
+      {
+        "id": "cmr9fdu2i0003znc8m0i2htvy",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "Bus Type",
+        "key": "bus_type",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 2,
+        "createdAt": "2026-07-06T16:19:28.506Z",
+        "updatedAt": "2026-07-06T16:19:28.506Z"
+      },
+      {
+        "id": "cmr9bvs9c003nnjjldprfoq71",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "Memory Type",
+        "key": "memory_type",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 3,
+        "createdAt": "2026-07-06T14:41:27.505Z",
+        "updatedAt": "2026-07-06T16:19:28.509Z"
+      },
+      {
+        "id": "cmr9fdu2m0007znc8kc698wgu",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "Memory Clock",
+        "key": "memory_clock",
+        "dataType": "TEXT",
+        "unit": "MHz",
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 4,
+        "createdAt": "2026-07-06T16:19:28.511Z",
+        "updatedAt": "2026-07-06T16:19:28.511Z"
+      },
+      {
+        "id": "cmr9fdu2p0009znc81h27hava",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "Memory Bus (Bit)",
+        "key": "memory_bus",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 5,
+        "createdAt": "2026-07-06T16:19:28.513Z",
+        "updatedAt": "2026-07-06T16:19:28.513Z"
+      },
+      {
+        "id": "cmr9fdu2q000bznc8nqnk6n3y",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "Resolution",
+        "key": "resolution",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 6,
+        "createdAt": "2026-07-06T16:19:28.515Z",
+        "updatedAt": "2026-07-06T16:19:28.515Z"
+      },
+      {
+        "id": "cmr9fdu2s000dznc862mxbzdr",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "Multi Display",
+        "key": "multi_display",
+        "dataType": "NUMBER",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 7,
+        "createdAt": "2026-07-06T16:19:28.516Z",
+        "updatedAt": "2026-07-06T16:19:28.516Z"
+      },
+      {
+        "id": "cmr9bvs9c003onjjl73rcf6jj",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "GPU Chipset",
+        "key": "gpu_chipset",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": true,
+        "isRequired": true,
+        "order": 8,
+        "createdAt": "2026-07-06T14:41:27.505Z",
+        "updatedAt": "2026-07-06T16:19:28.518Z"
+      },
+      {
+        "id": "cmr9fdu2v000hznc8hqkuplm8",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "CUDA Cores (Nvidia)",
+        "key": "cuda_cores",
+        "dataType": "NUMBER",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 9,
+        "createdAt": "2026-07-06T16:19:28.520Z",
+        "updatedAt": "2026-07-06T16:19:28.520Z"
+      },
+      {
+        "id": "cmr9fdu2x000jznc8fy1302of",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "Interface (PCI Express)",
+        "key": "pci_express",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 10,
+        "createdAt": "2026-07-06T16:19:28.521Z",
+        "updatedAt": "2026-07-06T16:19:28.521Z"
+      },
+      {
+        "id": "cmr9fdu2z000lznc8a23p949m",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "DirectX",
+        "key": "directx",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 11,
+        "createdAt": "2026-07-06T16:19:28.523Z",
+        "updatedAt": "2026-07-06T16:19:28.523Z"
+      },
+      {
+        "id": "cmr9fdu30000nznc8r71v4upj",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "OpenGL",
+        "key": "opengl",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 12,
+        "createdAt": "2026-07-06T16:19:28.524Z",
+        "updatedAt": "2026-07-06T16:19:28.524Z"
+      },
+      {
+        "id": "cmr9fdu31000pznc8qjtoyzrk",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "Recommended Power",
+        "key": "recommended_psu",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 13,
+        "createdAt": "2026-07-06T16:19:28.526Z",
+        "updatedAt": "2026-07-06T16:19:28.526Z"
+      },
+      {
+        "id": "cmr9fdu33000rznc8knkdzgst",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "DisplayPort",
+        "key": "display_port",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 14,
+        "createdAt": "2026-07-06T16:19:28.527Z",
+        "updatedAt": "2026-07-06T16:19:28.527Z"
+      },
+      {
+        "id": "cmr9fdu34000tznc8rgc4pj4c",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "Power Connector",
+        "key": "power_connector",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 15,
+        "createdAt": "2026-07-06T16:19:28.528Z",
+        "updatedAt": "2026-07-06T16:19:28.528Z"
+      },
+      {
+        "id": "cmr9fdu35000vznc86eleam5x",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "HDMI",
+        "key": "hdmi",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 16,
+        "createdAt": "2026-07-06T16:19:28.530Z",
+        "updatedAt": "2026-07-06T16:19:28.530Z"
+      },
+      {
+        "id": "cmr9fdu37000xznc84up87zd7",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "Dimension",
+        "key": "dimension",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 17,
+        "createdAt": "2026-07-06T16:19:28.531Z",
+        "updatedAt": "2026-07-06T16:19:28.531Z"
+      },
+      {
+        "id": "cmr9fdu38000zznc8rwpfa7k5",
+        "categoryId": "cmr9bvs3p001qnjjlnzrmtdrs",
+        "name": "Warranty",
+        "key": "warranty",
+        "dataType": "TEXT",
+        "unit": null,
+        "isFilterable": false,
+        "isRequired": false,
+        "order": 18,
+        "createdAt": "2026-07-06T16:19:28.532Z",
+        "updatedAt": "2026-07-06T16:19:28.532Z"
+      }
+    ]
+  }
+}

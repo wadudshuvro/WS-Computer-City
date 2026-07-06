@@ -15,6 +15,7 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
     "db:setup": "prisma generate && prisma db push && tsx prisma/seed.ts",
+    "db:backup": "tsx scripts/backup-database.ts",
     "db:add-gpu-specs": "tsx scripts/add-gpu-specifications.ts",
     "db:export": "tsx scripts/export-database.ts",
     "type-check": "tsc --noEmit",

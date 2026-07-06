@@ -38,7 +38,9 @@ async function main() {
         images: true,
         specifications: {
           include: {
-            definition: { select: { id: true, name: true, slug: true } },
+            specificationDefinition: {
+              select: { id: true, name: true, key: true },
+            },
           },
         },
       },

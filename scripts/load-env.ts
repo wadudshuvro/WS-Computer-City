@@ -8,14 +8,29 @@ export function loadEnvValue(key: string): string {
   }
 
   const content = readFileSync(envPath, 'utf-8');
-  const pattern = new RegExp(`^${key}="([^"]*)"`, 'm');
-  const match = content.match(pattern);
 
-  if (!match?.[1]) {
-    throw new Error(`${key} not found in .env`);
+  for (const line of content.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+
+    const eqIndex = trimmed.indexOf('=');
+    if (eqIndex === -1) continue;
+
+    const envKey = trimmed.slice(0, eqIndex).trim();
+    if (envKey !== key) continue;
+
+    let value = trimmed.slice(eqIndex + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+
+    if (value) return value;
   }
 
-  return match[1];
+  throw new Error(`${key} not found in .env`);
 }
 
 export function parseDatabaseUrl(url: string) {
