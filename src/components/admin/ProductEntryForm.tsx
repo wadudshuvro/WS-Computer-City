@@ -591,8 +591,8 @@ export default function ProductEntryForm() {
               <div className="bg-white p-4 rounded border border-red-200 text-sm">
                 <p className="font-semibold text-red-900 mb-2">Quick Fix Options:</p>
                 <ol className="list-decimal list-inside space-y-1 text-red-800">
-                  <li><strong>Local PostgreSQL:</strong> Install from postgresql.org, then run: <code className="bg-red-100 px-2 py-1 rounded">npm run db:push && npm run db:seed</code></li>
-                  <li><strong>Cloud Database (Easiest):</strong> Sign up at supabase.com (free), get connection string, add to .env, then seed</li>
+                  <li><strong>Local PostgreSQL (recommended):</strong> Install from postgresql.org, set <code className="bg-red-100 px-2 py-1 rounded">DATABASE_URL</code> in <code className="bg-red-100 px-2 py-1 rounded">.env</code>, then run: <code className="bg-red-100 px-2 py-1 rounded">npm run db:setup</code></li>
+                  <li><strong>Weekly backup:</strong> Double-click <code className="bg-red-100 px-2 py-1 rounded">backup-db.bat</code> or run <code className="bg-red-100 px-2 py-1 rounded">npm run db:backup</code></li>
                   <li><strong>Docker:</strong> Run: <code className="bg-red-100 px-2 py-1 rounded">docker run --name ws-postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=ws_computer_city -p 5432:5432 -d postgres</code></li>
                 </ol>
                 <p className="mt-3 text-red-700">

@@ -45,3 +45,10 @@ prisma/migrations/*_migration.sql
 
 # OS
 Thumbs.db
+
+# Database backups — keep SQL/JSON in git (private repo only)
+backups/*.backup
+backups/*.dump
+!backups/
+!backups/.gitkeep
+!backups/README.md
