@@ -28,6 +28,13 @@ interface Product {
     alt?: string;
     isPrimary: boolean;
   }>;
+  specifications?: Array<{
+    specificationDefinition: {
+      key: string;
+      name: string;
+    };
+    value: string;
+  }>;
 }
 
 interface FilterCounts {
@@ -36,7 +43,7 @@ interface FilterCounts {
   };
 }
 
-function ProductsPageContent() {
+function ProcessorPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -50,38 +57,19 @@ function ProductsPageContent() {
   const [filterCounts, setFilterCounts] = useState<FilterCounts>({});
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 });
 
-  // Get current page, sort, category, and brand tab from URL
+  // Get current page, sort, and brand tab from URL
   const currentPage = Number(searchParams.get('page')) || 1;
   const currentSort = searchParams.get('sort') || 'default';
-  const categoryParam = searchParams.get('category');
-  const subCategory = searchParams.get('sub');
   const brandParam = searchParams.get('brand') || '';
+  const activeBrandTab = brandParam === 'amd' ? 'amd' : brandParam === 'intel' ? 'intel' : 'intel'; // default Intel when no brand
   const itemsPerPage = 30;
 
-  // Check if we're on processor category
-  const isProcessorCategory = subCategory === 'processor' || categoryParam === 'processor';
-  
-  // Check if we're on graphics card category (including nvidia and amd-gpu subcategories)
-  const isGpuCategory = subCategory === 'graphics-card' || subCategory === 'nvidia' || subCategory === 'amd-gpu' || categoryParam === 'graphics-card';
-
-  // Check if we're on SSD/Storage category
-  const isSsdCategory = subCategory === 'ssd' || subCategory === 'nvme' || subCategory === 'storage' || categoryParam === 'ssd';
-
-  // Active brand tab based on category type
-  const activeProcessorBrandTab = brandParam === 'amd' ? 'amd' : 'intel';
-  // For GPUs, active tab is based on sub-category (nvidia or amd-gpu)
-  const activeGpuBrandTab = subCategory === 'amd-gpu' ? 'amd' : 'nvidia';
-  // For SSD, active brand from URL
-  const activeSsdBrand = brandParam || '';
-
-  // SSD Brands list (matching Tech Land design)
-  const ssdBrands = [
-    'Corsair', 'Kingston', 'Samsung', 'Team', 'XOC', 'MiPhi', 'OSCOO', 'Lexar', 'MSI', 'SanDisk',
-    'Seagate', 'Adata', 'Ocpc', 'Western Digital', 'Aitc', 'Acer', 'Transcend', 'Crucial', 'Apacer',
-    'Colorful', 'KingSpec', 'Netac', 'PNY', 'Twinmos', 'Pc Power', 'Biwintech', 'Kingbox', 'GIGABYTE',
-    'NCX', 'Orico', 'HP', 'King Super', 'Addlink', 'NEO FORZA', 'Hikvision', 'Patriot', 'Ramsta',
-    'Redragon', 'Kimtigo', 'AGI', 'Revenger', 'Dahua', 'LENOVO', 'Smart', 'Walton', 'Suneest', 'Kingbank'
-  ];
+  const handleBrandTabChange = (brand: 'intel' | 'amd') => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('brand', brand);
+    params.set('page', '1');
+    router.push(`/products/processor?${params.toString()}`);
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -93,17 +81,13 @@ function ProductsPageContent() {
       
       // Build query string from URL params
       const params = new URLSearchParams(searchParams.toString());
+      params.set('category', 'processor');
       
       if (!params.has('limit')) {
         params.set('limit', itemsPerPage.toString());
       }
 
-      // Use processor-specific API if on processor category
-      const apiUrl = isProcessorCategory 
-        ? `/api/products/processor?${params.toString()}`
-        : `/api/admin/products?${params.toString()}`;
-
-      const res = await fetch(apiUrl);
+      const res = await fetch(`/api/products/processor?${params.toString()}`);
       
       if (!res.ok) {
         throw new Error('Failed to fetch products');
@@ -111,7 +95,7 @@ function ProductsPageContent() {
       
       const data = await res.json();
       setProducts(data.data || []);
-      setTotalProducts(data.pagination?.total || data.data?.length || 0);
+      setTotalProducts(data.pagination?.total || 0);
       setTotalPages(data.pagination?.pages || 1);
       
       if (data.filters) {
@@ -130,52 +114,14 @@ function ProductsPageContent() {
     const params = new URLSearchParams(searchParams.toString());
     params.set('sort', sort);
     params.set('page', '1');
-    router.push(`/products?${params.toString()}`);
+    router.push(`/products/processor?${params.toString()}`);
   };
 
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', page.toString());
-    router.push(`/products?${params.toString()}`);
+    router.push(`/products/processor?${params.toString()}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleProcessorBrandTabChange = (brand: 'intel' | 'amd') => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('brand', brand);
-    params.set('page', '1');
-    if (!params.has('category') && !params.has('sub')) {
-      params.set('sub', 'processor');
-    }
-    router.push(`/products?${params.toString()}`);
-  };
-
-  const handleGpuBrandTabChange = (gpuType: 'nvidia' | 'amd') => {
-    const params = new URLSearchParams(searchParams.toString());
-    // For GPUs, we filter by sub-category (nvidia or amd-gpu) not brand
-    // Brand is the manufacturer (ASUS, MSI, etc.) while category is the chip maker
-    params.set('sub', gpuType === 'amd' ? 'amd-gpu' : 'nvidia');
-    params.delete('brand'); // Remove brand filter when switching GPU type
-    params.set('page', '1');
-    params.set('category', 'components');
-    router.push(`/products?${params.toString()}`);
-  };
-
-  const handleSsdBrandClick = (brand: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    const brandSlug = brand.toLowerCase().replace(/\s+/g, '-');
-    
-    // Toggle brand filter - if already selected, clear it
-    if (brandParam === brandSlug) {
-      params.delete('brand');
-    } else {
-      params.set('brand', brandSlug);
-    }
-    params.set('page', '1');
-    if (!params.has('sub')) {
-      params.set('sub', 'ssd');
-    }
-    router.push(`/products?${params.toString()}`);
   };
 
   const getStockStatusBadge = (status: string) => {
@@ -218,14 +164,6 @@ function ProductsPageContent() {
     return pages;
   };
 
-  // Get page title based on category
-  const getPageTitle = () => {
-    if (isProcessorCategory) return 'Processor Price In BD 2026';
-    if (isGpuCategory) return 'Graphics Card Price In BD 2026';
-    if (isSsdCategory) return 'SSD Best Price in BD 2026 | Tech Land BD';
-    return 'All Products';
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Breadcrumb */}
@@ -236,17 +174,11 @@ function ProductsPageContent() {
               Home
             </Link>
             <ChevronRight className="w-4 h-4 text-gray-400" />
-            {categoryParam && (
-              <>
-                <Link href="/products" className="text-gray-500 hover:text-blue-600">
-                  {categoryParam === 'components' ? 'Components' : categoryParam}
-                </Link>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-              </>
-            )}
-            <span className="text-gray-900 font-medium">
-              {isProcessorCategory ? 'Processor' : isGpuCategory ? 'Graphics Card' : isSsdCategory ? 'SSD' : 'Products'}
-            </span>
+            <Link href="/products" className="text-gray-500 hover:text-blue-600">
+              Components
+            </Link>
+            <ChevronRight className="w-4 h-4 text-gray-400" />
+            <span className="text-gray-900 font-medium">Processor</span>
           </nav>
         </div>
       </div>
@@ -255,141 +187,64 @@ function ProductsPageContent() {
       <div className="bg-white border-b">
         <div className="max-w-[1400px] mx-auto px-4 py-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            {getPageTitle()}
+            Processor Price In BD 2026
           </h1>
-          {isProcessorCategory && (
-            <>
-              <p className="text-sm text-gray-600 max-w-4xl">
-                Processor Price in BD 2026 begins at BDT 5,600/- and can go up to BDT 85,500/- depending on the brand and specifications. 
-                With a variety of 135 items available at WS Computer City, where 97 items are in stock now & 135 items offer you the best 
-                discount price in BD. Find the perfect Processor Components for your requirements.
-              </p>
-              
-              {/* Sub-category tabs - filter by brand */}
-              <div className="flex gap-4 mt-4">
-                <button
-                  type="button"
-                  onClick={() => handleProcessorBrandTabChange('intel')}
-                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                    activeProcessorBrandTab === 'intel'
-                      ? 'text-blue-600 border-blue-600'
-                      : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  Intel
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleProcessorBrandTabChange('amd')}
-                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                    activeProcessorBrandTab === 'amd'
-                      ? 'text-blue-600 border-blue-600'
-                      : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  AMD Ryzen
-                </button>
-              </div>
-            </>
-          )}
+          <p className="text-sm text-gray-600 max-w-4xl">
+            Processor Price in BD 2026 begins at BDT 5,600/- and can go up to BDT 85,500/- depending on the brand and specifications. 
+            With a variety of 135 items available at WS Computer City, where 97 items are in stock now & 135 items offer you the best 
+            discount price in BD. Find the perfect Processor Components for your requirements.
+          </p>
           
-          {isGpuCategory && (
-            <>
-              <p className="text-sm text-gray-600 max-w-4xl">
-                Graphics Card Price in BD 2026 starts from BDT 8,500/- and can go up to BDT 250,000/- depending on the brand and specifications. 
-                WS Computer City offers a wide selection of NVIDIA GeForce and AMD Radeon graphics cards for gaming, content creation, and professional workloads.
-              </p>
-              
-              {/* Sub-category tabs - filter by GPU brand */}
-              <div className="flex gap-4 mt-4">
-                <button
-                  type="button"
-                  onClick={() => handleGpuBrandTabChange('nvidia')}
-                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                    activeGpuBrandTab === 'nvidia'
-                      ? 'text-blue-600 border-blue-600'
-                      : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  NVIDIA
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleGpuBrandTabChange('amd')}
-                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                    activeGpuBrandTab === 'amd'
-                      ? 'text-blue-600 border-blue-600'
-                      : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  AMD Radeon
-                </button>
-              </div>
-            </>
-          )}
-
-          {/* SSD Category Section */}
-          {isSsdCategory && (
-            <>
-              <p className="text-sm text-gray-600 max-w-4xl mb-4">
-                SSD Best Price in BD 2026 begins at BDT 3,150/- and can go up to BDT 85,000/- depending on the brand and specifications. 
-                With a variety of 1126 items available at WS Computer City, where 223 items are in stock now & 1076 items offer you the best 
-                discount price in BD. Find the perfect SSD Components for your requirements. Search for SSD price in bd, 1tb SSD price in bd, 
-                256 GB SSD price in bd, 512GB SSD price in bd, portable SSD price in bd, m.2 SSD price in bd, nvme SSD price in bd.
-              </p>
-              
-              {/* SSD Brands Grid - Similar to Tech Land design */}
-              <div className="flex flex-wrap gap-2 mt-4">
-                {ssdBrands.map((brand) => {
-                  const brandSlug = brand.toLowerCase().replace(/\s+/g, '-');
-                  const isActive = brandParam === brandSlug;
-                  return (
-                    <button
-                      key={brand}
-                      type="button"
-                      onClick={() => handleSsdBrandClick(brand)}
-                      className={`px-3 py-1.5 text-sm rounded border transition-colors ${
-                        isActive
-                          ? 'bg-blue-600 text-white border-blue-600'
-                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600'
-                      }`}
-                    >
-                      {brand}
-                    </button>
-                  );
-                })}
-              </div>
-            </>
-          )}
+          {/* Sub-category tabs - filter by brand */}
+          <div className="flex gap-4 mt-4">
+            <button
+              type="button"
+              onClick={() => handleBrandTabChange('intel')}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeBrandTab === 'intel'
+                  ? 'text-blue-600 border-blue-600'
+                  : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Intel
+            </button>
+            <button
+              type="button"
+              onClick={() => handleBrandTabChange('amd')}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeBrandTab === 'amd'
+                  ? 'text-blue-600 border-blue-600'
+                  : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              AMD Ryzen
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="max-w-[1400px] mx-auto px-4 py-6">
         <div className="flex gap-6">
-          {/* Sidebar Filters - Desktop (Only for processor category) */}
-          {isProcessorCategory && (
-            <div className="hidden lg:block w-[280px] flex-shrink-0">
-              <ProcessorFilters
-                priceRange={priceRange}
-                filterCounts={filterCounts}
-              />
-            </div>
-          )}
+          {/* Sidebar Filters - Desktop */}
+          <div className="hidden lg:block w-[280px] flex-shrink-0">
+            <ProcessorFilters
+              priceRange={priceRange}
+              filterCounts={filterCounts}
+            />
+          </div>
 
-          {/* Mobile Filter Button (Only for processor category) */}
-          {isProcessorCategory && (
-            <button
-              onClick={() => setShowMobileFilters(true)}
-              className="lg:hidden fixed bottom-4 left-4 z-40 bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2"
-            >
-              <SlidersHorizontal className="w-5 h-5" />
-              Filters
-            </button>
-          )}
+          {/* Mobile Filter Button */}
+          <button
+            onClick={() => setShowMobileFilters(true)}
+            className="lg:hidden fixed bottom-4 left-4 z-40 bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2"
+          >
+            <SlidersHorizontal className="w-5 h-5" />
+            Filters
+          </button>
 
           {/* Mobile Filters Overlay */}
-          {isProcessorCategory && showMobileFilters && (
+          {showMobileFilters && (
             <div className="lg:hidden fixed inset-0 z-50 bg-black/50">
               <div className="absolute right-0 top-0 bottom-0 w-[320px] bg-white overflow-y-auto">
                 <div className="flex items-center justify-between p-4 border-b">
@@ -416,21 +271,19 @@ function ProductsPageContent() {
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   {/* Sort Dropdown */}
-                  {isProcessorCategory && (
-                    <div className="flex items-center gap-2">
-                      <select
-                        value={currentSort}
-                        onChange={(e) => handleSortChange(e.target.value)}
-                        className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        {processorSortOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={currentSort}
+                      onChange={(e) => handleSortChange(e.target.value)}
+                      className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      {processorSortOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   
                   {/* Items per page */}
                   <div className="flex items-center gap-2">
@@ -474,7 +327,7 @@ function ProductsPageContent() {
             {loading && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
                 <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading products...</p>
+                <p className="text-gray-600">Loading processors...</p>
               </div>
             )}
 
@@ -493,7 +346,7 @@ function ProductsPageContent() {
                   Try adjusting your filters or search criteria.
                 </p>
                 <Link
-                  href="/products"
+                  href="/products/processor"
                   className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
                 >
                   Clear Filters
@@ -510,7 +363,7 @@ function ProductsPageContent() {
                     : 'grid-cols-1'
                 }`}>
                   {products.map((product) => {
-                    const primaryImage = product.images?.find(img => img.isPrimary) || product.images?.[0];
+                    const primaryImage = product.images.find(img => img.isPrimary) || product.images[0];
                     const discount = product.compareAtPrice
                       ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
                       : 0;
@@ -520,7 +373,7 @@ function ProductsPageContent() {
                       // Grid View Card
                       <div
                         key={product.id}
-                        className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow group relative"
+                        className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow group"
                       >
                         {/* Discount Badge */}
                         {discount > 0 && (
@@ -716,122 +569,52 @@ function ProductsPageContent() {
         </div>
       </div>
 
-      {/* SEO Content Section (Only for processor category) */}
-      {isProcessorCategory && (
-        <div className="bg-white border-t mt-8">
-          <div className="max-w-[1400px] mx-auto px-4 py-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
-              Processor Price in Bangladesh
-            </h2>
-            <div className="prose prose-sm max-w-none text-gray-600">
-              <p>
-                A processor, also known as a microprocessor, is a small chip that acts as the brain of a computer and other electronic devices. 
-                The central processor of a computer is called the CPU (Central Processing Unit), and most desktop CPUs are developed by Intel or AMD. 
-                Modern processors include multiple cores that work together to execute instructions efficiently and improve multitasking performance.
-                When upgrading or building a new computer, checking local pricing is important, such as the processor price in BD, to understand 
-                the cost of modern and efficient hardware. WS Computer City BD offers a wide selection of Intel processors in Bangladesh, 
-                including Core i3, Core i5, Core i7, and Core i9 models.
-              </p>
-              
-              <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">Intel Processor</h3>
-              <p>
-                Intel Corporation develops Intel processors, which serve as central processing units (CPUs) in laptops, desktops, and servers. 
-                These processors deliver strong performance and reliable operation. Intel organizes them into families such as Core™ (i3, i5, i7, i9) 
-                for everyday and high-end use, Xeon™ for servers, and Pentium®, Celeron®, and Atom™ for basic computing tasks.
-              </p>
-              
-              <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">AMD Processor</h3>
-              <p>
-                AMD (Advanced Micro Devices) processors offer excellent performance and value for gaming, content creation, and professional workloads. 
-                The Ryzen series, including Ryzen 3, Ryzen 5, Ryzen 7, and Ryzen 9, provides options for every user from budget-conscious buyers to 
-                enthusiasts seeking top-tier performance.
-              </p>
-            </div>
+      {/* SEO Content Section */}
+      <div className="bg-white border-t mt-8">
+        <div className="max-w-[1400px] mx-auto px-4 py-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            Processor Price in Bangladesh
+          </h2>
+          <div className="prose prose-sm max-w-none text-gray-600">
+            <p>
+              A processor, also known as a microprocessor, is a small chip that acts as the brain of a computer and other electronic devices. 
+              The central processor of a computer is called the CPU (Central Processing Unit), and most desktop CPUs are developed by Intel or AMD. 
+              Modern processors include multiple cores that work together to execute instructions efficiently and improve multitasking performance.
+              When upgrading or building a new computer, checking local pricing is important, such as the processor price in BD, to understand 
+              the cost of modern and efficient hardware. WS Computer City BD offers a wide selection of Intel processors in Bangladesh, 
+              including Core i3, Core i5, Core i7, and Core i9 models.
+            </p>
+            
+            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">Intel Processor</h3>
+            <p>
+              Intel Corporation develops Intel processors, which serve as central processing units (CPUs) in laptops, desktops, and servers. 
+              These processors deliver strong performance and reliable operation. Intel organizes them into families such as Core™ (i3, i5, i7, i9) 
+              for everyday and high-end use, Xeon™ for servers, and Pentium®, Celeron®, and Atom™ for basic computing tasks. Intel processors 
+              include technologies like Turbo Boost, Hyper-Threading, and integrated graphics to improve multitasking and overall efficiency.
+            </p>
+            
+            <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">AMD Processor</h3>
+            <p>
+              AMD (Advanced Micro Devices) processors offer excellent performance and value for gaming, content creation, and professional workloads. 
+              The Ryzen series, including Ryzen 3, Ryzen 5, Ryzen 7, and Ryzen 9, provides options for every user from budget-conscious buyers to 
+              enthusiasts seeking top-tier performance. AMD's innovative technologies like Precision Boost, 3D V-Cache, and excellent multi-threaded 
+              performance make them a popular choice among PC builders.
+            </p>
           </div>
         </div>
-      )}
-
-      {/* SEO Content Section (Only for GPU category) */}
-      {isGpuCategory && (
-        <div className="bg-white border-t mt-8">
-          <div className="max-w-[1400px] mx-auto px-4 py-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
-              Graphics Card Price in Bangladesh
-            </h2>
-            <div className="prose prose-sm max-w-none text-gray-600">
-              <p>
-                A graphics card (GPU) is a specialized electronic circuit designed to rapidly manipulate and alter memory to accelerate 
-                the creation of images for display. Modern graphics cards are essential for gaming, video editing, 3D rendering, and 
-                machine learning tasks. WS Computer City BD offers a comprehensive selection of graphics cards from leading manufacturers 
-                including NVIDIA and AMD.
-              </p>
-              
-              <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">NVIDIA Graphics Cards</h3>
-              <p>
-                NVIDIA GeForce graphics cards are renowned for their cutting-edge technology and exceptional gaming performance. 
-                The GeForce RTX series features real-time ray tracing and AI-powered DLSS technology for stunning visuals. 
-                From the entry-level GTX 1650 to the flagship RTX 4090, NVIDIA offers options for every budget and performance requirement.
-              </p>
-              
-              <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">AMD Graphics Cards</h3>
-              <p>
-                AMD Radeon graphics cards deliver excellent value and performance for gamers and content creators. 
-                The Radeon RX 7000 series offers competitive performance with features like AMD FidelityFX Super Resolution (FSR) 
-                for enhanced frame rates. AMD GPUs are known for their strong price-to-performance ratio.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* SEO Content Section (Only for SSD category) */}
-      {isSsdCategory && (
-        <div className="bg-white border-t mt-8">
-          <div className="max-w-[1400px] mx-auto px-4 py-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
-              SSD Price in Bangladesh
-            </h2>
-            <div className="prose prose-sm max-w-none text-gray-600">
-              <p>
-                A Solid State Drive (SSD) is a storage device that uses flash memory to store data permanently. Unlike traditional 
-                Hard Disk Drives (HDDs), SSDs have no moving parts, making them faster, more durable, and more energy-efficient. 
-                SSDs significantly improve system boot times, application loading speeds, and overall computer responsiveness. 
-                WS Computer City BD offers a wide selection of SSDs from leading brands including Samsung, Kingston, Crucial, 
-                Western Digital, and many more.
-              </p>
-              
-              <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">Types of SSDs</h3>
-              <p>
-                <strong>SATA SSD:</strong> These are the most common type, using the SATA III interface with speeds up to 550 MB/s. 
-                Available in 2.5-inch form factor, they're ideal for upgrading older laptops and desktops.
-              </p>
-              <p>
-                <strong>NVMe SSD:</strong> Using the PCIe interface, NVMe SSDs offer significantly faster speeds (up to 7,000 MB/s or more). 
-                Available in M.2 form factor, they're perfect for gaming, content creation, and professional workloads.
-              </p>
-              
-              <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">Popular SSD Brands</h3>
-              <p>
-                Samsung leads the market with their 980 PRO and 990 PRO series. Kingston offers reliable options with their A2000 and 
-                KC3000 series. Crucial provides excellent value with their MX500 and P5 Plus series. Western Digital's WD Blue and 
-                WD Black series are popular choices for both everyday use and gaming.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
 
-export default function ProductsPage() {
+export default function ProcessorPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div>
       </div>
     }>
-      <ProductsPageContent />
+      <ProcessorPageContent />
     </Suspense>
   );
 }

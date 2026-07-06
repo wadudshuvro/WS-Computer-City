@@ -48,16 +48,27 @@ export class ProductService {
 
       // 3. Create product specifications
       if (data.specifications && data.specifications.length > 0) {
-        await tx.productSpecification.createMany({
-          data: data.specifications.map((spec) => ({
-            productId: product.id,
-            specificationDefinitionId: spec.specificationDefinitionId,
-            value: spec.value,
-          })),
-        });
+        // Filter to only include specs with valid specificationDefinitionId (database-defined specs)
+        // Category-based specs (with key only) are stored as metadata but not in the specifications table
+        const dbSpecs = data.specifications.filter(
+          (spec: any) => 'specificationDefinitionId' in spec && spec.specificationDefinitionId
+        );
+        
+        if (dbSpecs.length > 0) {
+          await tx.productSpecification.createMany({
+            data: dbSpecs.map((spec: any) => ({
+              productId: product.id,
+              specificationDefinitionId: spec.specificationDefinitionId,
+              value: spec.value,
+            })),
+          });
 
-        // 4. Update filterable specification cache
-        await this.updateFilterCache(tx, data.categoryId, data.specifications);
+          // 4. Update filterable specification cache
+          await this.updateFilterCache(tx, data.categoryId, dbSpecs.map((s: any) => ({
+            specificationDefinitionId: s.specificationDefinitionId,
+            value: s.value,
+          })));
+        }
       }
 
       // 5. Return product with all relations
@@ -125,14 +136,21 @@ export class ProductService {
         // Delete existing specifications
         await tx.productSpecification.deleteMany({ where: { productId: id } });
         
-        // Create new specifications
-        await tx.productSpecification.createMany({
-          data: data.specifications.map((spec) => ({
-            productId: id,
-            specificationDefinitionId: spec.specificationDefinitionId,
-            value: spec.value,
-          })),
-        });
+        // Filter to only include specs with valid specificationDefinitionId
+        const dbSpecs = data.specifications.filter(
+          (spec: any) => 'specificationDefinitionId' in spec && spec.specificationDefinitionId
+        );
+        
+        if (dbSpecs.length > 0) {
+          // Create new specifications
+          await tx.productSpecification.createMany({
+            data: dbSpecs.map((spec: any) => ({
+              productId: id,
+              specificationDefinitionId: spec.specificationDefinitionId,
+              value: spec.value,
+            })),
+          });
+        }
       }
 
       return await tx.product.findUnique({
@@ -164,6 +182,121 @@ export class ProductService {
       where.category = {
         slug: filters.category,
       };
+    }
+
+    // Brand filter
+    if (filters.brand) {
+      const brands = Array.isArray(filters.brand) ? filters.brand : [filters.brand];
+      where.brand = {
+        slug: { in: brands },
+      };
+    }
+
+    // Price range filter
+    if (filters.minPrice || filters.maxPrice) {
+      where.price = {};
+      if (filters.minPrice) {
+        where.price.gte = new Prisma.Decimal(filters.minPrice);
+      }
+      if (filters.maxPrice) {
+        where.price.lte = new Prisma.Decimal(filters.maxPrice);
+      }
+    }
+
+    // Stock status filter
+    if (filters.stockStatus) {
+      const statuses = Array.isArray(filters.stockStatus)
+        ? filters.stockStatus
+        : [filters.stockStatus];
+      where.stockStatus = { in: statuses };
+    }
+
+    // Search filter
+    if (filters.search) {
+      where.OR = [
+        { name: { contains: filters.search, mode: 'insensitive' } },
+        { description: { contains: filters.search, mode: 'insensitive' } },
+        { sku: { contains: filters.search, mode: 'insensitive' } },
+      ];
+    }
+
+    // Dynamic specification filters
+    if (filters.specs && Object.keys(filters.specs).length > 0) {
+      where.specifications = {
+        some: {
+          AND: Object.entries(filters.specs).map(([key, value]) => ({
+            specificationDefinition: { key },
+            value: { contains: value, mode: 'insensitive' },
+          })),
+        },
+      };
+    }
+
+    // Sorting
+    const orderBy: Prisma.ProductOrderByWithRelationInput = this.getSortOrder(filters.sort);
+
+    // Execute queries in parallel
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        include: {
+          category: true,
+          brand: true,
+          images: {
+            where: { isPrimary: true },
+            take: 1,
+          },
+        },
+        skip: (filters.page - 1) * filters.limit,
+        take: filters.limit,
+        orderBy,
+      }),
+      prisma.product.count({ where }),
+    ]);
+
+    return {
+      products,
+      pagination: {
+        total,
+        page: filters.page,
+        limit: filters.limit,
+        pages: Math.ceil(total / filters.limit),
+      },
+    };
+  }
+
+  /**
+   * Get products with filters - includes products from child categories
+   * When filtering by "graphics-card", also includes products from "nvidia" and "amd-gpu"
+   */
+  static async getFilteredWithChildren(filters: ProductFilterDTO) {
+    const where: Prisma.ProductWhereInput = {
+      isActive: true,
+    };
+
+    // Category filter - include child categories
+    if (filters.category) {
+      // Find the category and its children
+      const category = await prisma.category.findFirst({
+        where: { slug: filters.category },
+        include: {
+          children: true,
+        },
+      });
+
+      if (category) {
+        // Get all category IDs (parent + children)
+        const categoryIds = [category.id, ...category.children.map(c => c.id)];
+        
+        where.categoryId = {
+          in: categoryIds,
+        };
+      } else {
+        // If category not found, fall back to slug match
+        where.category = {
+          slug: filters.category,
+        };
+      }
     }
 
     // Brand filter

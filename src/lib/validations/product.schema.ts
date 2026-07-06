@@ -9,14 +9,25 @@ export const productImageSchema = z.object({
   isPrimary: z.boolean().default(false),
 });
 
-// Product Specification Schema
-export const productSpecificationSchema = z.object({
-  specificationDefinitionId: z.string().cuid('Invalid specification definition ID'),
-  value: z.string().min(1, 'Specification value is required'),
-});
+// Product Specification Schema - supports both database specs (with CUID) and category specs (with key)
+export const productSpecificationSchema = z.union([
+  // Database specification (with CUID)
+  z.object({
+    specificationDefinitionId: z.string().cuid('Invalid specification definition ID'),
+    value: z.string().min(1, 'Specification value is required'),
+  }),
+  // Category-based specification (with key)
+  z.object({
+    key: z.string().min(1, 'Specification key is required'),
+    value: z.string().min(1, 'Specification value is required'),
+  }),
+]);
+
+// Helper to transform empty strings to undefined
+const emptyStringToUndefined = z.string().transform((val) => val === '' ? undefined : val);
 
 // Create Product Schema
-export const createProductSchema = z.object({
+const baseProductSchema = z.object({
   name: z.string().min(3, 'Product name must be at least 3 characters').max(255),
   slug: z
     .string()
@@ -28,13 +39,13 @@ export const createProductSchema = z.object({
     .min(3, 'SKU must be at least 3 characters')
     .max(100)
     .regex(/^[A-Z0-9-]+$/, 'SKU must be uppercase alphanumeric with hyphens'),
-  description: z.string().optional(),
-  shortDescription: z.string().max(500).optional(),
+  description: z.string().optional().nullable(),
+  shortDescription: z.string().max(500).optional().nullable(),
   
   // Pricing
   price: z.number().positive('Price must be positive'),
-  compareAtPrice: z.number().positive().optional(),
-  costPrice: z.number().positive().optional(),
+  compareAtPrice: z.number().positive().optional().nullable(),
+  costPrice: z.number().positive().optional().nullable(),
   
   // Stock
   stockStatus: z.nativeEnum(StockStatus),
@@ -46,9 +57,9 @@ export const createProductSchema = z.object({
   brandId: z.string().cuid('Invalid brand ID'),
   
   // SEO
-  metaTitle: z.string().max(60).optional(),
-  metaDescription: z.string().max(160).optional(),
-  metaKeywords: z.string().optional(),
+  metaTitle: z.string().max(60).optional().nullable(),
+  metaDescription: z.string().max(160).optional().nullable(),
+  metaKeywords: z.string().optional().nullable(),
   
   // Features
   isFeatured: z.boolean().default(false),
@@ -57,7 +68,9 @@ export const createProductSchema = z.object({
   // Nested
   images: z.array(productImageSchema).min(1, 'At least one image is required'),
   specifications: z.array(productSpecificationSchema).optional(),
-}).refine(
+});
+
+export const createProductSchema = baseProductSchema.refine(
   (data) => {
     // If compareAtPrice is provided, it must be greater than price
     if (data.compareAtPrice && data.compareAtPrice <= data.price) {
@@ -72,7 +85,7 @@ export const createProductSchema = z.object({
 );
 
 // Update Product Schema (all fields optional)
-export const updateProductSchema = createProductSchema.partial();
+export const updateProductSchema = baseProductSchema.partial();
 
 // Product Filter Schema
 export const productFilterSchema = z.object({
