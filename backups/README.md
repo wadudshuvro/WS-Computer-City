@@ -2,6 +2,24 @@
 
 This folder stores local PostgreSQL backups from your PC.
 
+## Office / Home sync (use these 2 commands)
+
+**START work** (morning at office, or evening at home):
+
+```powershell
+npm run sync:pull
+```
+
+**END work** (before leaving office, or before sleep at home):
+
+```powershell
+npm run sync:push
+```
+
+Or double-click `sync-from-github.bat` / `sync-to-github.bat` in the project root.
+
+---
+
 ## Create a backup
 
 **Double-click:** `backup-db.bat` in the project root

@@ -6,6 +6,7 @@ import { loadEnvValue, parseDatabaseUrl } from './load-env';
 function findPgDump(): string | null {
   const candidates = [
     'pg_dump',
+    'C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe',
     'C:\\Program Files\\PostgreSQL\\17\\bin\\pg_dump.exe',
     'C:\\Program Files\\PostgreSQL\\16\\bin\\pg_dump.exe',
     'C:\\Program Files\\PostgreSQL\\15\\bin\\pg_dump.exe',
@@ -60,7 +61,22 @@ function main() {
   console.log(`📦 Creating SQL backup: ${sqlPath}`);
   execFileSync(
     pgDump,
-    ['-h', db.host, '-p', db.port, '-U', db.user, '-d', db.database, '-F', 'p', '-f', sqlPath],
+    [
+      '-h',
+      db.host,
+      '-p',
+      db.port,
+      '-U',
+      db.user,
+      '-d',
+      db.database,
+      '--clean',
+      '--if-exists',
+      '-F',
+      'p',
+      '-f',
+      sqlPath,
+    ],
     { env, stdio: 'inherit' }
   );
 

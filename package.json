@@ -18,6 +18,9 @@
     "db:backup": "tsx scripts/backup-database.ts",
     "db:add-gpu-specs": "tsx scripts/add-gpu-specifications.ts",
     "db:export": "tsx scripts/export-database.ts",
+    "db:restore": "tsx scripts/restore-database.ts",
+    "sync:pull": "tsx scripts/sync-pull.ts",
+    "sync:push": "tsx scripts/sync-push.ts",
     "type-check": "tsc --noEmit",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "test": "vitest"
