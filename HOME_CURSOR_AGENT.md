@@ -135,7 +135,6 @@ npm run dev
 ### When you FINISH work (before sleep)
 
 ```powershell
-npm run sync:pull
 npm run sync:push
 ```
 
