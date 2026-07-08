@@ -52,18 +52,18 @@ export default function CategoryProductsPage() {
     return () => clearTimeout(timer);
   }, [searchInput]);
 
-  const handleDelete = async (productId: string) => {
-    if (!confirm('Are you sure you want to delete this product?')) return;
-
+  const handleDelete = async (productId: string): Promise<boolean> => {
     setDeletingId(productId);
     try {
       const res = await fetch(`/api/admin/products/${productId}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete');
       setProducts((prev) => prev.filter((p) => p.id !== productId));
       setTotal((prev) => prev - 1);
+      return true;
     } catch (error) {
       console.error('Error deleting product:', error);
       alert('Failed to delete product');
+      return false;
     } finally {
       setDeletingId(null);
     }

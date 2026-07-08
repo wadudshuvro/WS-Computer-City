@@ -430,7 +430,7 @@ export default function ProductEntryForm({ defaultCategorySlug }: ProductEntryFo
           value: value.trim(),
         }));
 
-      const categorySpecs = Object.entries(categorySpecifications)
+      const formattedCategorySpecs = Object.entries(categorySpecifications)
         .filter(([_, value]) => {
           if (Array.isArray(value)) return value.length > 0;
           return value && String(value).trim() !== '';
@@ -440,7 +440,7 @@ export default function ProductEntryForm({ defaultCategorySlug }: ProductEntryFo
           value: Array.isArray(value) ? value.join(', ') : String(value).trim(),
         }));
 
-      const allSpecifications = [...dbSpecifications, ...categorySpecs];
+      const allSpecifications = [...dbSpecifications, ...formattedCategorySpecs];
 
       const payload = {
         name: formData.name,

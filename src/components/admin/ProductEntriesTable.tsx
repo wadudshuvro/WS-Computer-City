@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { Pencil, Trash2, ExternalLink } from 'lucide-react';
+import { DeleteConfirmDialog } from '@/components/admin/DeleteConfirmDialog';
 
 export interface AdminProduct {
   id: string;
@@ -20,7 +22,7 @@ export interface AdminProduct {
 
 interface ProductEntriesTableProps {
   products: AdminProduct[];
-  onDelete: (id: string) => void;
+  onDelete: (id: string) => Promise<boolean> | boolean;
   deletingId?: string | null;
 }
 
@@ -36,8 +38,30 @@ function stockBadge(status: string) {
 }
 
 export function ProductEntriesTable({ products, onDelete, deletingId }: ProductEntriesTableProps) {
+  const [pendingDelete, setPendingDelete] = useState<AdminProduct | null>(null);
+
+  const handleConfirmDelete = async () => {
+    if (!pendingDelete) return;
+    const success = await onDelete(pendingDelete.id);
+    if (success) {
+      setPendingDelete(null);
+    }
+  };
+
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+    <>
+      <DeleteConfirmDialog
+        open={pendingDelete !== null}
+        itemName={pendingDelete?.name}
+        loading={pendingDelete !== null && deletingId === pendingDelete.id}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => {
+          if (deletingId) return;
+          setPendingDelete(null);
+        }}
+      />
+
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
       <table className="min-w-full">
         <thead>
           <tr className="border-b border-gray-200 bg-gray-50/80">
@@ -91,7 +115,7 @@ export function ProductEntriesTable({ products, onDelete, deletingId }: ProductE
                     <Pencil className="w-4 h-4" />
                   </Link>
                   <button
-                    onClick={() => onDelete(product.id)}
+                    onClick={() => setPendingDelete(product)}
                     disabled={deletingId === product.id}
                     className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                     title="Delete"
@@ -104,6 +128,7 @@ export function ProductEntriesTable({ products, onDelete, deletingId }: ProductE
           ))}
         </tbody>
       </table>
-    </div>
+      </div>
+    </>
   );
 }

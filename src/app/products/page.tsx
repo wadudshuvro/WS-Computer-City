@@ -59,8 +59,23 @@ function ProductsPageContent() {
   const brandParam = searchParams.get('brand') || '';
   const itemsPerPage = 30;
 
-  // Check if we're on processor category
-  const isProcessorCategory = subCategory === 'processor' || categoryParam === 'processor';
+  const PROCESSOR_SUB_SLUGS = ['processor', 'intel', 'amd', 'amd-ryzen'] as const;
+
+  // Processor pages: parent slug or Intel/AMD child slugs from mega menu
+  const isProcessorCategory =
+    (subCategory !== null && PROCESSOR_SUB_SLUGS.includes(subCategory as (typeof PROCESSOR_SUB_SLUGS)[number])) ||
+    categoryParam === 'processor';
+
+  const brandSlugs = brandParam ? brandParam.split(',').filter(Boolean) : [];
+
+  const activeProcessorBrandTab: 'intel' | 'amd' =
+    brandSlugs.length === 1 && brandSlugs[0] === 'amd'
+      ? 'amd'
+      : brandSlugs.length === 1 && brandSlugs[0] === 'intel'
+        ? 'intel'
+        : subCategory === 'amd' || subCategory === 'amd-ryzen'
+          ? 'amd'
+          : 'intel';
   
   // Check if we're on graphics card category (including nvidia and amd-gpu subcategories)
   const isGpuCategory =
@@ -75,7 +90,6 @@ function ProductsPageContent() {
   const isSsdCategory = subCategory === 'ssd' || subCategory === 'nvme' || subCategory === 'storage' || categoryParam === 'ssd';
 
   // Active brand tab based on category type
-  const activeProcessorBrandTab = brandParam === 'amd' ? 'amd' : 'intel';
   const activeGpuBrandTab =
     subCategory === 'amd-gpu' || typeParam === 'amd-gpu' ? 'amd' : 'nvidia';
   // For SSD, active brand from URL
@@ -100,13 +114,24 @@ function ProductsPageContent() {
       
       // Build query string from URL params
       const params = new URLSearchParams(searchParams.toString());
-      
+
       if (!params.has('limit')) {
         params.set('limit', itemsPerPage.toString());
       }
 
-      // Use public products API with child-category + GPU type support
-      const apiUrl = isProcessorCategory 
+      // Only derive brand from sub tab when user has not set a brand filter
+      if (isProcessorCategory && !params.has('brand')) {
+        if (!params.has('category')) {
+          params.set('category', 'components');
+        }
+        if (subCategory === 'intel') {
+          params.set('brand', 'intel');
+        } else if (subCategory === 'amd' || subCategory === 'amd-ryzen') {
+          params.set('brand', 'amd');
+        }
+      }
+
+      const apiUrl = isProcessorCategory
         ? `/api/products/processor?${params.toString()}`
         : `/api/products?${params.toString()}`;
 
@@ -148,12 +173,11 @@ function ProductsPageContent() {
   };
 
   const handleProcessorBrandTabChange = (brand: 'intel' | 'amd') => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams();
+    params.set('category', 'components');
+    params.set('sub', brand === 'amd' ? 'amd-ryzen' : 'intel');
     params.set('brand', brand);
     params.set('page', '1');
-    if (!params.has('category') && !params.has('sub')) {
-      params.set('sub', 'processor');
-    }
     router.push(`/products?${params.toString()}`);
   };
 

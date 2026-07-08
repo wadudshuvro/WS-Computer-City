@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
+import {
+  buildProcessorFilterCounts,
+  buildProcessorSpecCondition,
+  getDistinctProcessorSpecValues,
+  PROCESSOR_SPEC_FILTER_KEYS,
+} from '@/lib/processorFilterQuery';
 
 /**
  * GET /api/products/processor
@@ -24,38 +30,39 @@ export async function GET(req: NextRequest) {
 
     // Dynamic specification filters
     const specFilters: Record<string, string[]> = {};
-    const specKeys = [
-      'number_of_cores',
-      'processor_model',
-      'number_of_threads',
-      'generation',
-      'base_clock',
-      'socket_type',
-      'cache_size',
-      'processor_features',
-    ];
-
-    specKeys.forEach((key) => {
+    PROCESSOR_SPEC_FILTER_KEYS.forEach((key) => {
       const value = searchParams.get(key);
       if (value) {
         specFilters[key] = value.split(',').filter(Boolean);
       }
     });
 
-    // Build where clause
+    // Build where clause — brand filter takes precedence over sub tab
+    const sub = searchParams.get('sub');
     const where: Prisma.ProductWhereInput = {
       isActive: true,
-      category: {
+    };
+
+    if (brands.length === 1) {
+      where.category = { slug: brands[0] === 'amd' ? 'amd' : 'intel' };
+    } else if (brands.length > 1) {
+      where.category = { slug: { in: ['intel', 'amd'] } };
+    } else if (sub === 'intel') {
+      where.category = { slug: 'intel' };
+    } else if (sub === 'amd' || sub === 'amd-ryzen') {
+      where.category = { slug: 'amd' };
+    } else {
+      where.category = {
         OR: [
           { slug: 'processor' },
           { parent: { slug: 'processor' } },
           { slug: 'intel' },
           { slug: 'amd' },
         ],
-      },
-    };
+      };
+    }
 
-    // Brand filter
+    // Brand filter (redundant when single brand already scoped category, needed for multi-brand)
     if (brands.length > 0) {
       where.brand = {
         slug: { in: brands },
@@ -87,30 +94,27 @@ export async function GET(req: NextRequest) {
       ];
     }
 
-    // Specification filters - build dynamic conditions
-    // Use AND logic between different spec types, OR logic within same spec type
+    // Specification filters — AND between types, OR within type
     if (Object.keys(specFilters).length > 0) {
-      // Each spec type needs to have at least one matching value (AND between types)
-      // Within each spec type, any of the selected values can match (OR within type)
+      const needsDistinct = specFilters.base_clock || specFilters.cache_size;
+      const distinctSpecValues = needsDistinct
+        ? await getDistinctProcessorSpecValues(
+            ['base_clock', 'cache_size'].filter((k) => specFilters[k]),
+            where
+          )
+        : {};
+
       const specAndConditions: Prisma.ProductWhereInput[] = [];
 
       for (const [key, values] of Object.entries(specFilters)) {
-        if (values.length > 0) {
-          // For each spec type, the product must have a matching specification
-          specAndConditions.push({
-            specifications: {
-              some: {
-                specificationDefinition: { key },
-                value: { in: values },
-              },
-            },
-          });
+        const condition = buildProcessorSpecCondition(key, values, distinctSpecValues);
+        if (condition) {
+          specAndConditions.push(condition);
         }
       }
 
-      // Apply AND logic between different specification types
       if (specAndConditions.length > 0) {
-        where.AND = specAndConditions;
+        where.AND = [...(Array.isArray(where.AND) ? where.AND : []), ...specAndConditions];
       }
     }
 
@@ -240,11 +244,8 @@ export async function GET(req: NextRequest) {
  * These counts show how many products have each specification value
  */
 async function getFilterCounts(): Promise<Record<string, Record<string, number>>> {
-  const counts: Record<string, Record<string, number>> = {};
-
   try {
-    // Base where clause for processor products
-    const baseWhere = {
+    const baseWhere: Prisma.ProductWhereInput = {
       isActive: true,
       category: {
         OR: [
@@ -256,54 +257,20 @@ async function getFilterCounts(): Promise<Record<string, Record<string, number>>
       },
     };
 
-    // Get brand counts
-    const brandCounts = await prisma.product.groupBy({
-      by: ['brandId'],
-      where: baseWhere,
-      _count: true,
-    });
-
-    const brands = await prisma.brand.findMany({
-      where: { id: { in: brandCounts.map((b) => b.brandId) } },
-      select: { id: true, slug: true },
-    });
-
-    counts['brand'] = {};
-    brandCounts.forEach((bc) => {
-      const brand = brands.find((b) => b.id === bc.brandId);
-      if (brand) {
-        counts['brand'][brand.slug] = bc._count;
-      }
-    });
-
-    // Get stock status counts
-    const stockCounts = await prisma.product.groupBy({
+    const stockCountsRaw = await prisma.product.groupBy({
       by: ['stockStatus'],
       where: baseWhere,
       _count: true,
     });
 
-    counts['stockStatus'] = {};
-    stockCounts.forEach((sc) => {
-      counts['stockStatus'][sc.stockStatus] = sc._count;
+    const stockCounts: Record<string, number> = {};
+    stockCountsRaw.forEach((sc) => {
+      stockCounts[sc.stockStatus] = sc._count;
     });
 
-    // Get specification value counts for all filter-relevant specs
-    // These keys must match both the filter config and the specification definition keys
-    const specKeys = [
-      'number_of_cores',
-      'processor_model',
-      'number_of_threads',
-      'generation',
-      'socket_type',
-      'cache_size',
-      'tdp',
-      'processor_features',
-      'integrated_graphics',
-      'memory_type',
-    ];
+    const specValuesByKey: Record<string, { value: string; count: number }[]> = {};
 
-    for (const key of specKeys) {
+    for (const key of PROCESSOR_SPEC_FILTER_KEYS) {
       const specCounts = await prisma.productSpecification.groupBy({
         by: ['value'],
         where: {
@@ -313,23 +280,15 @@ async function getFilterCounts(): Promise<Record<string, Record<string, number>>
         _count: true,
       });
 
-      counts[key] = {};
-      specCounts.forEach((sc) => {
-        // Handle multi-value specs (like processor_features which can be comma-separated)
-        if (key === 'processor_features' && sc.value.includes(',')) {
-          // Split comma-separated values and count each
-          const features = sc.value.split(',').map(f => f.trim());
-          features.forEach(feature => {
-            counts[key][feature] = (counts[key][feature] || 0) + sc._count;
-          });
-        } else {
-          counts[key][sc.value] = sc._count;
-        }
-      });
+      specValuesByKey[key] = specCounts.map((sc) => ({
+        value: sc.value,
+        count: sc._count,
+      }));
     }
+
+    return buildProcessorFilterCounts(specValuesByKey, stockCounts);
   } catch (error) {
     console.error('Error getting filter counts:', error);
+    return {};
   }
-
-  return counts;
 }

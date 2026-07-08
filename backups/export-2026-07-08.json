@@ -1,10 +1,10 @@
 {
-  "exportedAt": "2026-07-08T13:11:11.939Z",
+  "exportedAt": "2026-07-08T17:31:58.362Z",
   "counts": {
     "users": 1,
     "categories": 11,
     "brands": 51,
-    "products": 3,
+    "products": 4,
     "specificationDefinitions": 52
   },
   "data": {
@@ -712,438 +712,6 @@
     ],
     "products": [
       {
-        "id": "cmr9bvs9s0042njjlfqeg1cdv",
-        "name": "Intel Core i5-12400F 6 Core 12 Thread 12th Gen Processor",
-        "slug": "intel-core-i5-12400f",
-        "sku": "PROC-INTEL-12400F",
-        "description": "The Intel Core i5-12400F Desktop Processor comes with 6 cores and 12 threads. It has an 18MB Intel Smart Cache and the total L2 Cache is 7.5MB. This processor comes with a maximum turbo frequency of 4.40 GHz, and the processor base frequency is 2.50 GHz. It supports up to DDR5 4800 MT/s and DDR4 3200 MT/s memory types with a maximum memory size of 128 GB.",
-        "shortDescription": "6 Cores, 12 Threads, up to 4.4 GHz, LGA1700 Socket",
-        "price": "24100",
-        "compareAtPrice": "27390",
-        "costPrice": null,
-        "stockStatus": "IN_STOCK",
-        "stockQuantity": 50,
-        "lowStockAlert": 5,
-        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
-        "brandId": "cmr9bvs140004njjlq3f0ltgt",
-        "metaTitle": "Intel Core i5-12400F Processor Price in Bangladesh",
-        "metaDescription": "Buy Intel Core i5-12400F 6 Core 12 Thread 12th Gen Processor at best price in Bangladesh. In stock and ready to ship.",
-        "metaKeywords": null,
-        "isFeatured": true,
-        "isActive": true,
-        "createdAt": "2026-07-06T14:41:27.520Z",
-        "updatedAt": "2026-07-06T14:41:27.520Z",
-        "publishedAt": "2026-07-06T14:41:27.518Z",
-        "brand": {
-          "id": "cmr9bvs140004njjlq3f0ltgt",
-          "name": "Intel",
-          "slug": "intel"
-        },
-        "category": {
-          "id": "cmr9bvs3l001mnjjlqu2ps65y",
-          "name": "Intel",
-          "slug": "intel"
-        },
-        "images": [
-          {
-            "id": "cmr9bvs9s0043njjl9963fodo",
-            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
-            "url": "https://placehold.co/600x600/4169E1/FFFFFF/png?text=Intel+i5-12400F",
-            "alt": "Intel Core i5-12400F",
-            "order": 0,
-            "isPrimary": true,
-            "createdAt": "2026-07-06T14:41:27.520Z"
-          }
-        ],
-        "specifications": [
-          {
-            "id": "cmr9bvs9s0045njjllwzdazhl",
-            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
-            "specificationDefinitionId": "cmr9bvs3y0023njjljhlzuud0",
-            "value": "LGA 1700",
-            "createdAt": "2026-07-06T14:41:27.520Z",
-            "updatedAt": "2026-07-06T14:41:27.520Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs3y0023njjljhlzuud0",
-              "name": "CPU Socket",
-              "key": "socket_type"
-            }
-          },
-          {
-            "id": "cmr9bvs9s0046njjlznuqd6rj",
-            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
-            "specificationDefinitionId": "cmr9bvs3z0028njjl78cbu80i",
-            "value": "6 Core",
-            "createdAt": "2026-07-06T14:41:27.520Z",
-            "updatedAt": "2026-07-06T14:41:27.520Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs3z0028njjl78cbu80i",
-              "name": "Number Of Cores",
-              "key": "number_of_cores"
-            }
-          },
-          {
-            "id": "cmr9bvs9s0047njjl7zy140fz",
-            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
-            "specificationDefinitionId": "cmr9bvs3y0027njjlmnphc78d",
-            "value": "12 Threads",
-            "createdAt": "2026-07-06T14:41:27.520Z",
-            "updatedAt": "2026-07-06T14:41:27.520Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs3y0027njjlmnphc78d",
-              "name": "Number Of Threads",
-              "key": "number_of_threads"
-            }
-          },
-          {
-            "id": "cmr9bvs9s0048njjls3hxafva",
-            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
-            "specificationDefinitionId": "cmr9bvs3y0026njjlozqqv8z0",
-            "value": "2.5",
-            "createdAt": "2026-07-06T14:41:27.520Z",
-            "updatedAt": "2026-07-06T14:41:27.520Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs3y0026njjlozqqv8z0",
-              "name": "Base Frequency",
-              "key": "base_clock"
-            }
-          },
-          {
-            "id": "cmr9bvs9s0049njjlpab06oys",
-            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
-            "specificationDefinitionId": "cmr9bvs3y0024njjl9e3ah51v",
-            "value": "4.4",
-            "createdAt": "2026-07-06T14:41:27.520Z",
-            "updatedAt": "2026-07-06T14:41:27.520Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs3y0024njjl9e3ah51v",
-              "name": "Maximum Turbo Frequency",
-              "key": "boost_clock"
-            }
-          },
-          {
-            "id": "cmr9bvs9s004anjjla0gn62gj",
-            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
-            "specificationDefinitionId": "cmr9bvs6g002injjlwouuh804",
-            "value": "18 MB",
-            "createdAt": "2026-07-06T14:41:27.520Z",
-            "updatedAt": "2026-07-06T14:41:27.520Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs6g002injjlwouuh804",
-              "name": "Cache",
-              "key": "cache_size"
-            }
-          },
-          {
-            "id": "cmr9bvs9s004bnjjlc7s8feym",
-            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
-            "specificationDefinitionId": "cmr9bvs5i002anjjlcuk2lj5u",
-            "value": "65W",
-            "createdAt": "2026-07-06T14:41:27.520Z",
-            "updatedAt": "2026-07-06T14:41:27.520Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs5i002anjjlcuk2lj5u",
-              "name": "TDP (Thermal Design Power)",
-              "key": "tdp"
-            }
-          },
-          {
-            "id": "cmr9bvs9s004cnjjlqzybawzc",
-            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
-            "specificationDefinitionId": "cmr9bvs6u002mnjjl4mw9r2r4",
-            "value": "Intel Core i5",
-            "createdAt": "2026-07-06T14:41:27.520Z",
-            "updatedAt": "2026-07-06T14:41:27.520Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs6u002mnjjl4mw9r2r4",
-              "name": "Processor Brand",
-              "key": "processor_model"
-            }
-          },
-          {
-            "id": "cmr9bvs9s004dnjjlqkoi8hk3",
-            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
-            "specificationDefinitionId": "cmr9bvs69002enjjlzzee8gs4",
-            "value": "Core i5-12400F",
-            "createdAt": "2026-07-06T14:41:27.520Z",
-            "updatedAt": "2026-07-06T14:41:27.520Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs69002enjjlzzee8gs4",
-              "name": "Processor Model",
-              "key": "model_number"
-            }
-          },
-          {
-            "id": "cmr9bvs9s004enjjleq7np278",
-            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
-            "specificationDefinitionId": "cmr9bvs6f002hnjjl1x3olffk",
-            "value": "12th Gen (Alder Lake)",
-            "createdAt": "2026-07-06T14:41:27.520Z",
-            "updatedAt": "2026-07-06T14:41:27.520Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs6f002hnjjl1x3olffk",
-              "name": "Processor Series",
-              "key": "generation"
-            }
-          },
-          {
-            "id": "cmr9bvs9s004fnjjl4z79n27w",
-            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
-            "specificationDefinitionId": "cmr9bvs6x002onjjln15z5srx",
-            "value": "DDR5",
-            "createdAt": "2026-07-06T14:41:27.520Z",
-            "updatedAt": "2026-07-06T14:41:27.520Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs6x002onjjln15z5srx",
-              "name": "Memory Type",
-              "key": "memory_type"
-            }
-          },
-          {
-            "id": "cmr9bvs9s004gnjjlvoy1hm2l",
-            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
-            "specificationDefinitionId": "cmr9bvs6i002knjjlemi601rt",
-            "value": "DDR5-4800",
-            "createdAt": "2026-07-06T14:41:27.520Z",
-            "updatedAt": "2026-07-06T14:41:27.520Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs6i002knjjlemi601rt",
-              "name": "Max Memory Speed",
-              "key": "max_memory_speed"
-            }
-          },
-          {
-            "id": "cmr9bvs9s004hnjjlzqy9q8r1",
-            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
-            "specificationDefinitionId": "cmr9bvs91002qnjjlspy1ptf2",
-            "value": "128 GB",
-            "createdAt": "2026-07-06T14:41:27.520Z",
-            "updatedAt": "2026-07-06T14:41:27.520Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs91002qnjjlspy1ptf2",
-              "name": "Max. Memory Size",
-              "key": "max_memory_size"
-            }
-          }
-        ]
-      },
-      {
-        "id": "cmr9bvsa7004jnjjlzqzyt643",
-        "name": "AMD Ryzen 5 5600X 6 Core 12 Thread Desktop Processor",
-        "slug": "amd-ryzen-5-5600x",
-        "sku": "PROC-AMD-5600X",
-        "description": "AMD Ryzen 5 5600X Desktop Processor comes with 6 cores and 12 threads. This 5th Generation processor has a base clock speed of 3.7 GHz and a maximum boost clock of up to 4.6 GHz. It features 35MB of combined cache and supports DDR4 memory.",
-        "shortDescription": "6 Cores, 12 Threads, up to 4.6 GHz, AM4 Socket",
-        "price": "22500",
-        "compareAtPrice": "25000",
-        "costPrice": null,
-        "stockStatus": "IN_STOCK",
-        "stockQuantity": 30,
-        "lowStockAlert": 5,
-        "categoryId": "cmr9bvs3n001onjjl46q890qi",
-        "brandId": "cmr9bvs0u0002njjlrpqvkmbi",
-        "metaTitle": "AMD Ryzen 5 5600X Processor Price in Bangladesh",
-        "metaDescription": "Buy AMD Ryzen 5 5600X 6 Core 12 Thread Processor at best price in Bangladesh.",
-        "metaKeywords": null,
-        "isFeatured": true,
-        "isActive": true,
-        "createdAt": "2026-07-06T14:41:27.536Z",
-        "updatedAt": "2026-07-06T14:41:27.536Z",
-        "publishedAt": "2026-07-06T14:41:27.534Z",
-        "brand": {
-          "id": "cmr9bvs0u0002njjlrpqvkmbi",
-          "name": "AMD",
-          "slug": "amd"
-        },
-        "category": {
-          "id": "cmr9bvs3n001onjjl46q890qi",
-          "name": "AMD",
-          "slug": "amd"
-        },
-        "images": [
-          {
-            "id": "cmr9bvsa8004knjjl9cv1os55",
-            "productId": "cmr9bvsa7004jnjjlzqzyt643",
-            "url": "https://placehold.co/600x600/FF6B00/FFFFFF/png?text=AMD+5600X",
-            "alt": "AMD Ryzen 5 5600X",
-            "order": 0,
-            "isPrimary": true,
-            "createdAt": "2026-07-06T14:41:27.536Z"
-          }
-        ],
-        "specifications": [
-          {
-            "id": "cmr9bvsa8004mnjjlo5llh7f0",
-            "productId": "cmr9bvsa7004jnjjlzqzyt643",
-            "specificationDefinitionId": "cmr9bvs97002vnjjluf76j46i",
-            "value": "AM4",
-            "createdAt": "2026-07-06T14:41:27.536Z",
-            "updatedAt": "2026-07-06T14:41:27.536Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs97002vnjjluf76j46i",
-              "name": "CPU Socket",
-              "key": "socket_type"
-            }
-          },
-          {
-            "id": "cmr9bvsa8004nnjjlflde6g3g",
-            "productId": "cmr9bvsa7004jnjjlzqzyt643",
-            "specificationDefinitionId": "cmr9bvs97002unjjlkze12d8e",
-            "value": "6 Core",
-            "createdAt": "2026-07-06T14:41:27.536Z",
-            "updatedAt": "2026-07-06T14:41:27.536Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs97002unjjlkze12d8e",
-              "name": "Number Of Cores",
-              "key": "number_of_cores"
-            }
-          },
-          {
-            "id": "cmr9bvsa8004onjjlbr6mja9q",
-            "productId": "cmr9bvsa7004jnjjlzqzyt643",
-            "specificationDefinitionId": "cmr9bvs97003cnjjlsdpfrbzc",
-            "value": "12 Threads",
-            "createdAt": "2026-07-06T14:41:27.536Z",
-            "updatedAt": "2026-07-06T14:41:27.536Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs97003cnjjlsdpfrbzc",
-              "name": "Number Of Threads",
-              "key": "number_of_threads"
-            }
-          },
-          {
-            "id": "cmr9bvsa8004pnjjl48f6ovgj",
-            "productId": "cmr9bvsa7004jnjjlzqzyt643",
-            "specificationDefinitionId": "cmr9bvs97002xnjjlbgm11wr2",
-            "value": "3.7",
-            "createdAt": "2026-07-06T14:41:27.536Z",
-            "updatedAt": "2026-07-06T14:41:27.536Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs97002xnjjlbgm11wr2",
-              "name": "Base Frequency",
-              "key": "base_clock"
-            }
-          },
-          {
-            "id": "cmr9bvsa8004qnjjlu0q0ky73",
-            "productId": "cmr9bvsa7004jnjjlzqzyt643",
-            "specificationDefinitionId": "cmr9bvs970038njjlxvru0024",
-            "value": "4.6",
-            "createdAt": "2026-07-06T14:41:27.536Z",
-            "updatedAt": "2026-07-06T14:41:27.536Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs970038njjlxvru0024",
-              "name": "Maximum Turbo Frequency",
-              "key": "boost_clock"
-            }
-          },
-          {
-            "id": "cmr9bvsa8004rnjjlo6rb4u51",
-            "productId": "cmr9bvsa7004jnjjlzqzyt643",
-            "specificationDefinitionId": "cmr9bvs99003injjlawntuhv3",
-            "value": "32 MB",
-            "createdAt": "2026-07-06T14:41:27.536Z",
-            "updatedAt": "2026-07-06T14:41:27.536Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs99003injjlawntuhv3",
-              "name": "Cache",
-              "key": "cache_size"
-            }
-          },
-          {
-            "id": "cmr9bvsa8004snjjlx7db2inz",
-            "productId": "cmr9bvsa7004jnjjlzqzyt643",
-            "specificationDefinitionId": "cmr9bvs970031njjlxjwmui6s",
-            "value": "65W",
-            "createdAt": "2026-07-06T14:41:27.536Z",
-            "updatedAt": "2026-07-06T14:41:27.536Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs970031njjlxjwmui6s",
-              "name": "TDP (Thermal Design Power)",
-              "key": "tdp"
-            }
-          },
-          {
-            "id": "cmr9bvsa8004tnjjlxikngh2l",
-            "productId": "cmr9bvsa7004jnjjlzqzyt643",
-            "specificationDefinitionId": "cmr9bvs970032njjll06wzb1c",
-            "value": "Ryzen 5",
-            "createdAt": "2026-07-06T14:41:27.536Z",
-            "updatedAt": "2026-07-06T14:41:27.536Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs970032njjll06wzb1c",
-              "name": "Processor Brand",
-              "key": "processor_model"
-            }
-          },
-          {
-            "id": "cmr9bvsa8004unjjlqut2fubp",
-            "productId": "cmr9bvsa7004jnjjlzqzyt643",
-            "specificationDefinitionId": "cmr9bvs97003anjjly8pgyejf",
-            "value": "Ryzen 5 5600X",
-            "createdAt": "2026-07-06T14:41:27.536Z",
-            "updatedAt": "2026-07-06T14:41:27.536Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs97003anjjly8pgyejf",
-              "name": "Processor Model",
-              "key": "model_number"
-            }
-          },
-          {
-            "id": "cmr9bvsa8004vnjjlm49j6wan",
-            "productId": "cmr9bvsa7004jnjjlzqzyt643",
-            "specificationDefinitionId": "cmr9bvs970039njjl7x3qpa9y",
-            "value": "Ryzen 5000 Series",
-            "createdAt": "2026-07-06T14:41:27.536Z",
-            "updatedAt": "2026-07-06T14:41:27.536Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs970039njjl7x3qpa9y",
-              "name": "Processor Series",
-              "key": "generation"
-            }
-          },
-          {
-            "id": "cmr9bvsa8004wnjjlova1pojy",
-            "productId": "cmr9bvsa7004jnjjlzqzyt643",
-            "specificationDefinitionId": "cmr9bvs970034njjlup59w81g",
-            "value": "DDR4",
-            "createdAt": "2026-07-06T14:41:27.536Z",
-            "updatedAt": "2026-07-06T14:41:27.536Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs970034njjlup59w81g",
-              "name": "Memory Type",
-              "key": "memory_type"
-            }
-          },
-          {
-            "id": "cmr9bvsa8004xnjjlg7g6d8df",
-            "productId": "cmr9bvsa7004jnjjlzqzyt643",
-            "specificationDefinitionId": "cmr9bvs970035njjlw0stdb9f",
-            "value": "DDR4-3200",
-            "createdAt": "2026-07-06T14:41:27.536Z",
-            "updatedAt": "2026-07-06T14:41:27.536Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs970035njjlw0stdb9f",
-              "name": "Max Memory Speed",
-              "key": "max_memory_speed"
-            }
-          },
-          {
-            "id": "cmr9bvsa8004ynjjledk9ci3r",
-            "productId": "cmr9bvsa7004jnjjlzqzyt643",
-            "specificationDefinitionId": "cmr9bvs98003gnjjlh7t4qtax",
-            "value": "128 GB",
-            "createdAt": "2026-07-06T14:41:27.536Z",
-            "updatedAt": "2026-07-06T14:41:27.536Z",
-            "specificationDefinition": {
-              "id": "cmr9bvs98003gnjjlh7t4qtax",
-              "name": "Max. Memory Size",
-              "key": "max_memory_size"
-            }
-          }
-        ]
-      },
-      {
         "id": "cmr9esnv10002t1wvup6a0f8w",
         "name": "Gigabyte GeForce RTX 5060 AERO OC 8G GDDR7 Graphics Card",
         "slug": "gigabyte-geforce-rtx-5060-aero-oc-8g-gddr7-graphics-card",
@@ -1407,6 +975,667 @@
               "id": "cmr9fdu38000zznc8rwpfa7k5",
               "name": "Warranty",
               "key": "warranty"
+            }
+          }
+        ]
+      },
+      {
+        "id": "cmr9bvsa7004jnjjlzqzyt643",
+        "name": "AMD Ryzen 5 5600X 6 Core 12 Thread Desktop Processor",
+        "slug": "amd-ryzen-5-5600x",
+        "sku": "PROC-AMD-5600X",
+        "description": "AMD Ryzen 5 5600X Desktop Processor comes with 6 cores and 12 threads. This 5th Generation processor has a base clock speed of 3.7 GHz and a maximum boost clock of up to 4.6 GHz. It features 35MB of combined cache and supports DDR4 memory.",
+        "shortDescription": "6 Cores, 12 Threads, up to 4.6 GHz, AM4 Socket",
+        "price": "22500",
+        "compareAtPrice": "25000",
+        "costPrice": null,
+        "stockStatus": "IN_STOCK",
+        "stockQuantity": 30,
+        "lowStockAlert": 5,
+        "categoryId": "cmr9bvs3n001onjjl46q890qi",
+        "brandId": "cmr9bvs0u0002njjlrpqvkmbi",
+        "metaTitle": "AMD Ryzen 5 5600X Processor Price in Bangladesh",
+        "metaDescription": "Buy AMD Ryzen 5 5600X 6 Core 12 Thread Processor at best price in Bangladesh.",
+        "metaKeywords": "",
+        "isFeatured": true,
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.536Z",
+        "updatedAt": "2026-07-08T16:19:14.052Z",
+        "publishedAt": "2026-07-06T14:41:27.534Z",
+        "brand": {
+          "id": "cmr9bvs0u0002njjlrpqvkmbi",
+          "name": "AMD",
+          "slug": "amd"
+        },
+        "category": {
+          "id": "cmr9bvs3n001onjjl46q890qi",
+          "name": "AMD",
+          "slug": "amd"
+        },
+        "images": [
+          {
+            "id": "cmrca989900015men1sceadf9",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "url": "https://www.startech.com.bd/image/cache/catalog/processor/amd/5600x/5600x-001-500x500.jpg",
+            "alt": "AMD Ryzen 5 5600X",
+            "order": 0,
+            "isPrimary": true,
+            "createdAt": "2026-07-08T16:19:14.062Z"
+          }
+        ],
+        "specifications": [
+          {
+            "id": "cmrca989q00025men6423cdky",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs97002vnjjluf76j46i",
+            "value": "AM4",
+            "createdAt": "2026-07-08T16:19:14.078Z",
+            "updatedAt": "2026-07-08T16:19:14.078Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs97002vnjjluf76j46i",
+              "name": "CPU Socket",
+              "key": "socket_type"
+            }
+          },
+          {
+            "id": "cmrca989q00035men57dyh0y3",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs97002unjjlkze12d8e",
+            "value": "6 Core",
+            "createdAt": "2026-07-08T16:19:14.078Z",
+            "updatedAt": "2026-07-08T16:19:14.078Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs97002unjjlkze12d8e",
+              "name": "Number Of Cores",
+              "key": "number_of_cores"
+            }
+          },
+          {
+            "id": "cmrca989q00045menu6pidh3u",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs97003cnjjlsdpfrbzc",
+            "value": "12 Threads",
+            "createdAt": "2026-07-08T16:19:14.078Z",
+            "updatedAt": "2026-07-08T16:19:14.078Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs97003cnjjlsdpfrbzc",
+              "name": "Number Of Threads",
+              "key": "number_of_threads"
+            }
+          },
+          {
+            "id": "cmrca989q00055mene1stio9q",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs97002xnjjlbgm11wr2",
+            "value": "3.7",
+            "createdAt": "2026-07-08T16:19:14.078Z",
+            "updatedAt": "2026-07-08T16:19:14.078Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs97002xnjjlbgm11wr2",
+              "name": "Base Frequency",
+              "key": "base_clock"
+            }
+          },
+          {
+            "id": "cmrca989q00065menjmvl4nqc",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs970038njjlxvru0024",
+            "value": "4.6",
+            "createdAt": "2026-07-08T16:19:14.078Z",
+            "updatedAt": "2026-07-08T16:19:14.078Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs970038njjlxvru0024",
+              "name": "Maximum Turbo Frequency",
+              "key": "boost_clock"
+            }
+          },
+          {
+            "id": "cmrca989q00075menw0a1jzbr",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs99003injjlawntuhv3",
+            "value": "32 MB",
+            "createdAt": "2026-07-08T16:19:14.078Z",
+            "updatedAt": "2026-07-08T16:19:14.078Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs99003injjlawntuhv3",
+              "name": "Cache",
+              "key": "cache_size"
+            }
+          },
+          {
+            "id": "cmrca989q00085menepnx4oxn",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs970031njjlxjwmui6s",
+            "value": "65W",
+            "createdAt": "2026-07-08T16:19:14.078Z",
+            "updatedAt": "2026-07-08T16:19:14.078Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs970031njjlxjwmui6s",
+              "name": "TDP (Thermal Design Power)",
+              "key": "tdp"
+            }
+          },
+          {
+            "id": "cmrca989q00095menbr6ev4z2",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs970032njjll06wzb1c",
+            "value": "Ryzen 5",
+            "createdAt": "2026-07-08T16:19:14.078Z",
+            "updatedAt": "2026-07-08T16:19:14.078Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs970032njjll06wzb1c",
+              "name": "Processor Brand",
+              "key": "processor_model"
+            }
+          },
+          {
+            "id": "cmrca989q000a5men5ccis1op",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs97003anjjly8pgyejf",
+            "value": "Ryzen 5 5600X",
+            "createdAt": "2026-07-08T16:19:14.078Z",
+            "updatedAt": "2026-07-08T16:19:14.078Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs97003anjjly8pgyejf",
+              "name": "Processor Model",
+              "key": "model_number"
+            }
+          },
+          {
+            "id": "cmrca989q000b5menue43zp4x",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs970039njjl7x3qpa9y",
+            "value": "Ryzen 5000 Series",
+            "createdAt": "2026-07-08T16:19:14.078Z",
+            "updatedAt": "2026-07-08T16:19:14.078Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs970039njjl7x3qpa9y",
+              "name": "Processor Series",
+              "key": "generation"
+            }
+          },
+          {
+            "id": "cmrca989q000c5menc16jav5p",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs970034njjlup59w81g",
+            "value": "DDR4",
+            "createdAt": "2026-07-08T16:19:14.078Z",
+            "updatedAt": "2026-07-08T16:19:14.078Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs970034njjlup59w81g",
+              "name": "Memory Type",
+              "key": "memory_type"
+            }
+          },
+          {
+            "id": "cmrca989q000d5men9dyeh7lg",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs970035njjlw0stdb9f",
+            "value": "DDR4-3200",
+            "createdAt": "2026-07-08T16:19:14.078Z",
+            "updatedAt": "2026-07-08T16:19:14.078Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs970035njjlw0stdb9f",
+              "name": "Max Memory Speed",
+              "key": "max_memory_speed"
+            }
+          },
+          {
+            "id": "cmrca989q000e5menqkyvkk7n",
+            "productId": "cmr9bvsa7004jnjjlzqzyt643",
+            "specificationDefinitionId": "cmr9bvs98003gnjjlh7t4qtax",
+            "value": "128 GB",
+            "createdAt": "2026-07-08T16:19:14.078Z",
+            "updatedAt": "2026-07-08T16:19:14.078Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs98003gnjjlh7t4qtax",
+              "name": "Max. Memory Size",
+              "key": "max_memory_size"
+            }
+          }
+        ]
+      },
+      {
+        "id": "cmr9bvs9s0042njjlfqeg1cdv",
+        "name": "Intel Core i5-12400F 6 Core 12 Thread 12th Gen Processor",
+        "slug": "intel-core-i5-12400f",
+        "sku": "PROC-INTEL-12400F",
+        "description": "The Intel Core i5-12400F Desktop Processor comes with 6 cores and 12 threads. It has an 18MB Intel Smart Cache and the total L2 Cache is 7.5MB. This processor comes with a maximum turbo frequency of 4.40 GHz, and the processor base frequency is 2.50 GHz. It supports up to DDR5 4800 MT/s and DDR4 3200 MT/s memory types with a maximum memory size of 128 GB.",
+        "shortDescription": "6 Cores, 12 Threads, up to 4.4 GHz, LGA1700 Socket",
+        "price": "24100",
+        "compareAtPrice": "27390",
+        "costPrice": null,
+        "stockStatus": "IN_STOCK",
+        "stockQuantity": 50,
+        "lowStockAlert": 5,
+        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
+        "brandId": "cmr9bvs140004njjlq3f0ltgt",
+        "metaTitle": "Intel Core i5-12400F Processor Price in Bangladesh",
+        "metaDescription": "Buy Intel Core i5-12400F 6 Core 12 Thread 12th Gen Processor at best price in Bangladesh. In stock and ready to ship.",
+        "metaKeywords": "",
+        "isFeatured": true,
+        "isActive": true,
+        "createdAt": "2026-07-06T14:41:27.520Z",
+        "updatedAt": "2026-07-08T16:19:57.288Z",
+        "publishedAt": "2026-07-06T14:41:27.518Z",
+        "brand": {
+          "id": "cmr9bvs140004njjlq3f0ltgt",
+          "name": "Intel",
+          "slug": "intel"
+        },
+        "category": {
+          "id": "cmr9bvs3l001mnjjlqu2ps65y",
+          "name": "Intel",
+          "slug": "intel"
+        },
+        "images": [
+          {
+            "id": "cmrcaa5m3000n5men03seo5g5",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "url": "https://www.startech.com.bd/image/cache/catalog/processor/intel/i5-12400/i5-12400-001-500x500.jpg",
+            "alt": "Intel Core i5-12400F",
+            "order": 0,
+            "isPrimary": true,
+            "createdAt": "2026-07-08T16:19:57.291Z"
+          }
+        ],
+        "specifications": [
+          {
+            "id": "cmrcaa5mh000o5menvmc1kyx9",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs3y0023njjljhlzuud0",
+            "value": "LGA 1700",
+            "createdAt": "2026-07-08T16:19:57.305Z",
+            "updatedAt": "2026-07-08T16:19:57.305Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs3y0023njjljhlzuud0",
+              "name": "CPU Socket",
+              "key": "socket_type"
+            }
+          },
+          {
+            "id": "cmrcaa5mh000p5men0b8xxvxp",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs3z0028njjl78cbu80i",
+            "value": "6 Core",
+            "createdAt": "2026-07-08T16:19:57.305Z",
+            "updatedAt": "2026-07-08T16:19:57.305Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs3z0028njjl78cbu80i",
+              "name": "Number Of Cores",
+              "key": "number_of_cores"
+            }
+          },
+          {
+            "id": "cmrcaa5mh000q5menxajjj91h",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs3y0027njjlmnphc78d",
+            "value": "12 Threads",
+            "createdAt": "2026-07-08T16:19:57.305Z",
+            "updatedAt": "2026-07-08T16:19:57.305Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs3y0027njjlmnphc78d",
+              "name": "Number Of Threads",
+              "key": "number_of_threads"
+            }
+          },
+          {
+            "id": "cmrcaa5mh000r5men5i1hyvfp",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs3y0026njjlozqqv8z0",
+            "value": "2.5",
+            "createdAt": "2026-07-08T16:19:57.305Z",
+            "updatedAt": "2026-07-08T16:19:57.305Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs3y0026njjlozqqv8z0",
+              "name": "Base Frequency",
+              "key": "base_clock"
+            }
+          },
+          {
+            "id": "cmrcaa5mh000s5menqaqz8gz6",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs3y0024njjl9e3ah51v",
+            "value": "4.4",
+            "createdAt": "2026-07-08T16:19:57.305Z",
+            "updatedAt": "2026-07-08T16:19:57.305Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs3y0024njjl9e3ah51v",
+              "name": "Maximum Turbo Frequency",
+              "key": "boost_clock"
+            }
+          },
+          {
+            "id": "cmrcaa5mh000t5men6d478by5",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs6g002injjlwouuh804",
+            "value": "18 MB",
+            "createdAt": "2026-07-08T16:19:57.305Z",
+            "updatedAt": "2026-07-08T16:19:57.305Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs6g002injjlwouuh804",
+              "name": "Cache",
+              "key": "cache_size"
+            }
+          },
+          {
+            "id": "cmrcaa5mh000u5men7omswf2n",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs5i002anjjlcuk2lj5u",
+            "value": "65W",
+            "createdAt": "2026-07-08T16:19:57.305Z",
+            "updatedAt": "2026-07-08T16:19:57.305Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs5i002anjjlcuk2lj5u",
+              "name": "TDP (Thermal Design Power)",
+              "key": "tdp"
+            }
+          },
+          {
+            "id": "cmrcaa5mh000v5men1fgjse4i",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs6u002mnjjl4mw9r2r4",
+            "value": "Intel Core i5",
+            "createdAt": "2026-07-08T16:19:57.305Z",
+            "updatedAt": "2026-07-08T16:19:57.305Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs6u002mnjjl4mw9r2r4",
+              "name": "Processor Brand",
+              "key": "processor_model"
+            }
+          },
+          {
+            "id": "cmrcaa5mh000w5menb3jr6b3o",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs69002enjjlzzee8gs4",
+            "value": "Core i5-12400F",
+            "createdAt": "2026-07-08T16:19:57.305Z",
+            "updatedAt": "2026-07-08T16:19:57.305Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs69002enjjlzzee8gs4",
+              "name": "Processor Model",
+              "key": "model_number"
+            }
+          },
+          {
+            "id": "cmrcaa5mh000x5men8ulfiup4",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs6f002hnjjl1x3olffk",
+            "value": "12th Gen (Alder Lake)",
+            "createdAt": "2026-07-08T16:19:57.305Z",
+            "updatedAt": "2026-07-08T16:19:57.305Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs6f002hnjjl1x3olffk",
+              "name": "Processor Series",
+              "key": "generation"
+            }
+          },
+          {
+            "id": "cmrcaa5mh000y5mennyur8r88",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs6x002onjjln15z5srx",
+            "value": "DDR5",
+            "createdAt": "2026-07-08T16:19:57.305Z",
+            "updatedAt": "2026-07-08T16:19:57.305Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs6x002onjjln15z5srx",
+              "name": "Memory Type",
+              "key": "memory_type"
+            }
+          },
+          {
+            "id": "cmrcaa5mh000z5menswnxxopu",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs6i002knjjlemi601rt",
+            "value": "DDR5-4800",
+            "createdAt": "2026-07-08T16:19:57.305Z",
+            "updatedAt": "2026-07-08T16:19:57.305Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs6i002knjjlemi601rt",
+              "name": "Max Memory Speed",
+              "key": "max_memory_speed"
+            }
+          },
+          {
+            "id": "cmrcaa5mh00105menmz1gl4hu",
+            "productId": "cmr9bvs9s0042njjlfqeg1cdv",
+            "specificationDefinitionId": "cmr9bvs91002qnjjlspy1ptf2",
+            "value": "128 GB",
+            "createdAt": "2026-07-08T16:19:57.305Z",
+            "updatedAt": "2026-07-08T16:19:57.305Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs91002qnjjlspy1ptf2",
+              "name": "Max. Memory Size",
+              "key": "max_memory_size"
+            }
+          }
+        ]
+      },
+      {
+        "id": "cmrcbkzit001a5menuqtjvxca",
+        "name": "Intel Core i5 14400F 14th Gen Raptor Lake Processor",
+        "slug": "intel-core-i5-14400f-14th-gen-raptor-lake-processor",
+        "sku": "INTEL-CORE-I5-14400F",
+        "description": "Intel Core i5 14400F 14th Gen Raptor Lake Processor\nThe Intel Core i5-14400F 2.5 GHz 10-Core LGA 1700 Processor boosts your work, gaming, and multimedia production capabilities. This 14th-generation desktop CPU, built on the Intel 7 technology, offers increased power efficiency while fitting the LGA 1700 socket. The Core i5-14400F has an improved Hybrid Core Architecture, with six 2.5 GHz Performance-cores driving programs and games and four low-voltage Efficient-cores handling background chores for smooth multitasking. The built-in Intel Thread Director guarantees that the two function in tandem by dynamically and intelligently distributing tasks to the correct core at the right time. With 20MB of cache and a Turbo Boost frequency of 5 GHz, this CPU is designed to handle a wide range of applications. The Core i5-14400F also supports PCI Express 5.0 and up to 192GB of dual-channel DDR5 memory at 4800 MHz.\n\nHybrid Core Design\nThe Intel Core i5 14400F Processor gives you the speed to handle high-end games and demanding programs, while the processor's efficient cores manage low-priority and background operations such as streaming video, playing music, and transcoding media.\n\nIntel Thread Director\nThe Intel Thread Director is incorporated into the CPU cores and works with the operating system to guarantee that each of the 16 threads is allocated to the correct core at the proper time.\n\nPCIe 4.0 and 5.0\nThis Intel Core i5 14400F 14th Gen Processor provides up to four PCIe 4.0 and sixteen PCIe 5.0 lanes, for a total of 20 lanes for excellent data throughput with compatible devices.\n\nGaussian and Neural Accelerator 3.0\nThe Intel Core i5 14400F 14th Gen Raptor Lake Processor features Gaussian and Neural Accelerator 3.0 (GNA) technology, which aid in noise reduction while also improving backdrop blurring during video conferencing.\n\nBuy Intel Core i5 14400F 14th Gen Processor from the best Processor Shop in Bangladesh\nIn Bangladesh, you can get the original Intel Core i5 14400F 14th Gen Raptor Lake Processor From Star Tech. We have a large collection of the latest Intel Processor to purchase for your Desktop PC. Order Online Or Visit your Nearest Star Tech Shop to get yours at the lowest price. The Intel Core i5 14400F 14th Gen Processor comes with a 3-year warranty (No Warranty for Fan or Cooler).",
+        "shortDescription": "Model: Core i5 14400F (Tray Box) Clock Speed: 3.5 GHz up to 4.7 GHz Cache: 20 MB Intel Smart Cache CPU Cores: 10, CPU Threads: 16 Socket: LGA1700",
+        "price": "21000",
+        "compareAtPrice": "23000",
+        "costPrice": "2000",
+        "stockStatus": "IN_STOCK",
+        "stockQuantity": 11,
+        "lowStockAlert": 2,
+        "categoryId": "cmr9bvs3l001mnjjlqu2ps65y",
+        "brandId": "cmr9bvs140004njjlq3f0ltgt",
+        "metaTitle": null,
+        "metaDescription": null,
+        "metaKeywords": null,
+        "isFeatured": false,
+        "isActive": true,
+        "createdAt": "2026-07-08T16:56:22.229Z",
+        "updatedAt": "2026-07-08T16:56:22.229Z",
+        "publishedAt": "2026-07-08T16:56:22.226Z",
+        "brand": {
+          "id": "cmr9bvs140004njjlq3f0ltgt",
+          "name": "Intel",
+          "slug": "intel"
+        },
+        "category": {
+          "id": "cmr9bvs3l001mnjjlqu2ps65y",
+          "name": "Intel",
+          "slug": "intel"
+        },
+        "images": [
+          {
+            "id": "cmrcbkziz001b5menuna9ez05",
+            "productId": "cmrcbkzit001a5menuqtjvxca",
+            "url": "https://www.startech.com.bd/image/cache/catalog/processor/intel/i5-14400/i5-14400-01-500x500.webp",
+            "alt": "Intel Core i5 14400F 14th Gen Raptor Lake Processor",
+            "order": 0,
+            "isPrimary": true,
+            "createdAt": "2026-07-08T16:56:22.235Z"
+          }
+        ],
+        "specifications": [
+          {
+            "id": "cmrcbkzjg001c5men91l84ox3",
+            "productId": "cmrcbkzit001a5menuqtjvxca",
+            "specificationDefinitionId": "cmr9bvs6u002mnjjl4mw9r2r4",
+            "value": "Intel Core i5",
+            "createdAt": "2026-07-08T16:56:22.253Z",
+            "updatedAt": "2026-07-08T16:56:22.253Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs6u002mnjjl4mw9r2r4",
+              "name": "Processor Brand",
+              "key": "processor_model"
+            }
+          },
+          {
+            "id": "cmrcbkzjg001d5men4yzsp2us",
+            "productId": "cmrcbkzit001a5menuqtjvxca",
+            "specificationDefinitionId": "cmr9bvs69002enjjlzzee8gs4",
+            "value": "Intel Core i5 14400F",
+            "createdAt": "2026-07-08T16:56:22.253Z",
+            "updatedAt": "2026-07-08T16:56:22.253Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs69002enjjlzzee8gs4",
+              "name": "Processor Model",
+              "key": "model_number"
+            }
+          },
+          {
+            "id": "cmrcbkzjg001e5mengdkh32vj",
+            "productId": "cmrcbkzit001a5menuqtjvxca",
+            "specificationDefinitionId": "cmr9bvs3z0028njjl78cbu80i",
+            "value": "10 Core",
+            "createdAt": "2026-07-08T16:56:22.253Z",
+            "updatedAt": "2026-07-08T16:56:22.253Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs3z0028njjl78cbu80i",
+              "name": "Number Of Cores",
+              "key": "number_of_cores"
+            }
+          },
+          {
+            "id": "cmrcbkzjg001f5menjc81id2h",
+            "productId": "cmrcbkzit001a5menuqtjvxca",
+            "specificationDefinitionId": "cmr9bvs3y0027njjlmnphc78d",
+            "value": "16 Threads",
+            "createdAt": "2026-07-08T16:56:22.253Z",
+            "updatedAt": "2026-07-08T16:56:22.253Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs3y0027njjlmnphc78d",
+              "name": "Number Of Threads",
+              "key": "number_of_threads"
+            }
+          },
+          {
+            "id": "cmrcbkzjg001g5meneiv2hvuk",
+            "productId": "cmrcbkzit001a5menuqtjvxca",
+            "specificationDefinitionId": "cmr9bvs3y0026njjlozqqv8z0",
+            "value": "3.5",
+            "createdAt": "2026-07-08T16:56:22.253Z",
+            "updatedAt": "2026-07-08T16:56:22.253Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs3y0026njjlozqqv8z0",
+              "name": "Base Frequency",
+              "key": "base_clock"
+            }
+          },
+          {
+            "id": "cmrcbkzjg001h5menyasixrvo",
+            "productId": "cmrcbkzit001a5menuqtjvxca",
+            "specificationDefinitionId": "cmr9bvs3y0024njjl9e3ah51v",
+            "value": "4.7",
+            "createdAt": "2026-07-08T16:56:22.253Z",
+            "updatedAt": "2026-07-08T16:56:22.253Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs3y0024njjl9e3ah51v",
+              "name": "Maximum Turbo Frequency",
+              "key": "boost_clock"
+            }
+          },
+          {
+            "id": "cmrcbkzjg001i5meneqf99bi3",
+            "productId": "cmrcbkzit001a5menuqtjvxca",
+            "specificationDefinitionId": "cmr9bvs3y0023njjljhlzuud0",
+            "value": "LGA 1700",
+            "createdAt": "2026-07-08T16:56:22.253Z",
+            "updatedAt": "2026-07-08T16:56:22.253Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs3y0023njjljhlzuud0",
+              "name": "CPU Socket",
+              "key": "socket_type"
+            }
+          },
+          {
+            "id": "cmrcbkzjg001j5men97y98iue",
+            "productId": "cmrcbkzit001a5menuqtjvxca",
+            "specificationDefinitionId": "cmr9bvs6f002hnjjl1x3olffk",
+            "value": "14th Gen (Raptor Lake Refresh)",
+            "createdAt": "2026-07-08T16:56:22.253Z",
+            "updatedAt": "2026-07-08T16:56:22.253Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs6f002hnjjl1x3olffk",
+              "name": "Processor Series",
+              "key": "generation"
+            }
+          },
+          {
+            "id": "cmrcbkzjg001k5men17x5jv4q",
+            "productId": "cmrcbkzit001a5menuqtjvxca",
+            "specificationDefinitionId": "cmr9bvs6g002injjlwouuh804",
+            "value": "18 MB",
+            "createdAt": "2026-07-08T16:56:22.253Z",
+            "updatedAt": "2026-07-08T16:56:22.253Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs6g002injjlwouuh804",
+              "name": "Cache",
+              "key": "cache_size"
+            }
+          },
+          {
+            "id": "cmrcbkzjg001l5mens5yhy02e",
+            "productId": "cmrcbkzit001a5menuqtjvxca",
+            "specificationDefinitionId": "cmr9bvs5i002anjjlcuk2lj5u",
+            "value": "150W",
+            "createdAt": "2026-07-08T16:56:22.253Z",
+            "updatedAt": "2026-07-08T16:56:22.253Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs5i002anjjlcuk2lj5u",
+              "name": "TDP (Thermal Design Power)",
+              "key": "tdp"
+            }
+          },
+          {
+            "id": "cmrcbkzjg001m5menxo7a1bhk",
+            "productId": "cmrcbkzit001a5menuqtjvxca",
+            "specificationDefinitionId": "cmr9bvs64002cnjjl2ip49dn5",
+            "value": "Intel UHD Graphics 770",
+            "createdAt": "2026-07-08T16:56:22.253Z",
+            "updatedAt": "2026-07-08T16:56:22.253Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs64002cnjjl2ip49dn5",
+              "name": "Processor Graphics",
+              "key": "integrated_graphics"
+            }
+          },
+          {
+            "id": "cmrcbkzjg001n5men5zxaflzc",
+            "productId": "cmrcbkzit001a5menuqtjvxca",
+            "specificationDefinitionId": "cmr9bvs6x002onjjln15z5srx",
+            "value": "DDR4 + DDR5",
+            "createdAt": "2026-07-08T16:56:22.253Z",
+            "updatedAt": "2026-07-08T16:56:22.253Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs6x002onjjln15z5srx",
+              "name": "Memory Type",
+              "key": "memory_type"
+            }
+          },
+          {
+            "id": "cmrcbkzjg001o5men3n2je8be",
+            "productId": "cmrcbkzit001a5menuqtjvxca",
+            "specificationDefinitionId": "cmr9bvs6i002knjjlemi601rt",
+            "value": "DDR5-7200",
+            "createdAt": "2026-07-08T16:56:22.253Z",
+            "updatedAt": "2026-07-08T16:56:22.253Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs6i002knjjlemi601rt",
+              "name": "Max Memory Speed",
+              "key": "max_memory_speed"
+            }
+          },
+          {
+            "id": "cmrcbkzjg001p5menr7x32d0x",
+            "productId": "cmrcbkzit001a5menuqtjvxca",
+            "specificationDefinitionId": "cmr9bvs91002qnjjlspy1ptf2",
+            "value": "192 GB",
+            "createdAt": "2026-07-08T16:56:22.253Z",
+            "updatedAt": "2026-07-08T16:56:22.253Z",
+            "specificationDefinition": {
+              "id": "cmr9bvs91002qnjjlspy1ptf2",
+              "name": "Max. Memory Size",
+              "key": "max_memory_size"
             }
           }
         ]
