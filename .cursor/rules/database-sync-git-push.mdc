@@ -1,0 +1,45 @@
+---
+description: When user asks to push/commit to git, always run database sync:push (backup products) before push. Local Postgres only — never Supabase. Always apply.
+alwaysApply: true
+---
+
+# Database Sync & Git Push
+
+## Critical reality
+
+- Products live in **local PostgreSQL** (`ws_computer_city` on `localhost:5432`).
+- **`git pull` alone does NOT sync products.** Office/home each have separate DBs.
+- Same Cursor account does **not** sync the database.
+- Products only move: `sync:push` → GitHub `backups/` → `sync:pull`.
+
+## DB connection (both PCs)
+
+- Never use Supabase.
+- `.env` is never committed.
+- Default: `DATABASE_URL="postgresql://postgres:1234@localhost:5432/ws_computer_city?schema=public"`
+
+## When user says “push”, “commit and push”, “sync to github”, or “I'm leaving”
+
+Do **all** of this (prefer `npm run sync:push`):
+
+1. Ensure PostgreSQL is reachable (`DATABASE_URL` in `.env`).
+2. Run **`npm run sync:push`** — creates SQL + JSON under `backups/`, commits, pushes.
+3. If `sync:push` fails mid-way, fall back:
+   - `npm run db:backup` (needs `pg_dump`; check `C:\Program Files\PostgreSQL\*\bin\`)
+   - `npm run db:export`
+   - Commit `backups/db-backup-*.sql` and `backups/export-*.json` + code
+   - Push to `origin`
+4. Confirm GitHub has a **latest** `backups/db-backup-*.sql` (preferred) and/or `export-*.json`.
+5. Tell user the other PC must run: **`npm run sync:pull`** then **`npm run dev`**.
+
+## When user says “pull”, “start work”, “morning”, or “sync from github”
+
+1. Run **`npm run sync:pull`** (pull + restore DB from `backups/`).
+2. Then **`npm run dev`** if they want the site.
+3. Never tell them plain `git pull` is enough for product data.
+
+## Do not
+
+- Push code without backing up DB if products may have changed.
+- Commit `.env`.
+- Point `DATABASE_URL` at Supabase for local sync.

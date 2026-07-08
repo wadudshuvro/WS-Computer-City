@@ -1,58 +1,47 @@
 # Database backups
 
-This folder stores local PostgreSQL backups from your PC.
+This folder stores local PostgreSQL backups shared via GitHub (private repo).
 
-## Office / Home sync (use these 2 commands)
+## Daily workflow
 
-**START work** (morning at office, or evening at home):
+| When | Command |
+|------|---------|
+| Start work | `npm run sync:pull` then `npm run dev` |
+| End work / leave | `npm run sync:push` |
+
+Or tell Cursor: **"Run sync:push"** / **"Run sync:pull and dev"**.
+
+## What gets synced
+
+| File | Purpose | In git? |
+|------|---------|---------|
+| `db-backup-YYYY-MM-DD.sql` | Full SQL restore (preferred) | Yes |
+| `export-YYYY-MM-DD.json` | Readable product export / JSON import fallback | Yes |
+| `*.backup` / `*.dump` | Custom pg_dump format | No (gitignored) |
+
+## Restore on another PC
 
 ```powershell
 npm run sync:pull
 ```
 
-**END work** (before leaving office, or before sleep at home):
+That pulls code and restores the latest SQL. If only JSON exists:
 
 ```powershell
-npm run sync:push
+npm run db:import
 ```
 
-Or double-click `sync-from-github.bat` / `sync-to-github.bat` in the project root.
-
----
-
-## Create a backup
-
-**Double-click:** `backup-db.bat` in the project root
-
-**Or run:**
+## Manual commands
 
 ```powershell
-npm run db:backup    # SQL + .backup files (needs pg_dump)
-npm run db:export    # JSON export (readable in GitHub)
-```
-
-## Push to GitHub
-
-Use a **private** repository only.
-
-```powershell
-git add backups/
-git commit -m "Database backup"
-git push
-```
-
-## Restore later (when going live)
-
-```powershell
-# From SQL file
-psql -U postgres -d ws_computer_city -f backups/db-backup-YYYY-MM-DD.sql
-
-# From custom backup
-pg_restore -U postgres -d ws_computer_city backups/db-backup-YYYY-MM-DD.backup
+npm run db:backup    # SQL + custom dump
+npm run db:export    # JSON
+npm run db:restore   # Restore latest SQL (or JSON fallback)
+npm run db:import    # Import latest JSON only
 ```
 
 ## Notes
 
-- `.sql` and `.json` files are tracked in git for easy recovery.
-- Large `.backup` files are gitignored; keep them on your PC.
-- Product **images** are URLs in the database — back up image files separately if stored locally.
+- `.env` is never committed. Use `postgres` / `1234` / `ws_computer_city` locally.
+- Never use Supabase for this local sync flow.
+- Image URLs in the DB are external — local image files are not in this dump.
