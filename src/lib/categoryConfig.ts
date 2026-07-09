@@ -3,6 +3,8 @@
  * Defines the category hierarchy and category-specific specifications
  */
 
+import { MOTHERBOARD_SPEC_DEFINITIONS } from '@/lib/motherboardSpecDefinitions';
+
 // Main Categories with their Sub-Categories
 export const categoryHierarchy: Record<string, { name: string; subCategories: { id: string; name: string; slug: string }[] }> = {
   processor: {
@@ -243,7 +245,8 @@ export const processorSpecOptions = {
 export interface SpecificationField {
   key: string;
   name: string;
-  type: 'text' | 'number' | 'select' | 'multiselect' | 'boolean';
+  type: 'text' | 'number' | 'select' | 'multiselect' | 'boolean' | 'textarea';
+  section?: string;
   options?: string[];
   unit?: string;
   required?: boolean;
@@ -253,6 +256,27 @@ export interface SpecificationField {
     field: string;
     values: string[];
   };
+}
+
+export function groupSpecificationFieldsBySection(
+  specs: SpecificationField[]
+): { title: string; specs: SpecificationField[] }[] {
+  const groups: { title: string; specs: SpecificationField[] }[] = [];
+  const indexByTitle = new Map<string, number>();
+
+  for (const spec of specs) {
+    const title = spec.section || 'Specifications';
+    const existingIndex = indexByTitle.get(title);
+
+    if (existingIndex === undefined) {
+      indexByTitle.set(title, groups.length);
+      groups.push({ title, specs: [spec] });
+    } else {
+      groups[existingIndex].specs.push(spec);
+    }
+  }
+
+  return groups;
 }
 
 export const processorSpecifications: SpecificationField[] = [
@@ -600,6 +624,17 @@ export const gpuSpecOptions = {
     '575W',
   ],
 };
+
+export const motherboardSpecifications: SpecificationField[] = MOTHERBOARD_SPEC_DEFINITIONS.map(
+  (spec) => ({
+    key: spec.key,
+    name: spec.name,
+    section: spec.section,
+    type: spec.multiline ? 'textarea' : spec.dataType === 'NUMBER' ? 'number' : 'text',
+    required: spec.isRequired,
+    placeholder: spec.placeholder,
+  })
+);
 
 // GPU Specifications (matches TechLand grouped specification layout)
 export const gpuSpecifications: SpecificationField[] = [
@@ -1235,6 +1270,38 @@ export function inferGpuSubCategory(
   return '';
 }
 
+/** Maps form main category keys to parent database category slugs */
+const FORM_MAIN_TO_DB_PARENT_SLUG: Record<MainCategorySlug, string> = {
+  processor: 'processor',
+  motherboard: 'motherboard',
+  graphics_card: 'graphics-card',
+  ram: 'ram',
+  storage: 'ssd',
+};
+
+/**
+ * Resolve the database category slug for CMS forms from main/sub selection.
+ * Prefers sub-category slug (e.g. intel-motherboard), falls back to parent (e.g. motherboard).
+ */
+export function resolveDbCategorySlugForForm(
+  mainCategory: MainCategorySlug | '',
+  subCategoryId?: string
+): string | null {
+  if (!mainCategory) return null;
+
+  const hierarchy = categoryHierarchy[mainCategory];
+  if (!hierarchy) return null;
+
+  if (subCategoryId) {
+    const sub = hierarchy.subCategories.find(
+      (s) => s.id === subCategoryId || s.slug === subCategoryId
+    );
+    if (sub) return sub.slug;
+  }
+
+  return FORM_MAIN_TO_DB_PARENT_SLUG[mainCategory] ?? null;
+}
+
 export function getSpecificationsForCategory(mainCategory: MainCategorySlug, subCategory?: string): SpecificationField[] {
   switch (mainCategory) {
     case 'processor':
@@ -1242,6 +1309,8 @@ export function getSpecificationsForCategory(mainCategory: MainCategorySlug, sub
         return getProcessorSpecsForBrand(subCategory);
       }
       return processorSpecifications;
+    case 'motherboard':
+      return motherboardSpecifications;
     case 'graphics_card':
       if (subCategory === 'nvidia' || subCategory === 'amd-gpu') {
         return getGpuSpecsForBrand(subCategory);

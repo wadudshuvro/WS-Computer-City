@@ -1,7 +1,10 @@
 'use client';
 
 import { ProcessorFilters } from '@/components/products/ProcessorFilters';
-import { processorSortOptions } from '@/lib/filterConfig';
+import { GpuFilters } from '@/components/products/GpuFilters';
+import { processorSortOptions, GPU_MANUFACTURER_BRANDS } from '@/lib/filterConfig';
+import { PROCESSOR_SPEC_FILTER_KEYS } from '@/lib/processorFilterMappings';
+import { GPU_SPEC_FILTER_KEYS } from '@/lib/gpuFilterMappings';
 import { ChevronRight, Eye, Grid, Heart, List, ShoppingCart, SlidersHorizontal, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -133,7 +136,9 @@ function ProductsPageContent() {
 
       const apiUrl = isProcessorCategory
         ? `/api/products/processor?${params.toString()}`
-        : `/api/products?${params.toString()}`;
+        : isGpuCategory
+          ? `/api/products/gpu?${params.toString()}`
+          : `/api/products?${params.toString()}`;
 
       const res = await fetch(apiUrl);
       
@@ -178,16 +183,39 @@ function ProductsPageContent() {
     params.set('sub', brand === 'amd' ? 'amd-ryzen' : 'intel');
     params.set('brand', brand);
     params.set('page', '1');
+    PROCESSOR_SPEC_FILTER_KEYS.forEach((key) => params.delete(key));
+    params.delete('minPrice');
+    params.delete('maxPrice');
     router.push(`/products?${params.toString()}`);
   };
 
   const handleGpuBrandTabChange = (gpuType: 'nvidia' | 'amd') => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('sub', gpuType === 'amd' ? 'amd-gpu' : 'nvidia');
-    params.delete('type');
-    params.delete('brand');
-    params.set('page', '1');
+    const params = new URLSearchParams();
     params.set('category', 'components');
+    params.set('sub', gpuType === 'amd' ? 'amd-gpu' : 'nvidia');
+    params.set('page', '1');
+    GPU_SPEC_FILTER_KEYS.forEach((key) => params.delete(key));
+    params.delete('minPrice');
+    params.delete('maxPrice');
+    params.delete('stockStatus');
+    router.push(`/products?${params.toString()}`);
+  };
+
+  const handleGpuManufacturerClick = (manufacturerSlug: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const current = params.get('manufacturer')?.split(',').filter(Boolean) || [];
+
+    if (current.includes(manufacturerSlug)) {
+      const next = current.filter((v) => v !== manufacturerSlug);
+      if (next.length > 0) {
+        params.set('manufacturer', next.join(','));
+      } else {
+        params.delete('manufacturer');
+      }
+    } else {
+      params.set('manufacturer', [...current, manufacturerSlug].join(','));
+    }
+    params.set('page', '1');
     router.push(`/products?${params.toString()}`);
   };
 
@@ -355,6 +383,28 @@ function ProductsPageContent() {
                   AMD Radeon
                 </button>
               </div>
+
+              {/* Manufacturer brand pills */}
+              <div className="flex flex-wrap gap-2 mt-4">
+                {GPU_MANUFACTURER_BRANDS.map((brand) => {
+                  const selectedManufacturers = searchParams.get('manufacturer')?.split(',').filter(Boolean) || [];
+                  const isActive = selectedManufacturers.includes(brand.value);
+                  return (
+                    <button
+                      key={brand.value}
+                      type="button"
+                      onClick={() => handleGpuManufacturerClick(brand.value)}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                        isActive
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600'
+                      }`}
+                    >
+                      {brand.label}
+                    </button>
+                  );
+                })}
+              </div>
             </>
           )}
 
@@ -397,18 +447,29 @@ function ProductsPageContent() {
       {/* Main Content */}
       <div className="max-w-[1400px] mx-auto px-4 py-6">
         <div className="flex gap-6">
-          {/* Sidebar Filters - Desktop (Only for processor category) */}
+          {/* Sidebar Filters - Desktop */}
           {isProcessorCategory && (
             <div className="hidden lg:block w-[280px] flex-shrink-0">
               <ProcessorFilters
+                brand={activeProcessorBrandTab}
                 priceRange={priceRange}
                 filterCounts={filterCounts}
               />
             </div>
           )}
 
-          {/* Mobile Filter Button (Only for processor category) */}
-          {isProcessorCategory && (
+          {isGpuCategory && (
+            <div className="hidden lg:block w-[280px] flex-shrink-0">
+              <GpuFilters
+                chipsetBrand={activeGpuBrandTab}
+                priceRange={priceRange}
+                filterCounts={filterCounts}
+              />
+            </div>
+          )}
+
+          {/* Mobile Filter Button */}
+          {(isProcessorCategory || isGpuCategory) && (
             <button
               onClick={() => setShowMobileFilters(true)}
               className="lg:hidden fixed bottom-4 left-4 z-40 bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2"
@@ -419,7 +480,7 @@ function ProductsPageContent() {
           )}
 
           {/* Mobile Filters Overlay */}
-          {isProcessorCategory && showMobileFilters && (
+          {(isProcessorCategory || isGpuCategory) && showMobileFilters && (
             <div className="lg:hidden fixed inset-0 z-50 bg-black/50">
               <div className="absolute right-0 top-0 bottom-0 w-[320px] bg-white overflow-y-auto">
                 <div className="flex items-center justify-between p-4 border-b">
@@ -431,10 +492,20 @@ function ProductsPageContent() {
                     <X className="w-5 h-5" />
                   </button>
                 </div>
-                <ProcessorFilters
-                  priceRange={priceRange}
-                  filterCounts={filterCounts}
-                />
+                {isProcessorCategory && (
+                  <ProcessorFilters
+                    brand={activeProcessorBrandTab}
+                    priceRange={priceRange}
+                    filterCounts={filterCounts}
+                  />
+                )}
+                {isGpuCategory && (
+                  <GpuFilters
+                    chipsetBrand={activeGpuBrandTab}
+                    priceRange={priceRange}
+                    filterCounts={filterCounts}
+                  />
+                )}
               </div>
             </div>
           )}

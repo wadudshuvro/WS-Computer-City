@@ -6,9 +6,15 @@ import {
   categoryHierarchy, 
   getSpecificationsForCategory, 
   SpecificationField,
-  MainCategorySlug 
+  MainCategorySlug,
+  resolveDbCategorySlugForForm,
+  groupSpecificationFieldsBySection,
 } from '@/lib/categoryConfig';
 import { getContentTypeBySlug } from '@/lib/adminCategoryConfig';
+import {
+  filterBrandsForComponent,
+  hasComponentBrandFilter,
+} from '@/lib/componentBrandConfig';
 
 interface Category {
   id: string;
@@ -126,6 +132,16 @@ export default function ProductEntryForm({ defaultCategorySlug }: ProductEntryFo
     return specDefinitions.filter((s) => !categorySpecKeys.has(s.key));
   }, [specDefinitions, categorySpecs]);
 
+  const visibleBrands = useMemo(
+    () => filterBrandsForComponent(brands, selectedMainCategory),
+    [brands, selectedMainCategory]
+  );
+
+  const groupedCategorySpecs = useMemo(
+    () => groupSpecificationFieldsBySection(categorySpecs),
+    [categorySpecs]
+  );
+
   // Fetch categories and brands on mount
   useEffect(() => {
     async function loadData() {
@@ -154,7 +170,19 @@ export default function ProductEntryForm({ defaultCategorySlug }: ProductEntryFo
     }
     setSelectedSubCategory('');
     setCategorySpecifications({});
+    setFormData((prev) => ({ ...prev, brandId: '' }));
   }, [selectedMainCategory]);
+
+  // Clear brand if it is not valid for the selected component
+  useEffect(() => {
+    if (!formData.brandId || !selectedMainCategory || !hasComponentBrandFilter(selectedMainCategory)) {
+      return;
+    }
+    const allowed = filterBrandsForComponent(brands, selectedMainCategory);
+    if (!allowed.some((b) => b.id === formData.brandId)) {
+      setFormData((prev) => ({ ...prev, brandId: '' }));
+    }
+  }, [selectedMainCategory, brands, formData.brandId]);
 
   // Pre-select category when navigating from a content type page
   useEffect(() => {
@@ -188,19 +216,25 @@ export default function ProductEntryForm({ defaultCategorySlug }: ProductEntryFo
     defaultAppliedRef.current = true;
   }, [defaultCategorySlug, categories]);
 
-  // Update categoryId based on sub-category selection (find matching category in DB)
+  // Update categoryId from main/sub selection (exact slug match in DB)
   useEffect(() => {
-    if (selectedSubCategory && categories.length > 0) {
-      // Find the category that matches the selected sub-category slug
-      const matchingCategory = categories.find(cat => 
-        cat.slug === selectedSubCategory || 
-        cat.name.toLowerCase().includes(selectedSubCategory.toLowerCase())
+    if (!selectedMainCategory || categories.length === 0) return;
+
+    const targetSlug = resolveDbCategorySlugForForm(
+      selectedMainCategory as MainCategorySlug,
+      selectedSubCategory || undefined
+    );
+    if (!targetSlug) return;
+
+    const matchingCategory = categories.find((cat) => cat.slug === targetSlug);
+    if (matchingCategory) {
+      setFormData((prev) =>
+        prev.categoryId === matchingCategory.id
+          ? prev
+          : { ...prev, categoryId: matchingCategory.id }
       );
-      if (matchingCategory) {
-        setFormData(prev => ({ ...prev, categoryId: matchingCategory.id }));
-      }
     }
-  }, [selectedSubCategory, categories]);
+  }, [selectedMainCategory, selectedSubCategory, categories]);
 
   const fetchCategories = async () => {
     try {
@@ -605,6 +639,24 @@ export default function ProductEntryForm({ defaultCategorySlug }: ProductEntryFo
           </div>
         );
 
+      case 'textarea':
+        return (
+          <div key={spec.key} className="md:col-span-2">
+            <label className="block text-sm font-medium mb-1">
+              {spec.name} {spec.required && <span className="text-red-500">*</span>}
+            </label>
+            <textarea
+              value={(value as string) || ''}
+              onChange={(e) => handleCategorySpecChange(spec.key, e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder={spec.placeholder}
+              rows={4}
+            />
+            {spec.helpText && <p className="text-xs text-gray-500 mt-1">{spec.helpText}</p>}
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+          </div>
+        );
+
       default:
         return (
           <div key={spec.key}>
@@ -729,13 +781,21 @@ export default function ProductEntryForm({ defaultCategorySlug }: ProductEntryFo
               name="brandId"
               value={formData.brandId}
               onChange={handleInputChange}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+              disabled={!selectedMainCategory}
             >
-              <option value="">Select Brand</option>
-              {brands.map(brand => (
+              <option value="">
+                {selectedMainCategory ? 'Select Brand' : 'Select Main Category First'}
+              </option>
+              {visibleBrands.map((brand) => (
                 <option key={brand.id} value={brand.id}>{brand.name}</option>
               ))}
             </select>
+            {selectedMainCategory && hasComponentBrandFilter(selectedMainCategory) && visibleBrands.length === 0 && (
+              <p className="text-amber-600 text-sm mt-1">
+                No brands found for this category. Run <code className="text-xs">npm run db:seed</code> to add them.
+              </p>
+            )}
             {errors.brandId && <p className="text-red-500 text-sm mt-1">{errors.brandId}</p>}
           </div>
 
@@ -881,8 +941,17 @@ export default function ProductEntryForm({ defaultCategorySlug }: ProductEntryFo
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categorySpecs.map(spec => renderSpecField(spec))}
+          <div className="space-y-6">
+            {groupedCategorySpecs.map((group) => (
+              <div key={group.title}>
+                <div className="bg-gray-100 border border-gray-200 px-4 py-2 rounded-t">
+                  <h3 className="text-sm font-semibold text-gray-800">{group.title}</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 border border-t-0 border-gray-200 rounded-b bg-white">
+                  {group.specs.map((spec) => renderSpecField(spec))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}

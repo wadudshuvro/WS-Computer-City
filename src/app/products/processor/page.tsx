@@ -2,6 +2,7 @@
 
 import { ProcessorFilters } from '@/components/products/ProcessorFilters';
 import { processorSortOptions } from '@/lib/filterConfig';
+import { PROCESSOR_SPEC_FILTER_KEYS } from '@/lib/processorFilterMappings';
 import { ChevronRight, Eye, Grid, Heart, List, ShoppingCart, SlidersHorizontal, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -68,6 +69,9 @@ function ProcessorPageContent() {
     const params = new URLSearchParams(searchParams.toString());
     params.set('brand', brand);
     params.set('page', '1');
+    PROCESSOR_SPEC_FILTER_KEYS.forEach((key) => params.delete(key));
+    params.delete('minPrice');
+    params.delete('maxPrice');
     router.push(`/products/processor?${params.toString()}`);
   };
 
@@ -229,6 +233,7 @@ function ProcessorPageContent() {
           {/* Sidebar Filters - Desktop */}
           <div className="hidden lg:block w-[280px] flex-shrink-0">
             <ProcessorFilters
+              brand={activeBrandTab}
               priceRange={priceRange}
               filterCounts={filterCounts}
             />
@@ -257,6 +262,7 @@ function ProcessorPageContent() {
                   </button>
                 </div>
                 <ProcessorFilters
+                  brand={activeBrandTab}
                   priceRange={priceRange}
                   filterCounts={filterCounts}
                 />

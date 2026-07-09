@@ -2,81 +2,55 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import {
-  buildProcessorFilterCounts,
-  buildProcessorSpecCondition,
-  getDistinctProcessorSpecValues,
-  PROCESSOR_SPEC_FILTER_KEYS,
-} from '@/lib/processorFilterQuery';
-import { resolveProcessorBrand } from '@/lib/processorFilterMappings';
+  buildGpuCategoryWhere,
+  buildGpuFilterCounts,
+  buildGpuSpecCondition,
+  GPU_SPEC_FILTER_KEYS,
+} from '@/lib/gpuFilterQuery';
+import { resolveGpuChipsetBrand } from '@/lib/gpuFilterMappings';
 
 /**
- * GET /api/products/processor
- * Get processor products with dynamic filtering
+ * GET /api/products/gpu
+ * Get graphics card products with Star Tech-style sidebar filtering
  */
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
 
-    // Parse query parameters
     const page = Number(searchParams.get('page')) || 1;
     const limit = Number(searchParams.get('limit')) || 30;
     const sort = searchParams.get('sort') || 'default';
     const search = searchParams.get('search') || undefined;
 
-    // Standard filters
-    const brands = searchParams.get('brand')?.split(',').filter(Boolean) || [];
+    const sub = searchParams.get('sub');
+    const type = searchParams.get('type');
     const stockStatuses = searchParams.get('stockStatus')?.split(',').filter(Boolean) || [];
     const minPrice = searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined;
     const maxPrice = searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined;
 
-    // Dynamic specification filters
     const specFilters: Record<string, string[]> = {};
-    PROCESSOR_SPEC_FILTER_KEYS.forEach((key) => {
+    GPU_SPEC_FILTER_KEYS.forEach((key) => {
       const value = searchParams.get(key);
       if (value) {
         specFilters[key] = value.split(',').filter(Boolean);
       }
     });
 
-    // Build where clause — brand filter takes precedence over sub tab
-    const sub = searchParams.get('sub');
-    const processorBrand = resolveProcessorBrand(brands[0] || searchParams.get('brand'), sub);
+    const chipsetBrand = resolveGpuChipsetBrand(sub, type);
+    const hasChipsetFilter = (specFilters.gpu_chipset?.length ?? 0) > 0;
+    const categoryWhere = await buildGpuCategoryWhere(sub, type, {
+      scopeAllGpus: hasChipsetFilter,
+    });
+
     const where: Prisma.ProductWhereInput = {
       isActive: true,
+      ...categoryWhere,
     };
 
-    if (brands.length === 1) {
-      where.category = { slug: brands[0] === 'amd' ? 'amd' : 'intel' };
-    } else if (brands.length > 1) {
-      where.category = { slug: { in: ['intel', 'amd'] } };
-    } else if (sub === 'intel') {
-      where.category = { slug: 'intel' };
-    } else if (sub === 'amd' || sub === 'amd-ryzen') {
-      where.category = { slug: 'amd' };
-    } else {
-      where.category = {
-        OR: [
-          { slug: 'processor' },
-          { parent: { slug: 'processor' } },
-          { slug: 'intel' },
-          { slug: 'amd' },
-        ],
-      };
-    }
-
-    // Brand filter (redundant when single brand already scoped category, needed for multi-brand)
-    if (brands.length > 0) {
-      where.brand = {
-        slug: { in: brands },
-      };
-    }
-
-    // Stock status filter
     if (stockStatuses.length > 0) {
-      where.stockStatus = { in: stockStatuses as any[] };
+      where.stockStatus = { in: stockStatuses as Prisma.EnumStockStatusFilter['in'] };
     }
 
-    // Price range filter
     if (minPrice !== undefined || maxPrice !== undefined) {
       where.price = {};
       if (minPrice !== undefined) {
@@ -87,40 +61,34 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Search filter
     if (search) {
-      where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-        { sku: { contains: search, mode: 'insensitive' } },
+      where.AND = [
+        ...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []),
+        {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+            { sku: { contains: search, mode: 'insensitive' } },
+          ],
+        },
       ];
     }
 
-    // Specification filters — AND between types, OR within type
     if (Object.keys(specFilters).length > 0) {
-      const needsDistinct = specFilters.base_clock || specFilters.cache_size;
-      const distinctSpecValues = needsDistinct
-        ? await getDistinctProcessorSpecValues(
-            ['base_clock', 'cache_size'].filter((k) => specFilters[k]),
-            where
-          )
-        : {};
-
       const specAndConditions: Prisma.ProductWhereInput[] = [];
 
       for (const [key, values] of Object.entries(specFilters)) {
-        const condition = buildProcessorSpecCondition(key, values, distinctSpecValues, processorBrand);
+        const condition = buildGpuSpecCondition(key, values);
         if (condition) {
           specAndConditions.push(condition);
         }
       }
 
       if (specAndConditions.length > 0) {
-        where.AND = [...(Array.isArray(where.AND) ? where.AND : []), ...specAndConditions];
+        where.AND = [...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []), ...specAndConditions];
       }
     }
 
-    // Sorting
     let orderBy: Prisma.ProductOrderByWithRelationInput;
     switch (sort) {
       case 'price_asc':
@@ -139,9 +107,7 @@ export async function GET(req: NextRequest) {
         orderBy = { createdAt: 'desc' };
     }
 
-    // Execute queries in parallel
     const [products, total, priceAggregation, filterCounts] = await Promise.all([
-      // Get products
       prisma.product.findMany({
         where,
         include: {
@@ -160,27 +126,18 @@ export async function GET(req: NextRequest) {
         take: limit,
         orderBy,
       }),
-      // Get total count
       prisma.product.count({ where }),
-      // Get price range
       prisma.product.aggregate({
         where: {
           isActive: true,
-          category: {
-            OR: [
-              { slug: 'processor' },
-              { parent: { slug: 'processor' } },
-            ],
-          },
+          ...(await buildGpuCategoryWhere(sub, type)),
         },
         _min: { price: true },
         _max: { price: true },
       }),
-      // Get filter counts
-      getFilterCounts(processorBrand, sub, brands),
+      getFilterCounts(chipsetBrand, sub, type),
     ]);
 
-    // Format products for response
     const formattedProducts = products.map((product) => ({
       id: product.id,
       name: product.name,
@@ -222,13 +179,13 @@ export async function GET(req: NextRequest) {
       filters: {
         priceRange: {
           min: priceAggregation._min.price ? Number(priceAggregation._min.price) : 0,
-          max: priceAggregation._max.price ? Number(priceAggregation._max.price) : 1000000,
+          max: priceAggregation._max.price ? Number(priceAggregation._max.price) : 4600000,
         },
         counts: filterCounts,
       },
     });
   } catch (error) {
-    console.error('Error fetching processor products:', error);
+    console.error('Error fetching GPU products:', error);
     return NextResponse.json(
       {
         error: {
@@ -241,29 +198,16 @@ export async function GET(req: NextRequest) {
   }
 }
 
-/**
- * Get counts for each filter option
- * These counts show how many products have each specification value
- */
 async function getFilterCounts(
-  brand: 'intel' | 'amd',
+  brand: 'nvidia' | 'amd',
   sub?: string | null,
-  brands: string[] = []
+  type?: string | null
 ): Promise<Record<string, Record<string, number>>> {
   try {
     const baseWhere: Prisma.ProductWhereInput = {
       isActive: true,
+      ...(await buildGpuCategoryWhere(sub, type)),
     };
-
-    if (brands.length === 1) {
-      baseWhere.category = { slug: brands[0] === 'amd' ? 'amd' : 'intel' };
-    } else if (sub === 'intel') {
-      baseWhere.category = { slug: 'intel' };
-    } else if (sub === 'amd' || sub === 'amd-ryzen') {
-      baseWhere.category = { slug: 'amd' };
-    } else {
-      baseWhere.category = { slug: brand === 'amd' ? 'amd' : 'intel' };
-    }
 
     const stockCountsRaw = await prisma.product.groupBy({
       by: ['stockStatus'],
@@ -276,9 +220,31 @@ async function getFilterCounts(
       stockCounts[sc.stockStatus] = sc._count;
     });
 
+    const manufacturerCountsRaw = await prisma.product.groupBy({
+      by: ['brandId'],
+      where: baseWhere,
+      _count: true,
+    });
+
+    const brandIds = manufacturerCountsRaw.map((m) => m.brandId);
+    const brands = await prisma.brand.findMany({
+      where: { id: { in: brandIds } },
+      select: { id: true, slug: true },
+    });
+
+    const manufacturerCounts: Record<string, number> = {};
+    manufacturerCountsRaw.forEach((mc) => {
+      const brandRecord = brands.find((b) => b.id === mc.brandId);
+      if (brandRecord) {
+        manufacturerCounts[brandRecord.slug] = mc._count;
+      }
+    });
+
     const specValuesByKey: Record<string, { value: string; count: number }[]> = {};
 
-    for (const key of PROCESSOR_SPEC_FILTER_KEYS) {
+    for (const key of GPU_SPEC_FILTER_KEYS) {
+      if (key === 'manufacturer') continue;
+
       const specCounts = await prisma.productSpecification.groupBy({
         by: ['value'],
         where: {
@@ -294,9 +260,9 @@ async function getFilterCounts(
       }));
     }
 
-    return buildProcessorFilterCounts(specValuesByKey, stockCounts, brand);
+    return buildGpuFilterCounts(specValuesByKey, stockCounts, manufacturerCounts, brand);
   } catch (error) {
-    console.error('Error getting filter counts:', error);
+    console.error('Error getting GPU filter counts:', error);
     return {};
   }
 }

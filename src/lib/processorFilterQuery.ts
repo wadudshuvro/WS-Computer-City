@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
-import { processorFilters } from '@/lib/filterConfig';
+import { getProcessorFilters, type ProcessorBrand } from '@/lib/filterConfig';
 import {
   cacheBucketMatches,
   clockBucketMatches,
@@ -18,7 +18,8 @@ import {
 export function buildProcessorSpecCondition(
   key: string,
   values: string[],
-  distinctSpecValues: Record<string, string[]>
+  distinctSpecValues: Record<string, string[]>,
+  brand: ProcessorBrand = 'intel'
 ): Prisma.ProductWhereInput | null {
   if (values.length === 0) return null;
 
@@ -44,7 +45,7 @@ export function buildProcessorSpecCondition(
       };
 
     case 'processor_model': {
-      const dbValues = values.flatMap(mapTypeFilterToDb);
+      const dbValues = values.flatMap((v) => mapTypeFilterToDb(v, brand));
       return {
         specifications: {
           some: {
@@ -56,7 +57,7 @@ export function buildProcessorSpecCondition(
     }
 
     case 'generation': {
-      const dbValues = values.flatMap(mapGenerationFilterToDb);
+      const dbValues = values.flatMap((v) => mapGenerationFilterToDb(v, brand));
       return {
         specifications: {
           some: {
@@ -64,7 +65,13 @@ export function buildProcessorSpecCondition(
             OR: [
               { value: { in: dbValues } },
               ...values.map((filterValue) => ({
-                value: { contains: filterValue.replace(' Gen', ''), mode: 'insensitive' as const },
+                value: {
+                  contains:
+                    brand === 'amd'
+                      ? filterValue.replace(' Series', '')
+                      : filterValue.replace(' Gen', ''),
+                  mode: 'insensitive' as const,
+                },
               })),
             ],
           },
@@ -73,7 +80,7 @@ export function buildProcessorSpecCondition(
     }
 
     case 'socket_type': {
-      const dbValues = values.flatMap(mapSocketFilterToDb);
+      const dbValues = values.flatMap((v) => mapSocketFilterToDb(v, brand));
       return {
         specifications: {
           some: {
@@ -159,8 +166,10 @@ export async function getDistinctProcessorSpecValues(
 
 export function buildProcessorFilterCounts(
   specValuesByKey: Record<string, { value: string; count: number }[]>,
-  stockCounts: Record<string, number>
+  stockCounts: Record<string, number>,
+  brand: ProcessorBrand = 'intel'
 ): Record<string, Record<string, number>> {
+  const processorFilters = getProcessorFilters(brand);
   const counts: Record<string, Record<string, number>> = {
     stockStatus: stockCounts,
   };
@@ -192,7 +201,7 @@ export function buildProcessorFilterCounts(
     counts.processor_model = {};
     const dbCounts = specValuesByKey.processor_model || [];
     for (const option of typeFilter.options) {
-      const dbValues = mapTypeFilterToDb(option.value);
+      const dbValues = mapTypeFilterToDb(option.value, brand);
       counts.processor_model[option.value] = dbCounts
         .filter((d) => dbValues.includes(d.value))
         .reduce((sum, d) => sum + d.count, 0);
@@ -205,7 +214,7 @@ export function buildProcessorFilterCounts(
     const dbCounts = specValuesByKey.generation || [];
     for (const option of genFilter.options) {
       counts.generation[option.value] = dbCounts
-        .filter((d) => generationDbValueMatchesFilter(option.value, d.value))
+        .filter((d) => generationDbValueMatchesFilter(option.value, d.value, brand))
         .reduce((sum, d) => sum + d.count, 0);
     }
   }
@@ -215,7 +224,7 @@ export function buildProcessorFilterCounts(
     counts.socket_type = {};
     const dbCounts = specValuesByKey.socket_type || [];
     for (const option of socketFilter.options) {
-      const dbValues = mapSocketFilterToDb(option.value);
+      const dbValues = mapSocketFilterToDb(option.value, brand);
       counts.socket_type[option.value] = dbCounts
         .filter((d) => dbValues.some((v) => d.value.replace(/\s+/g, '') === v.replace(/\s+/g, '')))
         .reduce((sum, d) => sum + d.count, 0);

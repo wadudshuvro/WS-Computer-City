@@ -19,6 +19,7 @@ import {
   Minus
 } from 'lucide-react';
 import { GPU_SPECIFICATION_GROUPS, isGpuCategory, getCategorySlugs } from '@/lib/gpuSpecDefinitions';
+import { MOTHERBOARD_SPECIFICATION_GROUPS, isMotherboardCategory } from '@/lib/motherboardSpecDefinitions';
 import { GpuProductHighlights } from '@/components/products/GpuProductHighlights';
 import { ProductDescription } from '@/components/products/ProductDescription';
 
@@ -197,9 +198,12 @@ export default function ProductDetailPage() {
   const groupedSpecifications = () => {
     if (!product) return [];
 
-    const groupsConfig = isGpuCategory(getCategorySlugs(product.category))
+    const categorySlugs = getCategorySlugs(product.category);
+    const groupsConfig = isGpuCategory(categorySlugs)
       ? GPU_SPECIFICATION_GROUPS
-      : specificationGroups;
+      : isMotherboardCategory(categorySlugs)
+        ? MOTHERBOARD_SPECIFICATION_GROUPS
+        : specificationGroups;
 
     const groups: { title: string; specs: { name: string; value: string }[] }[] = [];
 
@@ -261,7 +265,9 @@ export default function ProductDetailPage() {
   }
 
   const stockStatus = getStockStatus(product.stockStatus);
-  const isGpu = isGpuCategory(getCategorySlugs(product.category));
+  const categorySlugs = getCategorySlugs(product.category);
+  const isGpu = isGpuCategory(categorySlugs);
+  const isMotherboard = isMotherboardCategory(categorySlugs);
   const discount = product.compareAtPrice
     ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
     : 0;
@@ -608,7 +614,13 @@ export default function ProductDetailPage() {
                   <div className="space-y-6">
                     {groupedSpecifications().map((group, groupIndex) => (
                       <div key={groupIndex}>
-                        <h3 className="text-sm font-semibold text-white bg-[#1e3a5f] px-4 py-2 rounded-t">
+                        <h3
+                          className={`text-sm font-semibold px-4 py-2 rounded-t ${
+                            isMotherboard
+                              ? 'bg-gray-100 text-gray-900 border border-gray-200'
+                              : 'text-white bg-[#1e3a5f]'
+                          }`}
+                        >
                           {group.title}
                         </h3>
                         <table className="w-full">
@@ -623,7 +635,7 @@ export default function ProductDetailPage() {
                                 <td className="px-4 py-3 text-sm text-gray-600 w-1/3 font-medium">
                                   {spec.name}
                                 </td>
-                                <td className="px-4 py-3 text-sm text-gray-900">
+                                <td className="px-4 py-3 text-sm text-gray-900 whitespace-pre-line">
                                   {spec.value}
                                 </td>
                               </tr>

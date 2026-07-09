@@ -1,6 +1,7 @@
 import { PrismaClient, StockStatus } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { GPU_SPEC_DEFINITIONS } from '../src/lib/gpuSpecDefinitions';
+import { MOTHERBOARD_SPEC_DEFINITIONS } from '../src/lib/motherboardSpecDefinitions';
 
 const prisma = new PrismaClient();
 
@@ -159,8 +160,37 @@ async function main() {
     });
   }
 
+  const motherboardBrandsList = [
+    { name: 'MSI (Intel)', slug: 'msi-intel', description: 'MSI Intel chipset motherboards' },
+    { name: 'MSI (AMD)', slug: 'msi-amd', description: 'MSI AMD chipset motherboards' },
+    { name: 'ASRock (Intel)', slug: 'asrock-intel', description: 'ASRock Intel chipset motherboards' },
+    { name: 'ASRock (AMD)', slug: 'asrock-amd', description: 'ASRock AMD chipset motherboards' },
+    { name: 'ASUS (Intel)', slug: 'asus-intel', description: 'ASUS Intel chipset motherboards' },
+    { name: 'ASUS (AMD)', slug: 'asus-amd', description: 'ASUS AMD chipset motherboards' },
+    { name: 'GIGABYTE (Intel)', slug: 'gigabyte-intel', description: 'GIGABYTE Intel chipset motherboards' },
+    { name: 'GIGABYTE (AMD)', slug: 'gigabyte-amd', description: 'GIGABYTE AMD chipset motherboards' },
+    { name: 'Colorful (Intel)', slug: 'colorful-intel', description: 'Colorful Intel chipset motherboards' },
+    { name: 'Colorful (AMD)', slug: 'colorful-amd', description: 'Colorful AMD chipset motherboards' },
+    { name: 'Intel Motherboard', slug: 'intel-motherboard', description: 'Intel platform motherboards' },
+    { name: 'AMD Motherboard', slug: 'amd-motherboard', description: 'AMD platform motherboards' },
+  ];
+
+  console.log('Creating motherboard brands...');
+  for (const brand of motherboardBrandsList) {
+    await prisma.brand.upsert({
+      where: { slug: brand.slug },
+      update: { name: brand.name },
+      create: {
+        name: brand.name,
+        slug: brand.slug,
+        description: brand.description,
+        isActive: true,
+      },
+    });
+  }
+
   const brands = coreBrands;
-  console.log('✅ Brands created:', coreBrands.length + ssdBrandsList.length);
+  console.log('✅ Brands created:', coreBrands.length + ssdBrandsList.length + motherboardBrandsList.length);
 
   // 3. Create Category Structure
   console.log('Creating categories...');
@@ -250,16 +280,58 @@ async function main() {
     },
   });
 
+  const motherboard = await prisma.category.upsert({
+    where: { slug: 'motherboard' },
+    update: { order: 2 },
+    create: {
+      name: 'Motherboard',
+      slug: 'motherboard',
+      description: 'Intel and AMD motherboards',
+      parentId: components.id,
+      level: 1,
+      order: 2,
+      isActive: true,
+    },
+  });
+
+  const intelMotherboard = await prisma.category.upsert({
+    where: { slug: 'intel-motherboard' },
+    update: {},
+    create: {
+      name: 'Intel Motherboard',
+      slug: 'intel-motherboard',
+      description: 'Intel chipset motherboards',
+      parentId: motherboard.id,
+      level: 2,
+      order: 1,
+      isActive: true,
+    },
+  });
+
+  const amdMotherboard = await prisma.category.upsert({
+    where: { slug: 'amd-motherboard' },
+    update: {},
+    create: {
+      name: 'AMD Motherboard',
+      slug: 'amd-motherboard',
+      description: 'AMD chipset motherboards',
+      parentId: motherboard.id,
+      level: 2,
+      order: 2,
+      isActive: true,
+    },
+  });
+
   const graphicsCard = await prisma.category.upsert({
     where: { slug: 'graphics-card' },
-    update: {},
+    update: { order: 3 },
     create: {
       name: 'Graphics Card',
       slug: 'graphics-card',
       description: 'GPUs and graphics cards',
       parentId: components.id,
       level: 1,
-      order: 2,
+      order: 3,
       isActive: true,
     },
   });
@@ -296,28 +368,28 @@ async function main() {
 
   const ssd = await prisma.category.upsert({
     where: { slug: 'ssd' },
-    update: {},
+    update: { order: 4 },
     create: {
       name: 'SSD',
       slug: 'ssd',
       description: 'Solid State Drives',
       parentId: components.id,
       level: 1,
-      order: 3,
+      order: 4,
       isActive: true,
     },
   });
 
   const ram = await prisma.category.upsert({
     where: { slug: 'ram' },
-    update: {},
+    update: { order: 5 },
     create: {
       name: 'RAM',
       slug: 'ram',
       description: 'Memory modules',
       parentId: components.id,
       level: 1,
-      order: 4,
+      order: 5,
       isActive: true,
     },
   });
@@ -877,6 +949,38 @@ async function main() {
       })
     )
   );
+
+  // Create Specification Definitions for Motherboard Category
+  const motherboardSpecs = await Promise.all(
+    MOTHERBOARD_SPEC_DEFINITIONS.map((spec) =>
+      prisma.specificationDefinition.upsert({
+        where: {
+          categoryId_key: {
+            categoryId: motherboard.id,
+            key: spec.key,
+          },
+        },
+        update: {
+          name: spec.name,
+          dataType: spec.dataType,
+          isFilterable: spec.isFilterable ?? false,
+          isRequired: spec.isRequired ?? false,
+          order: spec.order,
+        },
+        create: {
+          categoryId: motherboard.id,
+          name: spec.name,
+          key: spec.key,
+          dataType: spec.dataType,
+          isFilterable: spec.isFilterable ?? false,
+          isRequired: spec.isRequired ?? false,
+          order: spec.order,
+        },
+      })
+    )
+  );
+
+  console.log('✅ Motherboard specification definitions created:', motherboardSpecs.length);
 
   // Create Specification Definitions for SSD Category
   const ssdSpecs = await Promise.all([
