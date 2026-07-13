@@ -2,9 +2,14 @@
 
 import { ProcessorFilters } from '@/components/products/ProcessorFilters';
 import { GpuFilters } from '@/components/products/GpuFilters';
-import { processorSortOptions, GPU_MANUFACTURER_BRANDS } from '@/lib/filterConfig';
+import { RamFilters } from '@/components/products/RamFilters';
+import { MotherboardFilters } from '@/components/products/MotherboardFilters';
+import { processorSortOptions, GPU_MANUFACTURER_BRANDS, ramSortOptions } from '@/lib/filterConfig';
 import { PROCESSOR_SPEC_FILTER_KEYS } from '@/lib/processorFilterMappings';
 import { GPU_SPEC_FILTER_KEYS } from '@/lib/gpuFilterMappings';
+import { RAM_SPEC_FILTER_KEYS } from '@/lib/ramFilterMappings';
+import { RAM_BRANDS } from '@/lib/ramSpecDefinitions';
+import { MOTHERBOARD_BRANDS } from '@/lib/componentBrandConfig';
 import { ChevronRight, Eye, Grid, Heart, List, ShoppingCart, SlidersHorizontal, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -92,6 +97,23 @@ function ProductsPageContent() {
   // Check if we're on SSD/Storage category
   const isSsdCategory = subCategory === 'ssd' || subCategory === 'nvme' || subCategory === 'storage' || categoryParam === 'ssd';
 
+  // Desktop RAM category (including DDR4/DDR5 menu shortcuts)
+  const isRamCategory =
+    subCategory === 'desktop-ram' ||
+    subCategory === 'ram' ||
+    subCategory === 'laptop-ram' ||
+    subCategory === 'ddr4-ram' ||
+    subCategory === 'ddr5-ram' ||
+    categoryParam === 'ram' ||
+    categoryParam === 'desktop-ram';
+
+  // Motherboard category
+  const isMotherboardCategory =
+    subCategory === 'motherboard' ||
+    subCategory === 'intel-motherboard' ||
+    subCategory === 'amd-motherboard' ||
+    categoryParam === 'motherboard';
+
   // Active brand tab based on category type
   const activeGpuBrandTab =
     subCategory === 'amd-gpu' || typeParam === 'amd-gpu' ? 'amd' : 'nvidia';
@@ -134,11 +156,23 @@ function ProductsPageContent() {
         }
       }
 
+      // DDR4 / DDR5 menu items → Desktop RAM + memory type filter
+      if (isRamCategory && (subCategory === 'ddr4-ram' || subCategory === 'ddr5-ram')) {
+        params.set('sub', 'desktop-ram');
+        if (!params.has('memory_type')) {
+          params.set('memory_type', subCategory === 'ddr4-ram' ? 'DDR4' : 'DDR5');
+        }
+      }
+
       const apiUrl = isProcessorCategory
         ? `/api/products/processor?${params.toString()}`
         : isGpuCategory
           ? `/api/products/gpu?${params.toString()}`
-          : `/api/products?${params.toString()}`;
+          : isRamCategory
+            ? `/api/products/ram?${params.toString()}`
+            : isMotherboardCategory
+              ? `/api/products/motherboard?${params.toString()}`
+              : `/api/products?${params.toString()}`;
 
       const res = await fetch(apiUrl);
       
@@ -219,6 +253,46 @@ function ProductsPageContent() {
     router.push(`/products?${params.toString()}`);
   };
 
+  const handleRamBrandClick = (brandSlug: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const current = params.get('brand');
+
+    // Single-select: clicking the active pill clears it; otherwise replace selection
+    if (current === brandSlug) {
+      params.delete('brand');
+    } else {
+      params.set('brand', brandSlug);
+    }
+    params.set('page', '1');
+    if (!params.has('sub')) {
+      params.set('sub', 'desktop-ram');
+    }
+    if (!params.has('category')) {
+      params.set('category', 'components');
+    }
+    router.push(`/products?${params.toString()}`);
+  };
+
+  const handleMotherboardBrandClick = (brandSlug: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const current = params.get('brand');
+
+    // Single-select: clicking the active pill clears it; otherwise replace selection
+    if (current === brandSlug) {
+      params.delete('brand');
+    } else {
+      params.set('brand', brandSlug);
+    }
+    params.set('page', '1');
+    if (!params.has('sub')) {
+      params.set('sub', 'motherboard');
+    }
+    if (!params.has('category')) {
+      params.set('category', 'components');
+    }
+    router.push(`/products?${params.toString()}`);
+  };
+
   const handleSsdBrandClick = (brand: string) => {
     const params = new URLSearchParams(searchParams.toString());
     const brandSlug = brand.toLowerCase().replace(/\s+/g, '-');
@@ -280,6 +354,8 @@ function ProductsPageContent() {
   const getPageTitle = () => {
     if (isProcessorCategory) return 'Processor Price In BD 2026';
     if (isGpuCategory) return 'Graphics Card Price In BD 2026';
+    if (isRamCategory) return 'Desktop RAM Price in Bangladesh';
+    if (isMotherboardCategory) return 'Motherboard Price in Bangladesh';
     if (isSsdCategory) return 'SSD Best Price in BD 2026 | Tech Land BD';
     return 'All Products';
   };
@@ -303,7 +379,17 @@ function ProductsPageContent() {
               </>
             )}
             <span className="text-gray-900 font-medium">
-              {isProcessorCategory ? 'Processor' : isGpuCategory ? 'Graphics Card' : isSsdCategory ? 'SSD' : 'Products'}
+              {isProcessorCategory
+                ? 'Processor'
+                : isGpuCategory
+                  ? 'Graphics Card'
+                  : isRamCategory
+                    ? 'Desktop RAM'
+                    : isMotherboardCategory
+                      ? 'Motherboard'
+                      : isSsdCategory
+                        ? 'SSD'
+                        : 'Products'}
             </span>
           </nav>
         </div>
@@ -408,6 +494,67 @@ function ProductsPageContent() {
             </>
           )}
 
+          {/* Desktop RAM Category Section */}
+          {isRamCategory && (
+            <>
+              <p className="text-sm text-gray-600 max-w-4xl mb-4">
+                Desktop RAM Price in BD 2026 begins at BDT 1,500/- and can go up to BDT 45,000/- depending on the brand,
+                capacity, and speed. WS Computer City offers DDR4 and DDR5 desktop memory from leading brands including
+                Kingston, Corsair, G.SKILL, Team, and more.
+              </p>
+
+              <div className="flex flex-wrap gap-2 mt-4">
+                {RAM_BRANDS.map((brand) => {
+                  const isActive = brandParam === brand.slug;
+                  return (
+                    <button
+                      key={brand.slug}
+                      type="button"
+                      onClick={() => handleRamBrandClick(brand.slug)}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                        isActive
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600'
+                      }`}
+                    >
+                      {brand.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {/* Motherboard Category Section */}
+          {isMotherboardCategory && (
+            <>
+              <p className="text-sm text-gray-600 max-w-4xl mb-4">
+                Motherboard Price in Bangladesh starts from budget boards to premium gaming and workstation motherboards.
+                Filter by processor type, brand, socket, form factor, and RAM type to find the right board for your build.
+              </p>
+
+              <div className="flex flex-wrap gap-2 mt-4">
+                {MOTHERBOARD_BRANDS.map((brand) => {
+                  const isActive = brandParam === brand.slug;
+                  return (
+                    <button
+                      key={brand.slug}
+                      type="button"
+                      onClick={() => handleMotherboardBrandClick(brand.slug)}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                        isActive
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600'
+                      }`}
+                    >
+                      {brand.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
           {/* SSD Category Section */}
           {isSsdCategory && (
             <>
@@ -468,8 +615,20 @@ function ProductsPageContent() {
             </div>
           )}
 
+          {isRamCategory && (
+            <div className="hidden lg:block w-[280px] flex-shrink-0">
+              <RamFilters priceRange={priceRange} filterCounts={filterCounts} />
+            </div>
+          )}
+
+          {isMotherboardCategory && (
+            <div className="hidden lg:block w-[280px] flex-shrink-0">
+              <MotherboardFilters priceRange={priceRange} filterCounts={filterCounts} />
+            </div>
+          )}
+
           {/* Mobile Filter Button */}
-          {(isProcessorCategory || isGpuCategory) && (
+          {(isProcessorCategory || isGpuCategory || isRamCategory || isMotherboardCategory) && (
             <button
               onClick={() => setShowMobileFilters(true)}
               className="lg:hidden fixed bottom-4 left-4 z-40 bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2"
@@ -480,7 +639,7 @@ function ProductsPageContent() {
           )}
 
           {/* Mobile Filters Overlay */}
-          {(isProcessorCategory || isGpuCategory) && showMobileFilters && (
+          {(isProcessorCategory || isGpuCategory || isRamCategory || isMotherboardCategory) && showMobileFilters && (
             <div className="lg:hidden fixed inset-0 z-50 bg-black/50">
               <div className="absolute right-0 top-0 bottom-0 w-[320px] bg-white overflow-y-auto">
                 <div className="flex items-center justify-between p-4 border-b">
@@ -505,6 +664,12 @@ function ProductsPageContent() {
                     priceRange={priceRange}
                     filterCounts={filterCounts}
                   />
+                )}
+                {isRamCategory && (
+                  <RamFilters priceRange={priceRange} filterCounts={filterCounts} />
+                )}
+                {isMotherboardCategory && (
+                  <MotherboardFilters priceRange={priceRange} filterCounts={filterCounts} />
                 )}
               </div>
             </div>

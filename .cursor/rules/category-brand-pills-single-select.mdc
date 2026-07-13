@@ -1,0 +1,42 @@
+---
+description: Category product page brand pills must be single-select; follow existing filter patterns when adding categories
+alwaysApply: true
+---
+
+# Category Page Brand Pills & Filters
+
+## Brand / manufacturer pills — single select only
+
+On storefront category listing pages (e.g. `/products?category=components&sub=...`), **top brand pills are single-select**, not multi-select.
+
+- Clicking a pill sets that one brand (replaces any previous selection).
+- Clicking the already-active pill clears the selection.
+- Do **not** append brands into a comma-separated list for these pills.
+
+Correct pattern (Motherboard):
+
+```ts
+const current = params.get('brand');
+if (current === brandSlug) {
+  params.delete('brand');
+} else {
+  params.set('brand', brandSlug);
+}
+```
+
+Wrong pattern: `[...current, brandSlug].join(',')` for pill clicks.
+
+Sidebar checkbox filters (Availability, Brand list, sockets, etc.) may still be multi-select — that is separate from the top pills.
+
+## When adding a new product category
+
+Follow the existing GPU / RAM / Motherboard pattern:
+
+1. Spec/filter option definitions (`*SpecDefinitions.ts` / `*FilterOptions.ts`)
+2. Filter mappings + query helpers
+3. Dedicated API route (`/api/products/<category>`)
+4. `*Filters.tsx` sidebar wrapper + `get*Filters()` in `filterConfig.ts`
+5. Wire `products/page.tsx`: category detection, API fetch, sidebar, mobile filters, **single-select brand pills**
+6. CMS brand list only for that component via `componentBrandConfig.ts` (avoid circular imports with `filterConfig.ts`)
+
+Reference implementations: Motherboard (`handleMotherboardBrandClick`), Desktop RAM (`handleRamBrandClick`), SSD (`handleSsdBrandClick`).

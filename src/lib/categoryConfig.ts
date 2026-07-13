@@ -4,6 +4,7 @@
  */
 
 import { MOTHERBOARD_SPEC_DEFINITIONS } from '@/lib/motherboardSpecDefinitions';
+import { RAM_SPEC_DEFINITIONS } from '@/lib/ramSpecDefinitions';
 
 // Main Categories with their Sub-Categories
 export const categoryHierarchy: Record<string, { name: string; subCategories: { id: string; name: string; slug: string }[] }> = {
@@ -630,11 +631,28 @@ export const motherboardSpecifications: SpecificationField[] = MOTHERBOARD_SPEC_
     key: spec.key,
     name: spec.name,
     section: spec.section,
-    type: spec.multiline ? 'textarea' : spec.dataType === 'NUMBER' ? 'number' : 'text',
+    type: spec.multiline ? 'textarea' : spec.dataType === 'NUMBER' ? 'number' : spec.options ? 'select' : 'text',
     required: spec.isRequired,
     placeholder: spec.placeholder,
+    options: spec.options,
   })
 );
+
+export const ramSpecifications: SpecificationField[] = RAM_SPEC_DEFINITIONS.map((spec) => ({
+  key: spec.key,
+  name: spec.name,
+  section: spec.section,
+  type: spec.multiline
+    ? 'textarea'
+    : spec.options
+      ? 'select'
+      : spec.dataType === 'NUMBER'
+        ? 'number'
+        : 'text',
+  required: spec.isRequired,
+  placeholder: spec.placeholder,
+  options: spec.options,
+}));
 
 // GPU Specifications (matches TechLand grouped specification layout)
 export const gpuSpecifications: SpecificationField[] = [
@@ -1209,8 +1227,6 @@ const DB_SLUG_TO_MAIN: Record<string, MainCategorySlug> = {
   ram: 'ram',
   'desktop-ram': 'ram',
   'laptop-ram': 'ram',
-  'ddr4-ram': 'ram',
-  'ddr5-ram': 'ram',
   storage: 'storage',
   ssd: 'storage',
   hdd: 'storage',
@@ -1311,6 +1327,8 @@ export function getSpecificationsForCategory(mainCategory: MainCategorySlug, sub
       return processorSpecifications;
     case 'motherboard':
       return motherboardSpecifications;
+    case 'ram':
+      return ramSpecifications;
     case 'graphics_card':
       if (subCategory === 'nvidia' || subCategory === 'amd-gpu') {
         return getGpuSpecsForBrand(subCategory);

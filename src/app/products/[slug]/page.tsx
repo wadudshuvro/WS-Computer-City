@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { GPU_SPECIFICATION_GROUPS, isGpuCategory, getCategorySlugs } from '@/lib/gpuSpecDefinitions';
 import { MOTHERBOARD_SPECIFICATION_GROUPS, isMotherboardCategory } from '@/lib/motherboardSpecDefinitions';
+import { RAM_SPECIFICATION_GROUPS, isRamCategory } from '@/lib/ramSpecDefinitions';
 import { GpuProductHighlights } from '@/components/products/GpuProductHighlights';
 import { ProductDescription } from '@/components/products/ProductDescription';
 
@@ -203,7 +204,9 @@ export default function ProductDetailPage() {
       ? GPU_SPECIFICATION_GROUPS
       : isMotherboardCategory(categorySlugs)
         ? MOTHERBOARD_SPECIFICATION_GROUPS
-        : specificationGroups;
+        : isRamCategory(categorySlugs)
+          ? RAM_SPECIFICATION_GROUPS
+          : specificationGroups;
 
     const groups: { title: string; specs: { name: string; value: string }[] }[] = [];
 
@@ -268,6 +271,7 @@ export default function ProductDetailPage() {
   const categorySlugs = getCategorySlugs(product.category);
   const isGpu = isGpuCategory(categorySlugs);
   const isMotherboard = isMotherboardCategory(categorySlugs);
+  const isRam = isRamCategory(categorySlugs);
   const discount = product.compareAtPrice
     ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
     : 0;
@@ -616,7 +620,7 @@ export default function ProductDetailPage() {
                       <div key={groupIndex}>
                         <h3
                           className={`text-sm font-semibold px-4 py-2 rounded-t ${
-                            isMotherboard
+                            isMotherboard || isRam
                               ? 'bg-gray-100 text-gray-900 border border-gray-200'
                               : 'text-white bg-[#1e3a5f]'
                           }`}

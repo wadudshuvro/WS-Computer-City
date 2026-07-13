@@ -81,7 +81,9 @@ export function ProductSidebarFilters({
       const validValues: Record<string, Set<string>> = {};
       filters.forEach((filter) => {
         if (filter.options) {
-          validValues[filter.key] = new Set(filter.options.map((o) => o.value));
+          const existing = validValues[filter.key] ?? new Set<string>();
+          filter.options.forEach((o) => existing.add(o.value));
+          validValues[filter.key] = existing;
         }
       });
 
@@ -195,7 +197,10 @@ export function ProductSidebarFilters({
     return filterCounts[filterKey]?.[value] || 0;
   };
 
-  const defaultExpandedItems = filters.filter((f) => f.defaultExpanded).map((f) => f.key);
+  const defaultExpandedItems = filters
+    .map((f, index) => ({ filter: f, index }))
+    .filter(({ filter }) => filter.defaultExpanded)
+    .map(({ filter, index }) => `${filter.key}-${index}`);
 
   if (!mounted) {
     return (
@@ -227,8 +232,10 @@ export function ProductSidebarFilters({
           defaultValue={defaultExpandedItems}
           className="w-full space-y-0"
         >
-          {filters.map((filter) => (
-            <AccordionItem key={filter.key} value={filter.key} className="border-b-0">
+          {filters.map((filter, index) => {
+            const accordionId = `${filter.key}-${index}`;
+            return (
+            <AccordionItem key={accordionId} value={accordionId} className="border-b-0">
               <AccordionTrigger className="py-3 text-sm font-medium text-gray-700 hover:text-gray-900">
                 <div className="flex items-center gap-2">
                   {filter.name}
@@ -304,14 +311,14 @@ export function ProductSidebarFilters({
                           className="flex items-center space-x-2 hover:bg-gray-50 rounded px-1 py-1"
                         >
                           <Checkbox
-                            id={`${filter.key}-${option.value}`}
+                            id={`${accordionId}-${option.value}`}
                             checked={isChecked}
                             onCheckedChange={(checked) =>
                               handleCheckboxChange(filter.key, option.value, checked as boolean)
                             }
                           />
                           <Label
-                            htmlFor={`${filter.key}-${option.value}`}
+                            htmlFor={`${accordionId}-${option.value}`}
                             className="text-sm text-gray-600 cursor-pointer flex-1 flex items-center justify-between"
                           >
                             <span>{option.label}</span>
@@ -326,7 +333,8 @@ export function ProductSidebarFilters({
                 )}
               </AccordionContent>
             </AccordionItem>
-          ))}
+            );
+          })}
         </Accordion>
       </div>
 

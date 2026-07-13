@@ -12,6 +12,7 @@ export interface MotherboardSpecDefinitionSeed {
   multiline?: boolean;
   order: number;
   placeholder?: string;
+  options?: string[];
 }
 
 export const MOTHERBOARD_SPEC_DEFINITIONS: MotherboardSpecDefinitionSeed[] = [

@@ -1,5 +1,6 @@
 import type { MainCategorySlug } from '@/lib/categoryConfig';
 import { GPU_MANUFACTURER_BRANDS } from '@/lib/filterConfig';
+import { RAM_BRANDS } from '@/lib/ramSpecDefinitions';
 
 export interface ComponentBrandOption {
   slug: string;
@@ -27,6 +28,8 @@ export const PROCESSOR_BRANDS: ComponentBrandOption[] = [
   { slug: 'amd', label: 'AMD' },
 ];
 
+export const RAM_COMPONENT_BRANDS: ComponentBrandOption[] = RAM_BRANDS;
+
 export const GRAPHICS_CARD_BRANDS: ComponentBrandOption[] = GPU_MANUFACTURER_BRANDS.map((b) => ({
   slug: b.value,
   label: b.label,
@@ -40,6 +43,7 @@ export const COMPONENT_BRAND_OPTIONS: Partial<Record<MainCategorySlug, Component
   motherboard: MOTHERBOARD_BRANDS,
   processor: PROCESSOR_BRANDS,
   graphics_card: GRAPHICS_CARD_BRANDS,
+  ram: RAM_COMPONENT_BRANDS,
 };
 
 export function hasComponentBrandFilter(mainCategory: string): boolean {

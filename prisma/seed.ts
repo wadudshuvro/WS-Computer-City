@@ -2,6 +2,7 @@ import { PrismaClient, StockStatus } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { GPU_SPEC_DEFINITIONS } from '../src/lib/gpuSpecDefinitions';
 import { MOTHERBOARD_SPEC_DEFINITIONS } from '../src/lib/motherboardSpecDefinitions';
+import { RAM_BRANDS, RAM_SPEC_DEFINITIONS } from '../src/lib/ramSpecDefinitions';
 
 const prisma = new PrismaClient();
 
@@ -189,8 +190,22 @@ async function main() {
     });
   }
 
+  console.log('Creating RAM-specific brands...');
+  for (const brand of RAM_BRANDS) {
+    await prisma.brand.upsert({
+      where: { slug: brand.slug },
+      update: { name: brand.label },
+      create: {
+        name: brand.label,
+        slug: brand.slug,
+        description: `${brand.label} memory`,
+        isActive: true,
+      },
+    });
+  }
+
   const brands = coreBrands;
-  console.log('✅ Brands created:', coreBrands.length + ssdBrandsList.length + motherboardBrandsList.length);
+  console.log('✅ Brands created:', coreBrands.length + ssdBrandsList.length + motherboardBrandsList.length + RAM_BRANDS.length);
 
   // 3. Create Category Structure
   console.log('Creating categories...');
@@ -393,6 +408,37 @@ async function main() {
       isActive: true,
     },
   });
+
+  const desktopRam = await prisma.category.upsert({
+    where: { slug: 'desktop-ram' },
+    update: { parentId: ram.id, isActive: true },
+    create: {
+      name: 'Desktop RAM',
+      slug: 'desktop-ram',
+      description: 'Desktop DDR4 and DDR5 memory',
+      parentId: ram.id,
+      level: 2,
+      order: 1,
+      isActive: true,
+    },
+  });
+
+  const laptopRam = await prisma.category.upsert({
+    where: { slug: 'laptop-ram' },
+    update: { parentId: ram.id, isActive: true },
+    create: {
+      name: 'Laptop RAM',
+      slug: 'laptop-ram',
+      description: 'Laptop SO-DIMM memory',
+      parentId: ram.id,
+      level: 2,
+      order: 2,
+      isActive: true,
+    },
+  });
+
+  void desktopRam;
+  void laptopRam;
 
   console.log('✅ Categories created');
 
@@ -1043,64 +1089,36 @@ async function main() {
   ]);
 
   // Create Specification Definitions for RAM Category
-  const ramSpecs = await Promise.all([
-    prisma.specificationDefinition.upsert({
-      where: { 
-        categoryId_key: { 
-          categoryId: ram.id, 
-          key: 'capacity' 
-        } 
-      },
-      update: {},
-      create: {
-        categoryId: ram.id,
-        name: 'Capacity',
-        key: 'capacity',
-        dataType: 'NUMBER',
-        unit: 'GB',
-        isFilterable: true,
-        isRequired: true,
-        order: 1,
-      },
-    }),
-    prisma.specificationDefinition.upsert({
-      where: { 
-        categoryId_key: { 
-          categoryId: ram.id, 
-          key: 'memory_type' 
-        } 
-      },
-      update: {},
-      create: {
-        categoryId: ram.id,
-        name: 'Memory Type',
-        key: 'memory_type',
-        dataType: 'TEXT',
-        isFilterable: true,
-        isRequired: true,
-        order: 2,
-      },
-    }),
-    prisma.specificationDefinition.upsert({
-      where: { 
-        categoryId_key: { 
-          categoryId: ram.id, 
-          key: 'speed' 
-        } 
-      },
-      update: {},
-      create: {
-        categoryId: ram.id,
-        name: 'Speed',
-        key: 'speed',
-        dataType: 'NUMBER',
-        unit: 'MHz',
-        isFilterable: true,
-        isRequired: true,
-        order: 3,
-      },
-    }),
-  ]);
+  const ramSpecs = await Promise.all(
+    RAM_SPEC_DEFINITIONS.map((spec) =>
+      prisma.specificationDefinition.upsert({
+        where: {
+          categoryId_key: {
+            categoryId: ram.id,
+            key: spec.key,
+          },
+        },
+        update: {
+          name: spec.name,
+          dataType: spec.dataType,
+          isFilterable: spec.isFilterable ?? false,
+          isRequired: spec.isRequired ?? false,
+          order: spec.order,
+        },
+        create: {
+          categoryId: ram.id,
+          name: spec.name,
+          key: spec.key,
+          dataType: spec.dataType,
+          isFilterable: spec.isFilterable ?? false,
+          isRequired: spec.isRequired ?? false,
+          order: spec.order,
+        },
+      })
+    )
+  );
+
+  console.log('✅ RAM specification definitions created:', ramSpecs.length);
 
   console.log('✅ All specification definitions created');
 

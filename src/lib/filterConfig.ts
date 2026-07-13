@@ -3,6 +3,23 @@
  * Defines dynamic filters based on category specifications
  */
 
+import {
+  RAM_BRANDS,
+  RAM_FEATURE_OPTIONS,
+  RAM_SIZE_OPTIONS,
+  RAM_SPEED_OPTIONS,
+  RAM_TYPE_OPTIONS,
+} from '@/lib/ramSpecDefinitions';
+import {
+  MOTHERBOARD_AMD_SOCKETS,
+  MOTHERBOARD_FORM_FACTORS,
+  MOTHERBOARD_INTEL_SOCKETS,
+  MOTHERBOARD_MAKER_BRANDS,
+  MOTHERBOARD_PROCESSOR_TYPES,
+  MOTHERBOARD_RAM_TYPES,
+  MOTHERBOARD_SPECIAL_FEATURES,
+} from '@/lib/motherboardFilterOptions';
+
 export interface FilterOption {
   value: string;
   label: string;
@@ -385,6 +402,161 @@ export const GPU_SPEC_FILTER_KEYS = [
   'resolution',
 ] as const;
 
+const ramStockStatusFilter: FilterDefinition = {
+  key: 'stockStatus',
+  name: 'Availability',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: [
+    { value: 'IN_STOCK', label: 'In Stock' },
+    { value: 'OUT_OF_STOCK', label: 'Out of Stock' },
+    { value: 'PRE_ORDER', label: 'Pre Order' },
+    { value: 'UPCOMING', label: 'Up Coming' },
+  ],
+};
+
+const ramBrandFilter: FilterDefinition = {
+  key: 'brand',
+  name: 'Brands',
+  type: 'checkbox',
+  defaultExpanded: false,
+  showClearButton: true,
+  options: RAM_BRANDS.map((b) => ({ value: b.slug, label: b.label })),
+};
+
+const ramSpeedFilter: FilterDefinition = {
+  key: 'speed',
+  name: 'RAM Speed',
+  type: 'checkbox',
+  defaultExpanded: false,
+  options: RAM_SPEED_OPTIONS.map((s) => ({ value: s, label: s })),
+};
+
+const ramTypeFilter: FilterDefinition = {
+  key: 'memory_type',
+  name: 'RAM Type',
+  type: 'checkbox',
+  defaultExpanded: false,
+  options: RAM_TYPE_OPTIONS.map((t) => ({ value: t, label: t })),
+};
+
+const ramSizeFilter: FilterDefinition = {
+  key: 'capacity',
+  name: 'RAM Size',
+  type: 'checkbox',
+  defaultExpanded: false,
+  options: RAM_SIZE_OPTIONS.map((s) => ({ value: s, label: s })),
+};
+
+const ramFeaturesFilter: FilterDefinition = {
+  key: 'ram_features',
+  name: 'RAM Features',
+  type: 'checkbox',
+  defaultExpanded: false,
+  options: RAM_FEATURE_OPTIONS.map((f) => ({ value: f, label: f })),
+};
+
+export function getRamFilters(): FilterDefinition[] {
+  return [
+    ramStockStatusFilter,
+    priceRangeFilter,
+    ramBrandFilter,
+    ramSpeedFilter,
+    ramTypeFilter,
+    ramSizeFilter,
+    ramFeaturesFilter,
+  ];
+}
+
+export const ramSortOptions = processorSortOptions;
+
+export { RAM_BRANDS };
+
+const motherboardStockStatusFilter: FilterDefinition = {
+  key: 'stockStatus',
+  name: 'Availability',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: [
+    { value: 'IN_STOCK', label: 'In Stock' },
+    { value: 'PRE_ORDER', label: 'Pre Order' },
+    { value: 'UPCOMING', label: 'Up Coming' },
+  ],
+};
+
+const motherboardProcessorTypeFilter: FilterDefinition = {
+  key: 'processor_type',
+  name: 'Processor Type',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: MOTHERBOARD_PROCESSOR_TYPES.map((t) => ({ value: t.value, label: t.label })),
+};
+
+const motherboardMakerBrandFilter: FilterDefinition = {
+  key: 'mb_brand',
+  name: 'Brand',
+  type: 'checkbox',
+  defaultExpanded: true,
+  showClearButton: true,
+  options: MOTHERBOARD_MAKER_BRANDS.map((b) => ({ value: b.value, label: b.label })),
+};
+
+const motherboardAmdSocketFilter: FilterDefinition = {
+  key: 'cpu_socket',
+  name: 'CPU Sockets',
+  type: 'checkbox',
+  defaultExpanded: false,
+  options: MOTHERBOARD_AMD_SOCKETS.map((s) => ({ value: s, label: s })),
+};
+
+const motherboardIntelSocketFilter: FilterDefinition = {
+  key: 'cpu_socket',
+  name: 'CPU Sockets',
+  type: 'checkbox',
+  defaultExpanded: false,
+  options: MOTHERBOARD_INTEL_SOCKETS.map((s) => ({ value: s, label: s })),
+};
+
+const motherboardFormFactorFilter: FilterDefinition = {
+  key: 'form_factor',
+  name: 'Form Factor',
+  type: 'checkbox',
+  defaultExpanded: false,
+  options: MOTHERBOARD_FORM_FACTORS.map((f) => ({ value: f, label: f })),
+};
+
+const motherboardRamTypeFilter: FilterDefinition = {
+  key: 'memory_type',
+  name: 'RAM Type',
+  type: 'checkbox',
+  defaultExpanded: false,
+  options: MOTHERBOARD_RAM_TYPES.map((t) => ({ value: t, label: t })),
+};
+
+const motherboardSpecialFeaturesFilter: FilterDefinition = {
+  key: 'special_features',
+  name: 'Special Features',
+  type: 'checkbox',
+  defaultExpanded: false,
+  options: MOTHERBOARD_SPECIAL_FEATURES.map((f) => ({ value: f, label: f })),
+};
+
+export function getMotherboardFilters(): FilterDefinition[] {
+  return [
+    priceRangeFilter,
+    motherboardStockStatusFilter,
+    motherboardProcessorTypeFilter,
+    motherboardMakerBrandFilter,
+    motherboardAmdSocketFilter,
+    motherboardIntelSocketFilter,
+    motherboardFormFactorFilter,
+    motherboardRamTypeFilter,
+    motherboardSpecialFeaturesFilter,
+  ];
+}
+
+export const motherboardSortOptions = processorSortOptions;
+
 // Get filter config by category
 export function getFilterConfig(category: string, brand: ProcessorBrand = 'intel'): FilterDefinition[] {
   switch (category) {
@@ -392,6 +564,10 @@ export function getFilterConfig(category: string, brand: ProcessorBrand = 'intel
       return getProcessorFilters(brand);
     case 'gpu':
       return getGpuFilters(brand === 'amd' ? 'amd' : 'nvidia');
+    case 'ram':
+      return getRamFilters();
+    case 'motherboard':
+      return getMotherboardFilters();
     default:
       return [];
   }

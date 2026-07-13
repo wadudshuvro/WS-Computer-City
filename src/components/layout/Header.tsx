@@ -3,7 +3,7 @@ import { MegaMenu } from './MegaMenu';
 
 export function Header() {
   return (
-    <header className="bg-[#1a1f2e] text-white">
+    <header className="relative z-50 bg-[#1a1f2e] text-white overflow-visible">
       {/* Top Bar */}
       <div className="border-b border-gray-700">
         <div className="container mx-auto px-4 py-3">
