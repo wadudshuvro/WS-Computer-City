@@ -1,6 +1,10 @@
 import type { MainCategorySlug } from '@/lib/categoryConfig';
 import { GPU_MANUFACTURER_BRANDS } from '@/lib/filterConfig';
 import { RAM_BRANDS } from '@/lib/ramSpecDefinitions';
+import { PSU_BRANDS } from '@/lib/psuSpecDefinitions';
+import { SSD_BRANDS } from '@/lib/ssdSpecDefinitions';
+import { CASING_BRANDS } from '@/lib/casingSpecDefinitions';
+import { CPU_COOLER_BRANDS } from '@/lib/cpuCoolerSpecDefinitions';
 
 export interface ComponentBrandOption {
   slug: string;
@@ -35,6 +39,26 @@ export const GRAPHICS_CARD_BRANDS: ComponentBrandOption[] = GPU_MANUFACTURER_BRA
   label: b.label,
 }));
 
+export const POWER_SUPPLY_BRANDS: ComponentBrandOption[] = PSU_BRANDS.map((b) => ({
+  slug: b.slug,
+  label: b.label,
+}));
+
+export const SSD_COMPONENT_BRANDS: ComponentBrandOption[] = SSD_BRANDS.map((b) => ({
+  slug: b.slug,
+  label: b.label,
+}));
+
+export const CASING_COMPONENT_BRANDS: ComponentBrandOption[] = CASING_BRANDS.map((b) => ({
+  slug: b.slug,
+  label: b.label,
+}));
+
+export const CPU_COOLER_COMPONENT_BRANDS: ComponentBrandOption[] = CPU_COOLER_BRANDS.map((b) => ({
+  slug: b.slug,
+  label: b.label,
+}));
+
 /**
  * Per-component brand lists for CMS Add/Edit product forms.
  * Add a new entry here when a component needs its own brand dropdown.
@@ -44,6 +68,10 @@ export const COMPONENT_BRAND_OPTIONS: Partial<Record<MainCategorySlug, Component
   processor: PROCESSOR_BRANDS,
   graphics_card: GRAPHICS_CARD_BRANDS,
   ram: RAM_COMPONENT_BRANDS,
+  power_supply: POWER_SUPPLY_BRANDS,
+  storage: SSD_COMPONENT_BRANDS,
+  computer_case: CASING_COMPONENT_BRANDS,
+  cpu_cooler: CPU_COOLER_COMPONENT_BRANDS,
 };
 
 export function hasComponentBrandFilter(mainCategory: string): boolean {

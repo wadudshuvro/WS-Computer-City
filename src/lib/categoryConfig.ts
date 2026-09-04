@@ -5,6 +5,11 @@
 
 import { MOTHERBOARD_SPEC_DEFINITIONS } from '@/lib/motherboardSpecDefinitions';
 import { RAM_SPEC_DEFINITIONS } from '@/lib/ramSpecDefinitions';
+import { GPU_SPEC_DEFINITIONS } from '@/lib/gpuSpecDefinitions';
+import { PSU_SPEC_DEFINITIONS } from '@/lib/psuSpecDefinitions';
+import { SSD_SPEC_DEFINITIONS } from '@/lib/ssdSpecDefinitions';
+import { CASING_SPEC_DEFINITIONS } from '@/lib/casingSpecDefinitions';
+import { CPU_COOLER_SPEC_DEFINITIONS } from '@/lib/cpuCoolerSpecDefinitions';
 
 // Main Categories with their Sub-Categories
 export const categoryHierarchy: Record<string, { name: string; subCategories: { id: string; name: string; slug: string }[] }> = {
@@ -36,6 +41,10 @@ export const categoryHierarchy: Record<string, { name: string; subCategories: { 
       { id: 'laptop-ram', name: 'Laptop RAM', slug: 'laptop-ram' },
     ],
   },
+  power_supply: {
+    name: 'Power Supply',
+    subCategories: [],
+  },
   storage: {
     name: 'Storage',
     subCategories: [
@@ -43,6 +52,14 @@ export const categoryHierarchy: Record<string, { name: string; subCategories: { 
       { id: 'hdd', name: 'HDD', slug: 'hdd' },
       { id: 'nvme', name: 'NVMe', slug: 'nvme' },
     ],
+  },
+  computer_case: {
+    name: 'Computer Casing',
+    subCategories: [],
+  },
+  cpu_cooler: {
+    name: 'CPU Cooler',
+    subCategories: [],
   },
 };
 
@@ -273,7 +290,7 @@ export function groupSpecificationFieldsBySection(
       indexByTitle.set(title, groups.length);
       groups.push({ title, specs: [spec] });
     } else {
-      groups[existingIndex].specs.push(spec);
+      groups[existingIndex]!.specs.push(spec);
     }
   }
 
@@ -462,7 +479,7 @@ export function getProcessorSpecsForBrand(brand: 'intel' | 'amd'): Specification
   });
 }
 
-// GPU Specification Options
+// GPU Specification Options (chipset model lists + shared extras)
 export const gpuSpecOptions = {
   nvidiaChipsets: [
     'GeForce RTX 5090',
@@ -517,113 +534,6 @@ export const gpuSpecOptions = {
     'Radeon RX 6500 XT',
     'Radeon RX 6400',
   ],
-
-  memoryTypes: [
-    'GDDR7',
-    'GDDR6X',
-    'GDDR6',
-    'GDDR5X',
-    'GDDR5',
-    'HBM3',
-    'HBM2e',
-  ],
-
-  memorySizes: [
-    '4 GB',
-    '6 GB',
-    '8 GB',
-    '10 GB',
-    '12 GB',
-    '16 GB',
-    '20 GB',
-    '24 GB',
-    '32 GB',
-    '48 GB',
-  ],
-
-  busWidths: [
-    '64-bit',
-    '96-bit',
-    '128-bit',
-    '192-bit',
-    '256-bit',
-    '320-bit',
-    '384-bit',
-    '512-bit',
-  ],
-
-  coolingTypes: [
-    'Single Fan',
-    'Dual Fan',
-    'Triple Fan',
-    'Blower Style',
-    'Hybrid (Air + AIO)',
-    'Liquid Cooled',
-  ],
-
-  outputPorts: [
-    'HDMI 2.1',
-    'HDMI 2.0',
-    'DisplayPort 2.1',
-    'DisplayPort 1.4a',
-    'DisplayPort 1.4',
-    'USB-C (DisplayPort Alt Mode)',
-    'DVI-D',
-  ],
-
-  features: [
-    'Ray Tracing',
-    'DLSS 3',
-    'DLSS 2',
-    'FSR 3',
-    'FSR 2',
-    'AV1 Encoding',
-    'NVENC',
-    'VCE',
-    'G-Sync Compatible',
-    'FreeSync Premium Pro',
-    'FreeSync Premium',
-    'FreeSync',
-    'RGB Lighting',
-    'ARGB Lighting',
-    'Zero RPM Mode',
-    'Dual BIOS',
-    'Metal Backplate',
-    'PCIe 5.0',
-    'PCIe 4.0',
-    'DirectX 12 Ultimate',
-    'Vulkan',
-    'OpenGL 4.6',
-  ],
-
-  powerConnectors: [
-    '12VHPWR (16-pin)',
-    '12V-2x6',
-    '8-pin x3',
-    '8-pin x2',
-    '8-pin + 6-pin',
-    '8-pin',
-    '6-pin x2',
-    '6-pin',
-    'No External Power',
-  ],
-
-  tdpOptions: [
-    '75W',
-    '100W',
-    '120W',
-    '150W',
-    '170W',
-    '200W',
-    '220W',
-    '250W',
-    '285W',
-    '300W',
-    '320W',
-    '350W',
-    '450W',
-    '575W',
-  ],
 };
 
 export const motherboardSpecifications: SpecificationField[] = MOTHERBOARD_SPEC_DEFINITIONS.map(
@@ -631,7 +541,13 @@ export const motherboardSpecifications: SpecificationField[] = MOTHERBOARD_SPEC_
     key: spec.key,
     name: spec.name,
     section: spec.section,
-    type: spec.multiline ? 'textarea' : spec.dataType === 'NUMBER' ? 'number' : spec.options ? 'select' : 'text',
+    type: spec.multiline
+      ? 'textarea'
+      : spec.dataType === 'NUMBER'
+        ? 'number'
+        : spec.options
+          ? 'select'
+          : 'text',
     required: spec.isRequired,
     placeholder: spec.placeholder,
     options: spec.options,
@@ -654,150 +570,84 @@ export const ramSpecifications: SpecificationField[] = RAM_SPEC_DEFINITIONS.map(
   options: spec.options,
 }));
 
-// GPU Specifications (matches TechLand grouped specification layout)
-export const gpuSpecifications: SpecificationField[] = [
-  {
-    key: 'memory_size',
-    name: 'Memory Size',
-    type: 'select',
-    options: gpuSpecOptions.memorySizes,
-    required: true,
-  },
-  {
-    key: 'bus_type',
-    name: 'Bus Type',
-    type: 'text',
-    placeholder: 'e.g., 28 Gbps',
-    required: false,
-  },
-  {
-    key: 'memory_type',
-    name: 'Memory Type',
-    type: 'select',
-    options: gpuSpecOptions.memoryTypes,
-    required: true,
-  },
-  {
-    key: 'memory_clock',
-    name: 'Memory Clock',
-    type: 'text',
-    placeholder: 'e.g., 2595 MHz',
-    required: false,
-  },
-  {
-    key: 'memory_bus',
-    name: 'Memory Bus (Bit)',
-    type: 'select',
-    options: gpuSpecOptions.busWidths.map((w) => w.replace('-bit', ' bit')),
-    required: false,
-  },
-  {
-    key: 'resolution',
-    name: 'Resolution',
-    type: 'text',
-    placeholder: 'e.g., 7680x4320',
-    required: false,
-  },
-  {
-    key: 'multi_display',
-    name: 'Multi Display',
-    type: 'number',
-    placeholder: '4',
-    required: false,
-  },
-  {
-    key: 'gpu_chipset',
-    name: 'GPU Chipset',
-    type: 'select',
-    options: [...gpuSpecOptions.nvidiaChipsets, ...gpuSpecOptions.amdChipsets],
-    required: true,
-    helpText: 'Select the GPU model',
-  },
-  {
-    key: 'cuda_cores',
-    name: 'CUDA Cores (Nvidia)',
-    type: 'number',
-    required: false,
-    placeholder: '3840',
-    helpText: 'CUDA cores for NVIDIA, Stream Processors for AMD',
-  },
-  {
-    key: 'pci_express',
-    name: 'Interface (PCI Express)',
-    type: 'select',
-    options: ['PCI-E 3.0', 'PCI-E 4.0', 'PCI-E 5.0'],
-    required: false,
-  },
-  {
-    key: 'directx',
-    name: 'DirectX',
-    type: 'select',
-    options: ['DirectX 12 API', 'DirectX 12 Ultimate', 'DirectX 11'],
-    required: false,
-  },
-  {
-    key: 'opengl',
-    name: 'OpenGL',
-    type: 'select',
-    options: ['4.6', '4.5', '4.4'],
-    required: false,
-  },
-  {
-    key: 'recommended_psu',
-    name: 'Recommended Power',
-    type: 'text',
-    placeholder: 'e.g., 550W',
-    required: false,
-  },
-  {
-    key: 'display_port',
-    name: 'DisplayPort',
-    type: 'text',
-    placeholder: 'e.g., DisplayPort 2.1b *3',
-    required: false,
-  },
-  {
-    key: 'power_connector',
-    name: 'Power Connector',
-    type: 'select',
-    options: gpuSpecOptions.powerConnectors,
-    required: false,
-  },
-  {
-    key: 'hdmi',
-    name: 'HDMI',
-    type: 'text',
-    placeholder: 'e.g., HDMI 2.1b *1',
-    required: false,
-  },
-  {
-    key: 'dimension',
-    name: 'Dimension',
-    type: 'text',
-    placeholder: 'e.g., L=281 W=117 H=40',
-    required: false,
-  },
-  {
-    key: 'warranty',
-    name: 'Warranty',
-    type: 'text',
-    placeholder: 'e.g., 3 Years',
-    required: false,
-  },
-];
+export const psuSpecifications: SpecificationField[] = PSU_SPEC_DEFINITIONS.map((spec) => ({
+  key: spec.key,
+  name: spec.name,
+  section: spec.section,
+  type:
+    spec.formType ||
+    (spec.dataType === 'NUMBER' ? 'number' : spec.options ? 'select' : 'text'),
+  required: spec.isRequired,
+  placeholder: spec.placeholder,
+  options: spec.options,
+  helpText: spec.helpText,
+}));
+
+export const ssdSpecifications: SpecificationField[] = SSD_SPEC_DEFINITIONS.map((spec) => ({
+  key: spec.key,
+  name: spec.name,
+  section: spec.section,
+  type:
+    spec.formType ||
+    (spec.dataType === 'NUMBER' ? 'number' : spec.options ? 'select' : 'text'),
+  required: spec.isRequired,
+  placeholder: spec.placeholder,
+  options: spec.options,
+  helpText: spec.helpText,
+}));
+
+export const casingSpecifications: SpecificationField[] = CASING_SPEC_DEFINITIONS.map((spec) => ({
+  key: spec.key,
+  name: spec.name,
+  section: spec.section,
+  type:
+    spec.formType ||
+    (spec.dataType === 'NUMBER' ? 'number' : spec.options ? 'select' : 'text'),
+  required: spec.isRequired,
+  placeholder: spec.placeholder,
+  options: spec.options,
+  helpText: spec.helpText,
+}));
+
+export const cpuCoolerSpecifications: SpecificationField[] = CPU_COOLER_SPEC_DEFINITIONS.map((spec) => ({
+  key: spec.key,
+  name: spec.name,
+  section: spec.section,
+  type:
+    spec.formType ||
+    (spec.dataType === 'NUMBER' ? 'number' : spec.options ? 'select' : 'text'),
+  required: spec.isRequired,
+  placeholder: spec.placeholder,
+  options: spec.options,
+  helpText: spec.helpText,
+}));
+
+// GPU Specifications — mapped from shared seed definitions (Star Tech filter fields included)
+export const gpuSpecifications: SpecificationField[] = GPU_SPEC_DEFINITIONS.map((spec) => ({
+  key: spec.key,
+  name: spec.name,
+  section: spec.section,
+  type:
+    spec.formType ||
+    (spec.dataType === 'NUMBER' ? 'number' : spec.options ? 'select' : 'text'),
+  required: spec.isRequired,
+  placeholder: spec.placeholder,
+  options: spec.options,
+  unit: spec.unit,
+  helpText: spec.helpText,
+}));
 
 // Helper function to get GPU specifications by brand
 export function getGpuSpecsForBrand(brand: 'nvidia' | 'amd-gpu'): SpecificationField[] {
-  return gpuSpecifications.map(spec => {
+  return gpuSpecifications.map((spec) => {
     if (spec.key === 'gpu_chipset') {
       return {
         ...spec,
-        options: brand === 'nvidia' 
-          ? gpuSpecOptions.nvidiaChipsets 
-          : gpuSpecOptions.amdChipsets,
+        type: 'select',
+        options:
+          brand === 'nvidia' ? gpuSpecOptions.nvidiaChipsets : gpuSpecOptions.amdChipsets,
       };
     }
-    // For NVIDIA, show CUDA/Tensor cores labels; for AMD, show Stream Processors
     if (spec.key === 'cuda_cores') {
       return {
         ...spec,
@@ -808,301 +658,11 @@ export function getGpuSpecsForBrand(brand: 'nvidia' | 'amd-gpu'): SpecificationF
   });
 }
 
-// SSD Brand Options (from Tech Land reference)
+// SSD brand labels for legacy callers — canonical list: SSD_BRANDS in ssdSpecDefinitions.ts
 export const ssdBrands = [
-  'Corsair',
-  'Kingston',
-  'Samsung',
-  'Team',
-  'XOC',
-  'MiPhi',
-  'OSCOO',
-  'Lexar',
-  'MSI',
-  'SanDisk',
-  'Seagate',
-  'Adata',
-  'Ocpc',
-  'Western Digital',
-  'Aitc',
-  'Acer',
-  'Transcend',
-  'Crucial',
-  'Apacer',
-  'Colorful',
-  'KingSpec',
-  'Netac',
-  'PNY',
-  'Twinmos',
-  'Pc Power',
-  'Biwintech',
-  'Kingbox',
-  'GIGABYTE',
-  'NCX',
-  'Orico',
-  'HP',
-  'King Super',
-  'Addlink',
-  'NEO FORZA',
-  'Hikvision',
-  'Patriot',
-  'Ramsta',
-  'Redragon',
-  'Kimtigo',
-  'AGI',
-  'Revenger',
-  'Dahua',
-  'LENOVO',
-  'Smart',
-  'Walton',
-  'Suneest',
-  'Kingbank',
-];
-
-// SSD Specification Options
-export const ssdSpecOptions = {
-  // Form Factors
-  formFactors: [
-    '2.5 inch SATA',
-    'M.2 2280',
-    'M.2 2242',
-    'M.2 2230',
-    'mSATA',
-    'U.2',
-    'PCIe Add-in Card',
-  ],
-
-  // Interface Types
-  interfaces: [
-    'SATA III (6Gb/s)',
-    'NVMe PCIe 3.0 x4',
-    'NVMe PCIe 4.0 x4',
-    'NVMe PCIe 5.0 x4',
-    'USB 3.0',
-    'USB 3.1',
-    'USB 3.2',
-    'Thunderbolt 3',
-    'Thunderbolt 4',
-  ],
-
-  // Capacities
-  capacities: [
-    '120 GB',
-    '128 GB',
-    '240 GB',
-    '256 GB',
-    '480 GB',
-    '500 GB',
-    '512 GB',
-    '960 GB',
-    '1 TB',
-    '2 TB',
-    '4 TB',
-    '8 TB',
-  ],
-
-  // NAND Types
-  nandTypes: [
-    'TLC (Triple-Level Cell)',
-    'QLC (Quad-Level Cell)',
-    'MLC (Multi-Level Cell)',
-    'SLC (Single-Level Cell)',
-    '3D NAND TLC',
-    '3D NAND QLC',
-    '3D NAND MLC',
-    'V-NAND',
-  ],
-
-  // Controller Brands
-  controllers: [
-    'Samsung',
-    'Phison',
-    'Silicon Motion',
-    'Marvell',
-    'Realtek',
-    'Maxio',
-    'InnoGrit',
-    'Western Digital',
-    'SanDisk',
-    'Toshiba',
-  ],
-
-  // DRAM Cache Options
-  dramCache: [
-    'No DRAM (DRAM-less)',
-    '256 MB DDR3',
-    '512 MB DDR3',
-    '512 MB DDR4',
-    '1 GB DDR4',
-    '2 GB DDR4',
-    '4 GB DDR4',
-    'HMB (Host Memory Buffer)',
-  ],
-
-  // Features
-  features: [
-    'Hardware Encryption (AES 256-bit)',
-    'TRIM Support',
-    'S.M.A.R.T. Support',
-    'LDPC Error Correction',
-    'Wear Leveling',
-    'Bad Block Management',
-    'Over-Provisioning',
-    'Thermal Throttling',
-    'Power Loss Protection',
-    'SLC Caching',
-    'Dynamic SLC Caching',
-    'NVMe 1.4',
-    'NVMe 2.0',
-    'TCG Opal 2.0',
-    'Heat Sink Included',
-    'RGB Lighting',
-  ],
-
-  // Endurance (TBW)
-  enduranceTBW: [
-    '80 TBW',
-    '100 TBW',
-    '150 TBW',
-    '200 TBW',
-    '300 TBW',
-    '400 TBW',
-    '500 TBW',
-    '600 TBW',
-    '800 TBW',
-    '1000 TBW',
-    '1200 TBW',
-    '1400 TBW',
-    '2000 TBW',
-    '2400 TBW',
-    '3600 TBW',
-  ],
-
-  // Warranty Options
-  warranties: [
-    '1 Year',
-    '2 Years',
-    '3 Years',
-    '5 Years',
-    '10 Years',
-    'Limited Lifetime',
-  ],
-};
-
-// SSD Specifications
-export const ssdSpecifications: SpecificationField[] = [
-  {
-    key: 'ssd_brand',
-    name: 'Brand',
-    type: 'select',
-    options: ssdBrands,
-    required: true,
-    helpText: 'Select the SSD manufacturer',
-  },
-  {
-    key: 'capacity',
-    name: 'Storage Capacity',
-    type: 'select',
-    options: ssdSpecOptions.capacities,
-    required: true,
-  },
-  {
-    key: 'form_factor',
-    name: 'Form Factor',
-    type: 'select',
-    options: ssdSpecOptions.formFactors,
-    required: true,
-  },
-  {
-    key: 'interface',
-    name: 'Interface',
-    type: 'select',
-    options: ssdSpecOptions.interfaces,
-    required: true,
-  },
-  {
-    key: 'nand_type',
-    name: 'NAND Flash Type',
-    type: 'select',
-    options: ssdSpecOptions.nandTypes,
-    required: false,
-  },
-  {
-    key: 'controller',
-    name: 'Controller',
-    type: 'select',
-    options: ssdSpecOptions.controllers,
-    required: false,
-  },
-  {
-    key: 'dram_cache',
-    name: 'DRAM Cache',
-    type: 'select',
-    options: ssdSpecOptions.dramCache,
-    required: false,
-  },
-  {
-    key: 'read_speed',
-    name: 'Sequential Read Speed',
-    type: 'number',
-    unit: 'MB/s',
-    required: true,
-    placeholder: '3500',
-    helpText: 'Maximum sequential read speed',
-  },
-  {
-    key: 'write_speed',
-    name: 'Sequential Write Speed',
-    type: 'number',
-    unit: 'MB/s',
-    required: true,
-    placeholder: '3000',
-    helpText: 'Maximum sequential write speed',
-  },
-  {
-    key: 'random_read_iops',
-    name: 'Random Read IOPS',
-    type: 'text',
-    placeholder: 'e.g., 500,000 IOPS',
-    required: false,
-  },
-  {
-    key: 'random_write_iops',
-    name: 'Random Write IOPS',
-    type: 'text',
-    placeholder: 'e.g., 450,000 IOPS',
-    required: false,
-  },
-  {
-    key: 'endurance_tbw',
-    name: 'Endurance (TBW)',
-    type: 'select',
-    options: ssdSpecOptions.enduranceTBW,
-    required: false,
-    helpText: 'Total Bytes Written rating',
-  },
-  {
-    key: 'mtbf',
-    name: 'MTBF (Mean Time Between Failures)',
-    type: 'text',
-    placeholder: 'e.g., 1.8 Million Hours',
-    required: false,
-  },
-  {
-    key: 'ssd_features',
-    name: 'Features',
-    type: 'multiselect',
-    options: ssdSpecOptions.features,
-    required: false,
-    helpText: 'Select all applicable features',
-  },
-  {
-    key: 'warranty',
-    name: 'Warranty',
-    type: 'select',
-    options: ssdSpecOptions.warranties,
-    required: false,
-  },
+  'TEAM', 'Colorful', 'MiPhi', 'Corsair', 'Kingston', 'Western Digital', 'Lexar', 'Transcend',
+  'Seagate', 'AITC', 'Netac', 'OCPC', 'OSCOO', 'Addlink', 'KingBank', 'ADATA', 'Samsung', 'HP',
+  'Gigabyte', 'Dahua', 'PNY', 'TwinMOS', 'Apacer', 'Patriot', 'Biostar', 'Acer', 'Kingspec',
 ];
 
 // HDD Specification Options
@@ -1217,7 +777,15 @@ export const hddSpecifications: SpecificationField[] = [
 ];
 
 // Map of main category to specification definitions
-export type MainCategorySlug = 'processor' | 'motherboard' | 'graphics_card' | 'ram' | 'storage';
+export type MainCategorySlug =
+  | 'processor'
+  | 'motherboard'
+  | 'graphics_card'
+  | 'ram'
+  | 'power_supply'
+  | 'storage'
+  | 'computer_case'
+  | 'cpu_cooler';
 
 /** Maps database category slugs (with hyphens) to form hierarchy main keys */
 const DB_SLUG_TO_MAIN: Record<string, MainCategorySlug> = {
@@ -1227,10 +795,17 @@ const DB_SLUG_TO_MAIN: Record<string, MainCategorySlug> = {
   ram: 'ram',
   'desktop-ram': 'ram',
   'laptop-ram': 'ram',
+  'power-supply': 'power_supply',
+  psu: 'power_supply',
   storage: 'storage',
   ssd: 'storage',
   hdd: 'storage',
   nvme: 'storage',
+  'computer-case': 'computer_case',
+  casing: 'computer_case',
+  case: 'computer_case',
+  'cpu-cooler': 'cpu_cooler',
+  cooler: 'cpu_cooler',
 };
 
 /**
@@ -1292,7 +867,10 @@ const FORM_MAIN_TO_DB_PARENT_SLUG: Record<MainCategorySlug, string> = {
   motherboard: 'motherboard',
   graphics_card: 'graphics-card',
   ram: 'ram',
+  power_supply: 'power-supply',
   storage: 'ssd',
+  computer_case: 'computer-case',
+  cpu_cooler: 'cpu-cooler',
 };
 
 /**
@@ -1329,6 +907,8 @@ export function getSpecificationsForCategory(mainCategory: MainCategorySlug, sub
       return motherboardSpecifications;
     case 'ram':
       return ramSpecifications;
+    case 'power_supply':
+      return psuSpecifications;
     case 'graphics_card':
       if (subCategory === 'nvidia' || subCategory === 'amd-gpu') {
         return getGpuSpecsForBrand(subCategory);
@@ -1342,6 +922,10 @@ export function getSpecificationsForCategory(mainCategory: MainCategorySlug, sub
         return hddSpecifications;
       }
       return ssdSpecifications; // Default to SSD specs for storage
+    case 'computer_case':
+      return casingSpecifications;
+    case 'cpu_cooler':
+      return cpuCoolerSpecifications;
     default:
       return [];
   }

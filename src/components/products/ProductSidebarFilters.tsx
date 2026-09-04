@@ -6,7 +6,6 @@ import { X } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
 import {
   Accordion,
   AccordionContent,
@@ -105,47 +104,94 @@ export function ProductSidebarFilters({
     });
   }, [contextKey, filters]);
 
-  const applyFilters = useCallback(() => {
-    const params = new URLSearchParams(searchParams.toString());
+  const pushFiltersToUrl = useCallback(
+    (
+      nextFilters: Record<string, string[]>,
+      nextPriceRange: [number, number] = currentPriceRange
+    ) => {
+      const params = new URLSearchParams(searchParams.toString());
 
-    Object.entries(selectedFilters).forEach(([key, values]) => {
-      if (values.length > 0) {
-        params.set(key, values.join(','));
+      filters.forEach((filter) => {
+        if (filter.key === 'priceRange') return;
+        const values = nextFilters[filter.key] || [];
+        if (values.length > 0) {
+          params.set(filter.key, values.join(','));
+        } else {
+          params.delete(filter.key);
+        }
+      });
+
+      if (nextPriceRange[0] !== priceRange.min) {
+        params.set('minPrice', nextPriceRange[0].toString());
       } else {
-        params.delete(key);
+        params.delete('minPrice');
       }
-    });
+      if (nextPriceRange[1] !== priceRange.max) {
+        params.set('maxPrice', nextPriceRange[1].toString());
+      } else {
+        params.delete('maxPrice');
+      }
 
-    if (currentPriceRange[0] !== priceRange.min) {
-      params.set('minPrice', currentPriceRange[0].toString());
-    } else {
-      params.delete('minPrice');
-    }
-    if (currentPriceRange[1] !== priceRange.max) {
-      params.set('maxPrice', currentPriceRange[1].toString());
-    } else {
-      params.delete('maxPrice');
-    }
-
-    params.set('page', '1');
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [selectedFilters, currentPriceRange, priceRange, pathname, router, searchParams]);
+      params.set('page', '1');
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    },
+    [currentPriceRange, filters, pathname, priceRange, router, searchParams]
+  );
 
   const handleCheckboxChange = (filterKey: string, value: string, checked: boolean) => {
-    setSelectedFilters((prev) => {
-      const currentValues = prev[filterKey] || [];
-      const newValues = checked
-        ? [...currentValues, value]
-        : currentValues.filter((v) => v !== value);
+    const currentValues = selectedFilters[filterKey] || [];
+    const newValues = checked
+      ? [...currentValues, value]
+      : currentValues.filter((v) => v !== value);
 
-      return { ...prev, [filterKey]: newValues };
-    });
+    const nextFilters = { ...selectedFilters };
+    if (newValues.length > 0) {
+      nextFilters[filterKey] = newValues;
+    } else {
+      delete nextFilters[filterKey];
+    }
+
+    setSelectedFilters(nextFilters);
+    pushFiltersToUrl(nextFilters);
   };
 
-  const handlePriceChange = (values: [number, number]) => {
-    setCurrentPriceRange(values);
-    setPriceInputMin(values[0].toString());
-    setPriceInputMax(values[1].toString());
+  const handlePriceChange = (values: number[]) => {
+    const range: [number, number] = [values[0], values[1]];
+    setCurrentPriceRange(range);
+    setPriceInputMin(range[0].toString());
+    setPriceInputMax(range[1].toString());
+  };
+
+  const handlePriceCommit = (values: number[]) => {
+    const range: [number, number] = [values[0], values[1]];
+    setCurrentPriceRange(range);
+    setPriceInputMin(range[0].toString());
+    setPriceInputMax(range[1].toString());
+    pushFiltersToUrl(selectedFilters, range);
+  };
+
+  const clampPriceRange = (minRaw: string, maxRaw: string): [number, number] => {
+    let min = Number(minRaw);
+    let max = Number(maxRaw);
+
+    if (isNaN(min)) min = priceRange.min;
+    if (isNaN(max)) max = priceRange.max;
+
+    min = Math.max(priceRange.min, Math.min(min, priceRange.max));
+    max = Math.max(priceRange.min, Math.min(max, priceRange.max));
+
+    if (min > max) {
+      return [max, min];
+    }
+    return [min, max];
+  };
+
+  const commitPriceInputs = () => {
+    const range = clampPriceRange(priceInputMin, priceInputMax);
+    setCurrentPriceRange(range);
+    setPriceInputMin(range[0].toString());
+    setPriceInputMax(range[1].toString());
+    pushFiltersToUrl(selectedFilters, range);
   };
 
   const handlePriceInputChange = (type: 'min' | 'max', value: string) => {
@@ -181,11 +227,10 @@ export function ProductSidebarFilters({
   };
 
   const clearFilter = (filterKey: string) => {
-    setSelectedFilters((prev) => {
-      const newFilters = { ...prev };
-      delete newFilters[filterKey];
-      return newFilters;
-    });
+    const nextFilters = { ...selectedFilters };
+    delete nextFilters[filterKey];
+    setSelectedFilters(nextFilters);
+    pushFiltersToUrl(nextFilters);
   };
 
   const hasActiveFilters =
@@ -197,10 +242,10 @@ export function ProductSidebarFilters({
     return filterCounts[filterKey]?.[value] || 0;
   };
 
-  const defaultExpandedItems = filters
-    .map((f, index) => ({ filter: f, index }))
-    .filter(({ filter }) => filter.defaultExpanded)
-    .map(({ filter, index }) => `${filter.key}-${index}`);
+  // Open every filter section by default (Price, Brand, Chipset, etc.)
+  const defaultExpandedItems = filters.map(
+    (filter, index) => `${filter.key}-${index}`
+  );
 
   if (!mounted) {
     return (
@@ -255,6 +300,7 @@ export function ProductSidebarFilters({
                       step={1000}
                       value={currentPriceRange}
                       onValueChange={handlePriceChange}
+                      onValueCommit={handlePriceCommit}
                       className="w-full"
                     />
                     <div className="flex items-center gap-2">
@@ -268,6 +314,12 @@ export function ProductSidebarFilters({
                             type="number"
                             value={priceInputMin}
                             onChange={(e) => handlePriceInputChange('min', e.target.value)}
+                            onBlur={commitPriceInputs}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.currentTarget.blur();
+                              }
+                            }}
                             className="w-full pl-6 pr-2 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
@@ -283,6 +335,12 @@ export function ProductSidebarFilters({
                             type="number"
                             value={priceInputMax}
                             onChange={(e) => handlePriceInputChange('max', e.target.value)}
+                            onBlur={commitPriceInputs}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.currentTarget.blur();
+                              }
+                            }}
                             className="w-full pl-6 pr-2 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
@@ -336,12 +394,6 @@ export function ProductSidebarFilters({
             );
           })}
         </Accordion>
-      </div>
-
-      <div className="p-4 border-t border-gray-200">
-        <Button onClick={applyFilters} className="w-full">
-          Apply Filters
-        </Button>
       </div>
     </div>
   );

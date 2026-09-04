@@ -19,6 +19,70 @@ import {
   MOTHERBOARD_RAM_TYPES,
   MOTHERBOARD_SPECIAL_FEATURES,
 } from '@/lib/motherboardFilterOptions';
+import {
+  GPU_CHIPSET_OPTIONS,
+  GPU_CHIPSET_SERIES_OPTIONS,
+  GPU_FAN_OPTIONS,
+  GPU_MANUFACTURER_BRANDS,
+  GPU_MEMORY_SIZE_OPTIONS,
+  GPU_MEMORY_TYPE_OPTIONS,
+  GPU_PORT_COUNT_OPTIONS,
+  GPU_PORT_TYPE_OPTIONS,
+  GPU_RESOLUTION_OPTIONS,
+  GPU_SPEC_FILTER_KEYS,
+} from '@/lib/gpuFilterOptions';
+import {
+  PSU_BRANDS,
+  PSU_EFFICIENCY_OPTIONS,
+  PSU_FORM_FACTOR_OPTIONS,
+  PSU_MODULAR_OPTIONS,
+  PSU_SPEC_FILTER_KEYS,
+  PSU_WATTAGE_OPTIONS,
+} from '@/lib/psuSpecDefinitions';
+import {
+  SSD_BRANDS,
+  SSD_CAPACITY_FILTER_OPTIONS,
+  SSD_FORM_FACTOR_OPTIONS,
+  SSD_INTERFACE_OPTIONS,
+  SSD_PCIE_GEN_OPTIONS,
+  SSD_READ_SPEED_OPTIONS,
+  SSD_SPEC_FILTER_KEYS,
+  SSD_TECHNOLOGY_OPTIONS,
+  SSD_WRITE_SPEED_OPTIONS,
+} from '@/lib/ssdSpecDefinitions';
+import {
+  CASING_BRANDS,
+  CASING_COLOR_OPTIONS,
+  CASING_MOTHERBOARD_TYPE_OPTIONS,
+  CASING_PSU_INCLUDED_OPTIONS,
+  CASING_SIDE_PANEL_OPTIONS,
+  CASING_SPECIAL_FEATURE_OPTIONS,
+  CASING_SPEC_FILTER_KEYS,
+  CASING_TYPE_OPTIONS,
+} from '@/lib/casingSpecDefinitions';
+import {
+  CPU_COOLER_BRANDS,
+  CPU_COOLER_FAN_SIZE_OPTIONS,
+  CPU_COOLER_FAN_SPEED_OPTIONS,
+  CPU_COOLER_PROCESSOR_TYPE_OPTIONS,
+  CPU_COOLER_SOCKET_OPTIONS,
+  CPU_COOLER_SPECIAL_FEATURE_OPTIONS,
+  CPU_COOLER_SPEC_FILTER_KEYS,
+  CPU_COOLER_TYPE_OPTIONS,
+} from '@/lib/cpuCoolerSpecDefinitions';
+
+export {
+  GPU_MANUFACTURER_BRANDS,
+  GPU_SPEC_FILTER_KEYS,
+  PSU_BRANDS,
+  PSU_SPEC_FILTER_KEYS,
+  SSD_BRANDS,
+  SSD_SPEC_FILTER_KEYS,
+  CASING_BRANDS,
+  CASING_SPEC_FILTER_KEYS,
+  CPU_COOLER_BRANDS,
+  CPU_COOLER_SPEC_FILTER_KEYS,
+};
 
 export interface FilterOption {
   value: string;
@@ -289,35 +353,13 @@ export const gpuSortOptions = processorSortOptions;
 
 export type GpuChipsetBrand = 'nvidia' | 'amd';
 
-export const GPU_MANUFACTURER_BRANDS = [
-  { value: 'colorful', label: 'Colorful' },
-  { value: 'inno3d', label: 'INNO3D' },
-  { value: 'msi', label: 'MSI' },
-  { value: 'asus', label: 'ASUS' },
-  { value: 'pny', label: 'PNY' },
-  { value: 'gigabyte', label: 'GIGABYTE' },
-  { value: 'zotac', label: 'ZOTAC' },
-  { value: 'manli', label: 'Manli' },
-  { value: 'nvidia', label: 'NVIDIA' },
-  { value: 'sapphire', label: 'Sapphire' },
-  { value: 'powercolor', label: 'PowerColor' },
-  { value: 'gunnir', label: 'GUNNIR' },
-  { value: 'yeston', label: 'Yeston' },
-  { value: 'arktek', label: 'ARKTEK' },
-  { value: 'afox', label: 'AFOX' },
-  { value: 'ocpc', label: 'OCPC' },
-  { value: 'peladn', label: 'PELADN' },
-  { value: 'maxsun', label: 'MAXSUN' },
-  { value: 'unika', label: 'Unika' },
-];
-
 const gpuManufacturerFilter: FilterDefinition = {
   key: 'manufacturer',
   name: 'Brand',
   type: 'checkbox',
   defaultExpanded: false,
   showClearButton: true,
-  options: GPU_MANUFACTURER_BRANDS,
+  options: [...GPU_MANUFACTURER_BRANDS],
 };
 
 const gpuChipsetFilter: FilterDefinition = {
@@ -325,11 +367,16 @@ const gpuChipsetFilter: FilterDefinition = {
   name: 'Chipset',
   type: 'checkbox',
   defaultExpanded: true,
-  options: [
-    { value: 'NVIDIA GeForce', label: 'NVIDIA GeForce' },
-    { value: 'AMD Radeon', label: 'AMD Radeon' },
-    { value: 'Intel Arc', label: 'Intel Arc' },
-  ],
+  options: [...GPU_CHIPSET_OPTIONS],
+};
+
+const gpuChipsetSeriesFilter: FilterDefinition = {
+  key: 'chipset_series',
+  name: 'Chipset Series',
+  type: 'checkbox',
+  defaultExpanded: false,
+  showClearButton: true,
+  options: [...GPU_CHIPSET_SERIES_OPTIONS],
 };
 
 const gpuMemoryFilter: FilterDefinition = {
@@ -337,18 +384,7 @@ const gpuMemoryFilter: FilterDefinition = {
   name: 'Memory',
   type: 'checkbox',
   defaultExpanded: false,
-  options: [
-    { value: '1GB', label: '1GB' },
-    { value: '2GB', label: '2GB' },
-    { value: '4GB', label: '4GB' },
-    { value: '6GB', label: '6GB' },
-    { value: '8GB', label: '8GB' },
-    { value: '10GB', label: '10GB' },
-    { value: '12GB', label: '12GB' },
-    { value: '16GB', label: '16GB' },
-    { value: '20GB', label: '20GB' },
-    { value: '24GB', label: '24GB' },
-  ],
+  options: [...GPU_MEMORY_SIZE_OPTIONS],
 };
 
 const gpuMemoryTypeFilter: FilterDefinition = {
@@ -356,14 +392,31 @@ const gpuMemoryTypeFilter: FilterDefinition = {
   name: 'Memory Type',
   type: 'checkbox',
   defaultExpanded: false,
-  options: [
-    { value: 'GDDR3', label: 'GDDR3' },
-    { value: 'GDDR4', label: 'GDDR4' },
-    { value: 'GDDR5', label: 'GDDR5' },
-    { value: 'GDDR6', label: 'GDDR6' },
-    { value: 'GDDR6X', label: 'GDDR6X' },
-    { value: 'GDDR7', label: 'GDDR7' },
-  ],
+  options: [...GPU_MEMORY_TYPE_OPTIONS],
+};
+
+const gpuFanFilter: FilterDefinition = {
+  key: 'cooling_type',
+  name: 'No. of Fans',
+  type: 'checkbox',
+  defaultExpanded: false,
+  options: [...GPU_FAN_OPTIONS],
+};
+
+const gpuPortTypesFilter: FilterDefinition = {
+  key: 'port_types',
+  name: 'Types Of Ports',
+  type: 'checkbox',
+  defaultExpanded: false,
+  options: [...GPU_PORT_TYPE_OPTIONS],
+};
+
+const gpuPortCountFilter: FilterDefinition = {
+  key: 'port_count',
+  name: 'No. of Ports',
+  type: 'checkbox',
+  defaultExpanded: false,
+  options: [...GPU_PORT_COUNT_OPTIONS],
 };
 
 const gpuResolutionFilter: FilterDefinition = {
@@ -371,15 +424,7 @@ const gpuResolutionFilter: FilterDefinition = {
   name: 'Max Resolution',
   type: 'checkbox',
   defaultExpanded: false,
-  options: [
-    { value: '1920x1200', label: '1920 X 1200' },
-    { value: '2560x1440', label: '2560 X 1440' },
-    { value: '2560x1600', label: '2560 X 1600' },
-    { value: '3840x2160', label: '3840 X 2160' },
-    { value: '4096x2160', label: '4096 X 2160' },
-    { value: '5120x2880', label: '5120 X 2880' },
-    { value: '7680x4320', label: '7680 X 4320' },
-  ],
+  options: [...GPU_RESOLUTION_OPTIONS],
 };
 
 export function getGpuFilters(_chipsetBrand?: GpuChipsetBrand): FilterDefinition[] {
@@ -388,19 +433,15 @@ export function getGpuFilters(_chipsetBrand?: GpuChipsetBrand): FilterDefinition
     stockStatusFilter,
     gpuManufacturerFilter,
     gpuChipsetFilter,
+    gpuChipsetSeriesFilter,
     gpuMemoryFilter,
     gpuMemoryTypeFilter,
+    gpuFanFilter,
+    gpuPortTypesFilter,
+    gpuPortCountFilter,
     gpuResolutionFilter,
   ];
 }
-
-export const GPU_SPEC_FILTER_KEYS = [
-  'manufacturer',
-  'gpu_chipset',
-  'memory_size',
-  'memory_type',
-  'resolution',
-] as const;
 
 const ramStockStatusFilter: FilterDefinition = {
   key: 'stockStatus',
@@ -557,6 +598,346 @@ export function getMotherboardFilters(): FilterDefinition[] {
 
 export const motherboardSortOptions = processorSortOptions;
 
+const psuStockStatusFilter: FilterDefinition = {
+  key: 'stockStatus',
+  name: 'Availability',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: [
+    { value: 'IN_STOCK', label: 'In Stock' },
+    { value: 'PRE_ORDER', label: 'Pre Order' },
+    { value: 'UPCOMING', label: 'Up Coming' },
+  ],
+};
+
+const psuBrandFilter: FilterDefinition = {
+  key: 'brand',
+  name: 'Brand',
+  type: 'checkbox',
+  defaultExpanded: true,
+  showClearButton: true,
+  options: PSU_BRANDS.map((b) => ({ value: b.slug, label: b.label })),
+};
+
+const psuWattageFilter: FilterDefinition = {
+  key: 'wattage',
+  name: 'Wattage',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: PSU_WATTAGE_OPTIONS.map((w) => ({ value: w, label: w })),
+};
+
+const psuEfficiencyFilter: FilterDefinition = {
+  key: 'efficiency',
+  name: 'Efficiency Rating',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: PSU_EFFICIENCY_OPTIONS.map((e) => ({ value: e, label: e })),
+};
+
+const psuModularFilter: FilterDefinition = {
+  key: 'modular_type',
+  name: 'Modular Type',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: PSU_MODULAR_OPTIONS.map((m) => ({ value: m, label: m })),
+};
+
+const psuFormFactorFilter: FilterDefinition = {
+  key: 'form_factor',
+  name: 'Form Factor',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: PSU_FORM_FACTOR_OPTIONS.map((f) => ({ value: f, label: f })),
+};
+
+export function getPsuFilters(): FilterDefinition[] {
+  return [
+    priceRangeFilter,
+    psuStockStatusFilter,
+    psuBrandFilter,
+    psuWattageFilter,
+    psuEfficiencyFilter,
+    psuModularFilter,
+    psuFormFactorFilter,
+  ];
+}
+
+export const psuSortOptions = processorSortOptions;
+
+const ssdStockStatusFilter: FilterDefinition = {
+  key: 'stockStatus',
+  name: 'Availability',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: [
+    { value: 'IN_STOCK', label: 'In Stock' },
+    { value: 'PRE_ORDER', label: 'Pre Order' },
+    { value: 'UPCOMING', label: 'Up Coming' },
+  ],
+};
+
+const ssdBrandFilter: FilterDefinition = {
+  key: 'brand',
+  name: 'SSD Brand',
+  type: 'checkbox',
+  defaultExpanded: true,
+  showClearButton: true,
+  options: SSD_BRANDS.map((b) => ({ value: b.slug, label: b.label })),
+};
+
+const ssdCapacityFilter: FilterDefinition = {
+  key: 'capacity',
+  name: 'Capacity',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: [...SSD_CAPACITY_FILTER_OPTIONS],
+};
+
+const ssdInterfaceFilter: FilterDefinition = {
+  key: 'interface',
+  name: 'Interface',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: SSD_INTERFACE_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+const ssdFormFactorFilter: FilterDefinition = {
+  key: 'form_factor',
+  name: 'Form Factor',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: SSD_FORM_FACTOR_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+const ssdPcieGenFilter: FilterDefinition = {
+  key: 'pcie_gen',
+  name: 'PCI-Express Generation',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: SSD_PCIE_GEN_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+const ssdDramFilter: FilterDefinition = {
+  key: 'dram',
+  name: 'DRAM',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: [{ value: 'With DRAM', label: 'With DRAM' }],
+};
+
+const ssdTechnologyFilter: FilterDefinition = {
+  key: 'technology',
+  name: 'Technology',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: SSD_TECHNOLOGY_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+const ssdReadSpeedFilter: FilterDefinition = {
+  key: 'read_speed',
+  name: 'Read Speed',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: SSD_READ_SPEED_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+const ssdWriteSpeedFilter: FilterDefinition = {
+  key: 'write_speed',
+  name: 'Write Speed',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: SSD_WRITE_SPEED_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+export function getSsdFilters(): FilterDefinition[] {
+  return [
+    priceRangeFilter,
+    ssdStockStatusFilter,
+    ssdBrandFilter,
+    ssdCapacityFilter,
+    ssdInterfaceFilter,
+    ssdFormFactorFilter,
+    ssdPcieGenFilter,
+    ssdDramFilter,
+    ssdTechnologyFilter,
+    ssdReadSpeedFilter,
+    ssdWriteSpeedFilter,
+  ];
+}
+
+export const ssdSortOptions = processorSortOptions;
+
+const casingStockStatusFilter: FilterDefinition = {
+  key: 'stockStatus',
+  name: 'Availability',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: [
+    { value: 'IN_STOCK', label: 'In Stock' },
+    { value: 'PRE_ORDER', label: 'Pre Order' },
+    { value: 'UPCOMING', label: 'Up Coming' },
+  ],
+};
+
+const casingBrandFilter: FilterDefinition = {
+  key: 'brand',
+  name: 'Brand',
+  type: 'checkbox',
+  defaultExpanded: true,
+  showClearButton: true,
+  options: CASING_BRANDS.map((b) => ({ value: b.slug, label: b.label })),
+};
+
+const casingColorFilter: FilterDefinition = {
+  key: 'color',
+  name: 'Color',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: CASING_COLOR_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+const casingTypeFilter: FilterDefinition = {
+  key: 'case_type',
+  name: 'Type',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: CASING_TYPE_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+const casingMotherboardTypeFilter: FilterDefinition = {
+  key: 'motherboard_type',
+  name: 'Motherboard Type',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: CASING_MOTHERBOARD_TYPE_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+const casingSidePanelFilter: FilterDefinition = {
+  key: 'side_panel',
+  name: 'Side Panel',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: CASING_SIDE_PANEL_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+const casingPsuIncludedFilter: FilterDefinition = {
+  key: 'psu_included',
+  name: 'Power Supply',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: CASING_PSU_INCLUDED_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+const casingSpecialFeatureFilter: FilterDefinition = {
+  key: 'special_features',
+  name: 'Special Feature',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: CASING_SPECIAL_FEATURE_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+export function getCasingFilters(): FilterDefinition[] {
+  return [
+    priceRangeFilter,
+    casingStockStatusFilter,
+    casingBrandFilter,
+    casingColorFilter,
+    casingTypeFilter,
+    casingMotherboardTypeFilter,
+    casingSidePanelFilter,
+    casingPsuIncludedFilter,
+    casingSpecialFeatureFilter,
+  ];
+}
+
+export const casingSortOptions = processorSortOptions;
+
+const cpuCoolerStockStatusFilter: FilterDefinition = {
+  key: 'stockStatus',
+  name: 'Availability',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: [
+    { value: 'IN_STOCK', label: 'In Stock' },
+    { value: 'PRE_ORDER', label: 'Pre Order' },
+    { value: 'UPCOMING', label: 'Up Coming' },
+  ],
+};
+
+const cpuCoolerBrandFilter: FilterDefinition = {
+  key: 'brand',
+  name: 'Brand',
+  type: 'checkbox',
+  defaultExpanded: true,
+  showClearButton: true,
+  options: CPU_COOLER_BRANDS.map((b) => ({ value: b.slug, label: b.label })),
+};
+
+const cpuCoolerProcessorTypeFilter: FilterDefinition = {
+  key: 'processor_type',
+  name: 'Processor Type',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: CPU_COOLER_PROCESSOR_TYPE_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+const cpuCoolerSocketFilter: FilterDefinition = {
+  key: 'socket',
+  name: 'Sockets',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: CPU_COOLER_SOCKET_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+const cpuCoolerTypeFilter: FilterDefinition = {
+  key: 'cooler_type',
+  name: 'Cooler Type',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: CPU_COOLER_TYPE_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+const cpuCoolerFanSizeFilter: FilterDefinition = {
+  key: 'fan_size',
+  name: 'Fan Size',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: CPU_COOLER_FAN_SIZE_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+const cpuCoolerFanSpeedFilter: FilterDefinition = {
+  key: 'fan_speed',
+  name: 'Fan Speed',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: CPU_COOLER_FAN_SPEED_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+const cpuCoolerSpecialFeatureFilter: FilterDefinition = {
+  key: 'special_features',
+  name: 'Special Features',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: CPU_COOLER_SPECIAL_FEATURE_OPTIONS.map((v) => ({ value: v, label: v })),
+};
+
+export function getCpuCoolerFilters(): FilterDefinition[] {
+  return [
+    priceRangeFilter,
+    cpuCoolerStockStatusFilter,
+    cpuCoolerBrandFilter,
+    cpuCoolerProcessorTypeFilter,
+    cpuCoolerSocketFilter,
+    cpuCoolerTypeFilter,
+    cpuCoolerFanSizeFilter,
+    cpuCoolerFanSpeedFilter,
+    cpuCoolerSpecialFeatureFilter,
+  ];
+}
+
+export const cpuCoolerSortOptions = processorSortOptions;
+
 // Get filter config by category
 export function getFilterConfig(category: string, brand: ProcessorBrand = 'intel'): FilterDefinition[] {
   switch (category) {
@@ -568,6 +949,20 @@ export function getFilterConfig(category: string, brand: ProcessorBrand = 'intel
       return getRamFilters();
     case 'motherboard':
       return getMotherboardFilters();
+    case 'psu':
+    case 'power-supply':
+      return getPsuFilters();
+    case 'ssd':
+    case 'nvme':
+    case 'storage':
+      return getSsdFilters();
+    case 'casing':
+    case 'computer-case':
+    case 'case':
+      return getCasingFilters();
+    case 'cpu-cooler':
+    case 'cooler':
+      return getCpuCoolerFilters();
     default:
       return [];
   }

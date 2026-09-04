@@ -3,6 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
+import { RAM_BRANDS } from '@/lib/ramSpecDefinitions';
+import { PSU_BRANDS } from '@/lib/psuSpecDefinitions';
+import { SSD_BRANDS } from '@/lib/ssdSpecDefinitions';
+import { CASING_BRANDS } from '@/lib/casingSpecDefinitions';
+import { CPU_COOLER_BRANDS } from '@/lib/cpuCoolerSpecDefinitions';
 
 interface SubCategory {
   name: string;
@@ -22,6 +27,100 @@ interface Category {
 }
 
 const HOVER_CLOSE_DELAY_MS = 280;
+
+/** Star Tech–style order for Desktop RAM brand flyout (rest appended after). */
+const DESKTOP_RAM_MENU_BRAND_ORDER = [
+  'team',
+  'colorful',
+  'corsair',
+  'kingston',
+  'pny',
+  'g-skill',
+  'aitc',
+  'lexar',
+  'netac',
+  'ocpc',
+  'oscoo',
+  'kingbank',
+] as const;
+
+/** Laptop RAM menu brands only (Star Tech reference). */
+const LAPTOP_RAM_MENU_BRANDS = [
+  { slug: 'team', label: 'TEAM' },
+  { slug: 'adata', label: 'Adata' },
+  { slug: 'g-skill', label: 'G.Skill' },
+  { slug: 'lexar', label: 'Lexar' },
+  { slug: 'corsair', label: 'Corsair' },
+  { slug: 'pny', label: 'PNY' },
+  { slug: 'ocpc', label: 'OCPC' },
+  { slug: 'netac', label: 'Netac' },
+] as const;
+
+function getDesktopRamBrandChildren(): SubCategory[] {
+  const bySlug = new Map(RAM_BRANDS.map((b) => [b.slug, b]));
+  const ordered: { slug: string; label: string }[] = [];
+  const seen = new Set<string>();
+
+  for (const slug of DESKTOP_RAM_MENU_BRAND_ORDER) {
+    const brand = bySlug.get(slug);
+    if (brand) {
+      ordered.push(brand);
+      seen.add(slug);
+    }
+  }
+
+  for (const brand of RAM_BRANDS) {
+    if (!seen.has(brand.slug)) {
+      ordered.push(brand);
+    }
+  }
+
+  return ordered.map((brand) => ({
+    name: brand.label,
+    slug: brand.slug,
+    href: `/products?category=components&sub=desktop-ram&brand=${brand.slug}`,
+  }));
+}
+
+function getLaptopRamBrandChildren(): SubCategory[] {
+  return LAPTOP_RAM_MENU_BRANDS.map((brand) => ({
+    name: brand.label,
+    slug: brand.slug,
+    href: `/products?category=components&sub=laptop-ram&brand=${brand.slug}`,
+  }));
+}
+
+function getPsuBrandChildren(): SubCategory[] {
+  return PSU_BRANDS.map((brand) => ({
+    name: brand.label,
+    slug: brand.slug,
+    href: `/products?category=components&sub=power-supply&brand=${brand.slug}`,
+  }));
+}
+
+function getSsdBrandChildren(): SubCategory[] {
+  return SSD_BRANDS.map((brand) => ({
+    name: brand.label,
+    slug: brand.slug,
+    href: `/products?category=components&sub=ssd&brand=${brand.slug}`,
+  }));
+}
+
+function getCasingBrandChildren(): SubCategory[] {
+  return CASING_BRANDS.map((brand) => ({
+    name: brand.label,
+    slug: brand.slug,
+    href: `/products?category=components&sub=computer-case&brand=${brand.slug}`,
+  }));
+}
+
+function getCpuCoolerBrandChildren(): SubCategory[] {
+  return CPU_COOLER_BRANDS.map((brand) => ({
+    name: brand.label,
+    slug: brand.slug,
+    href: `/products?category=components&sub=cpu-cooler&brand=${brand.slug}`,
+  }));
+}
 
 /** Top nav — Star Tech order, single line only */
 const categories: Category[] = [
@@ -52,7 +151,7 @@ const categories: Category[] = [
           { name: 'AMD Ryzen', slug: 'amd-ryzen' },
         ],
       },
-      { name: 'CPU Cooler', slug: 'cpu-cooler' },
+      { name: 'CPU Cooler', slug: 'cpu-cooler', children: getCpuCoolerBrandChildren() },
       { name: 'Water / Liquid Cooling', slug: 'liquid-cooling' },
       {
         name: 'Motherboard',
@@ -73,33 +172,31 @@ const categories: Category[] = [
       {
         name: 'RAM (Desktop)',
         slug: 'desktop-ram',
-        children: [
-          {
-            name: 'DDR4 RAM',
-            slug: 'ddr4-ram',
-            href: '/products?category=components&sub=desktop-ram&memory_type=DDR4',
-          },
-          {
-            name: 'DDR5 RAM',
-            slug: 'ddr5-ram',
-            href: '/products?category=components&sub=desktop-ram&memory_type=DDR5',
-          },
-        ],
+        children: getDesktopRamBrandChildren(),
       },
-      { name: 'RAM (Laptop)', slug: 'laptop-ram' },
-      { name: 'Power Supply', slug: 'power-supply' },
+      {
+        name: 'RAM (Laptop)',
+        slug: 'laptop-ram',
+        children: getLaptopRamBrandChildren(),
+      },
+      {
+        name: 'Power Supply',
+        slug: 'power-supply',
+        children: getPsuBrandChildren(),
+      },
       { name: 'Hard Disk Drive', slug: 'hdd' },
       { name: 'Portable Hard Disk Drive', slug: 'portable-hdd' },
       {
         name: 'SSD',
         slug: 'ssd',
-        children: [
-          { name: 'SATA SSD', slug: 'ssd' },
-          { name: 'NVMe SSD', slug: 'nvme' },
-        ],
+        children: getSsdBrandChildren(),
       },
       { name: 'Portable SSD', slug: 'portable-ssd' },
-      { name: 'Casing', slug: 'computer-case' },
+      {
+        name: 'Casing',
+        slug: 'computer-case',
+        children: getCasingBrandChildren(),
+      },
       { name: 'Casing Cooler', slug: 'casing-fan' },
       { name: 'Optical Disk Drive', slug: 'optical-disk-drive' },
       { name: 'Vertical GPU Holder', slug: 'gpu-vertical-mount' },
@@ -279,7 +376,7 @@ export function MegaMenu() {
 
                             {hasChildren && isSubActive && (
                               <div
-                                className="absolute left-full top-0 z-[70] -ml-px min-w-[180px] border border-gray-200 bg-white text-gray-800 shadow-[0_8px_24px_rgba(0,0,0,0.12)]"
+                                className="absolute left-full top-0 z-[70] -ml-px max-h-[70vh] min-w-[180px] overflow-y-auto border border-gray-200 bg-white text-gray-800 shadow-[0_8px_24px_rgba(0,0,0,0.12)]"
                                 onMouseEnter={() => openSubCategory(subCat.slug)}
                                 onMouseLeave={scheduleCloseSubCategory}
                               >

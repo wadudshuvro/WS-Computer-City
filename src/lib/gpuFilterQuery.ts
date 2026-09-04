@@ -2,10 +2,14 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { getGpuFilters, type GpuChipsetBrand } from '@/lib/filterConfig';
 import {
+  chipsetSeriesDbValueMatches,
+  coolingTypeDbValueMatches,
   gpuChipsetDbValueMatches,
+  mapChipsetSeriesToPatterns,
   mapGpuChipsetFilterToPatterns,
   mapMemorySizeFilterToDb,
   memorySizeDbValueMatches,
+  portTypeDbValueMatches,
   resolutionDbValueMatches,
   GPU_SPEC_FILTER_KEYS,
 } from '@/lib/gpuFilterMappings';
@@ -51,7 +55,12 @@ export async function buildGpuCategoryWhere(
     };
   }
 
-  const slug = sub === 'nvidia' || type === 'nvidia' ? 'nvidia' : sub === 'amd-gpu' || type === 'amd-gpu' ? 'amd-gpu' : null;
+  const slug =
+    sub === 'nvidia' || type === 'nvidia'
+      ? 'nvidia'
+      : sub === 'amd-gpu' || type === 'amd-gpu'
+        ? 'amd-gpu'
+        : null;
 
   if (!slug) {
     return {
@@ -124,6 +133,43 @@ export function buildGpuSpecCondition(
       };
     }
 
+    case 'chipset_series': {
+      const patterns = values.flatMap(mapChipsetSeriesToPatterns);
+      return {
+        OR: [
+          ...values.map((series) => ({
+            specifications: {
+              some: {
+                specificationDefinition: { key: 'chipset_series' },
+                value: { equals: series, mode: 'insensitive' as const },
+              },
+            },
+          })),
+          ...patterns.flatMap((pattern) => [
+            {
+              specifications: {
+                some: {
+                  specificationDefinition: { key: 'chipset_series' },
+                  value: { contains: pattern, mode: 'insensitive' as const },
+                },
+              },
+            },
+            {
+              specifications: {
+                some: {
+                  specificationDefinition: { key: 'gpu_chipset' },
+                  value: { contains: pattern, mode: 'insensitive' as const },
+                },
+              },
+            },
+            {
+              name: { contains: pattern, mode: 'insensitive' as const },
+            },
+          ]),
+        ],
+      };
+    }
+
     case 'memory_size': {
       const dbValues = values.flatMap(mapMemorySizeFilterToDb);
       return {
@@ -148,13 +194,78 @@ export function buildGpuSpecCondition(
         },
       };
 
+    case 'cooling_type':
+      return {
+        OR: values.map((fan) => ({
+          specifications: {
+            some: {
+              specificationDefinition: { key: 'cooling_type' },
+              value: { contains: fan, mode: 'insensitive' as const },
+            },
+          },
+        })),
+      };
+
+    case 'port_types':
+      return {
+        OR: values.flatMap((port) => {
+          const patterns =
+            port === 'HDMI'
+              ? ['HDMI']
+              : port === 'DisplayPort'
+                ? ['DisplayPort', 'Display Port']
+                : port === 'Mini DisplayPort'
+                  ? ['Mini DisplayPort', 'Mini-DP']
+                  : port === 'DVI'
+                    ? ['DVI']
+                    : port === 'VGA (D-Sub)'
+                      ? ['VGA', 'D-Sub']
+                      : port === 'Type-C'
+                        ? ['Type-C', 'Type C', 'USB-C', 'USB C']
+                        : [port];
+          return patterns.map((pattern) => ({
+            specifications: {
+              some: {
+                OR: [
+                  {
+                    specificationDefinition: { key: 'port_types' },
+                    value: { contains: pattern, mode: 'insensitive' as const },
+                  },
+                  {
+                    specificationDefinition: { key: 'hdmi' },
+                    value: { contains: pattern, mode: 'insensitive' as const },
+                  },
+                  {
+                    specificationDefinition: { key: 'display_port' },
+                    value: { contains: pattern, mode: 'insensitive' as const },
+                  },
+                ],
+              },
+            },
+          }));
+        }),
+      };
+
+    case 'port_count':
+      return {
+        specifications: {
+          some: {
+            specificationDefinition: { key: 'port_count' },
+            value: { in: values },
+          },
+        },
+      };
+
     case 'resolution':
       return {
         OR: values.map((filterValue) => ({
           specifications: {
             some: {
               specificationDefinition: { key: 'resolution' },
-              value: { contains: filterValue.replace(/x/i, 'x'), mode: 'insensitive' as const },
+              value: {
+                contains: filterValue.replace(/x/i, 'x'),
+                mode: 'insensitive' as const,
+              },
             },
           },
         })),
@@ -213,6 +324,57 @@ export function buildGpuFilterCounts(
       counts.gpu_chipset[option.value] = dbCounts
         .filter((d) => gpuChipsetDbValueMatches(option.value, d.value))
         .reduce((sum, d) => sum + d.count, 0);
+    }
+  }
+
+  const seriesFilter = gpuFilters.find((f) => f.key === 'chipset_series');
+  if (seriesFilter?.options) {
+    counts.chipset_series = {};
+    const seriesCounts = specValuesByKey.chipset_series || [];
+    const chipsetCounts = specValuesByKey.gpu_chipset || [];
+    for (const option of seriesFilter.options) {
+      const fromSeries = seriesCounts
+        .filter((d) => chipsetSeriesDbValueMatches(option.value, d.value))
+        .reduce((sum, d) => sum + d.count, 0);
+      const fromChipset = chipsetCounts
+        .filter((d) => chipsetSeriesDbValueMatches(option.value, d.value))
+        .reduce((sum, d) => sum + d.count, 0);
+      counts.chipset_series[option.value] = Math.max(fromSeries, fromChipset);
+    }
+  }
+
+  const coolingFilter = gpuFilters.find((f) => f.key === 'cooling_type');
+  if (coolingFilter?.options) {
+    counts.cooling_type = {};
+    const dbCounts = specValuesByKey.cooling_type || [];
+    for (const option of coolingFilter.options) {
+      counts.cooling_type[option.value] = dbCounts
+        .filter((d) => coolingTypeDbValueMatches(option.value, d.value))
+        .reduce((sum, d) => sum + d.count, 0);
+    }
+  }
+
+  const portTypesFilter = gpuFilters.find((f) => f.key === 'port_types');
+  if (portTypesFilter?.options) {
+    counts.port_types = {};
+    const portTypeCounts = specValuesByKey.port_types || [];
+    const hdmiCounts = specValuesByKey.hdmi || [];
+    const dpCounts = specValuesByKey.display_port || [];
+    const combined = [...portTypeCounts, ...hdmiCounts, ...dpCounts];
+    for (const option of portTypesFilter.options) {
+      counts.port_types[option.value] = combined
+        .filter((d) => portTypeDbValueMatches(option.value, d.value))
+        .reduce((sum, d) => sum + d.count, 0);
+    }
+  }
+
+  const portCountFilter = gpuFilters.find((f) => f.key === 'port_count');
+  if (portCountFilter?.options) {
+    counts.port_count = {};
+    const dbCounts = specValuesByKey.port_count || [];
+    for (const option of portCountFilter.options) {
+      const match = dbCounts.find((d) => d.value === option.value);
+      if (match) counts.port_count[option.value] = match.count;
     }
   }
 

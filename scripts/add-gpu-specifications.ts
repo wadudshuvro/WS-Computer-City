@@ -4,6 +4,9 @@
  */
 import { PrismaClient } from '@prisma/client';
 import { GPU_SPEC_DEFINITIONS } from '../src/lib/gpuSpecDefinitions';
+import { loadEnvValue } from './load-env';
+
+process.env.DATABASE_URL = loadEnvValue('DATABASE_URL');
 
 const prisma = new PrismaClient();
 

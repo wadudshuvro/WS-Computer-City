@@ -4,11 +4,19 @@ import { ProcessorFilters } from '@/components/products/ProcessorFilters';
 import { GpuFilters } from '@/components/products/GpuFilters';
 import { RamFilters } from '@/components/products/RamFilters';
 import { MotherboardFilters } from '@/components/products/MotherboardFilters';
+import { PsuFilters } from '@/components/products/PsuFilters';
+import { SsdFilters } from '@/components/products/SsdFilters';
+import { CasingFilters } from '@/components/products/CasingFilters';
+import { CpuCoolerFilters } from '@/components/products/CpuCoolerFilters';
 import { processorSortOptions, GPU_MANUFACTURER_BRANDS, ramSortOptions } from '@/lib/filterConfig';
 import { PROCESSOR_SPEC_FILTER_KEYS } from '@/lib/processorFilterMappings';
 import { GPU_SPEC_FILTER_KEYS } from '@/lib/gpuFilterMappings';
 import { RAM_SPEC_FILTER_KEYS } from '@/lib/ramFilterMappings';
 import { RAM_BRANDS } from '@/lib/ramSpecDefinitions';
+import { PSU_BRANDS } from '@/lib/psuSpecDefinitions';
+import { SSD_BRANDS } from '@/lib/ssdSpecDefinitions';
+import { CASING_BRANDS } from '@/lib/casingSpecDefinitions';
+import { CPU_COOLER_BRANDS } from '@/lib/cpuCoolerSpecDefinitions';
 import { MOTHERBOARD_BRANDS } from '@/lib/componentBrandConfig';
 import { ChevronRight, Eye, Grid, Heart, List, ShoppingCart, SlidersHorizontal, X } from 'lucide-react';
 import Link from 'next/link';
@@ -97,6 +105,20 @@ function ProductsPageContent() {
   // Check if we're on SSD/Storage category
   const isSsdCategory = subCategory === 'ssd' || subCategory === 'nvme' || subCategory === 'storage' || categoryParam === 'ssd';
 
+  // Computer Casing category
+  const isCasingCategory =
+    subCategory === 'computer-case' ||
+    subCategory === 'casing' ||
+    subCategory === 'case' ||
+    categoryParam === 'computer-case' ||
+    categoryParam === 'casing';
+
+  // CPU Cooler category
+  const isCpuCoolerCategory =
+    subCategory === 'cpu-cooler' ||
+    subCategory === 'cooler' ||
+    categoryParam === 'cpu-cooler';
+
   // Desktop RAM category (including DDR4/DDR5 menu shortcuts)
   const isRamCategory =
     subCategory === 'desktop-ram' ||
@@ -114,20 +136,16 @@ function ProductsPageContent() {
     subCategory === 'amd-motherboard' ||
     categoryParam === 'motherboard';
 
+  // Power Supply category
+  const isPsuCategory =
+    subCategory === 'power-supply' ||
+    subCategory === 'psu' ||
+    categoryParam === 'power-supply' ||
+    categoryParam === 'psu';
+
   // Active brand tab based on category type
   const activeGpuBrandTab =
     subCategory === 'amd-gpu' || typeParam === 'amd-gpu' ? 'amd' : 'nvidia';
-  // For SSD, active brand from URL
-  const activeSsdBrand = brandParam || '';
-
-  // SSD Brands list (matching Tech Land design)
-  const ssdBrands = [
-    'Corsair', 'Kingston', 'Samsung', 'Team', 'XOC', 'MiPhi', 'OSCOO', 'Lexar', 'MSI', 'SanDisk',
-    'Seagate', 'Adata', 'Ocpc', 'Western Digital', 'Aitc', 'Acer', 'Transcend', 'Crucial', 'Apacer',
-    'Colorful', 'KingSpec', 'Netac', 'PNY', 'Twinmos', 'Pc Power', 'Biwintech', 'Kingbox', 'GIGABYTE',
-    'NCX', 'Orico', 'HP', 'King Super', 'Addlink', 'NEO FORZA', 'Hikvision', 'Patriot', 'Ramsta',
-    'Redragon', 'Kimtigo', 'AGI', 'Revenger', 'Dahua', 'LENOVO', 'Smart', 'Walton', 'Suneest', 'Kingbank'
-  ];
 
   useEffect(() => {
     fetchProducts();
@@ -172,7 +190,15 @@ function ProductsPageContent() {
             ? `/api/products/ram?${params.toString()}`
             : isMotherboardCategory
               ? `/api/products/motherboard?${params.toString()}`
-              : `/api/products?${params.toString()}`;
+              : isPsuCategory
+                ? `/api/products/psu?${params.toString()}`
+                : isSsdCategory
+                  ? `/api/products/ssd?${params.toString()}`
+                  : isCasingCategory
+                    ? `/api/products/casing?${params.toString()}`
+                    : isCpuCoolerCategory
+                      ? `/api/products/cpu-cooler?${params.toString()}`
+                : `/api/products?${params.toString()}`;
 
       const res = await fetch(apiUrl);
       
@@ -293,19 +319,70 @@ function ProductsPageContent() {
     router.push(`/products?${params.toString()}`);
   };
 
-  const handleSsdBrandClick = (brand: string) => {
+  const handlePsuBrandClick = (brandSlug: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    const brandSlug = brand.toLowerCase().replace(/\s+/g, '-');
-    
-    // Toggle brand filter - if already selected, clear it
-    if (brandParam === brandSlug) {
+    const current = params.get('brand');
+
+    if (current === brandSlug) {
       params.delete('brand');
     } else {
       params.set('brand', brandSlug);
     }
     params.set('page', '1');
-    if (!params.has('sub')) {
-      params.set('sub', 'ssd');
+    params.set('sub', 'power-supply');
+    if (!params.has('category')) {
+      params.set('category', 'components');
+    }
+    router.push(`/products?${params.toString()}`);
+  };
+
+  const handleSsdBrandClick = (brandSlug: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const current = params.get('brand');
+
+    if (current === brandSlug) {
+      params.delete('brand');
+    } else {
+      params.set('brand', brandSlug);
+    }
+    params.set('page', '1');
+    params.set('sub', 'ssd');
+    if (!params.has('category')) {
+      params.set('category', 'components');
+    }
+    router.push(`/products?${params.toString()}`);
+  };
+
+  const handleCasingBrandClick = (brandSlug: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const current = params.get('brand');
+
+    if (current === brandSlug) {
+      params.delete('brand');
+    } else {
+      params.set('brand', brandSlug);
+    }
+    params.set('page', '1');
+    params.set('sub', 'computer-case');
+    if (!params.has('category')) {
+      params.set('category', 'components');
+    }
+    router.push(`/products?${params.toString()}`);
+  };
+
+  const handleCpuCoolerBrandClick = (brandSlug: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const current = params.get('brand');
+
+    if (current === brandSlug) {
+      params.delete('brand');
+    } else {
+      params.set('brand', brandSlug);
+    }
+    params.set('page', '1');
+    params.set('sub', 'cpu-cooler');
+    if (!params.has('category')) {
+      params.set('category', 'components');
     }
     router.push(`/products?${params.toString()}`);
   };
@@ -356,7 +433,10 @@ function ProductsPageContent() {
     if (isGpuCategory) return 'Graphics Card Price In BD 2026';
     if (isRamCategory) return 'Desktop RAM Price in Bangladesh';
     if (isMotherboardCategory) return 'Motherboard Price in Bangladesh';
-    if (isSsdCategory) return 'SSD Best Price in BD 2026 | Tech Land BD';
+    if (isPsuCategory) return 'Power Supply Price in Bangladesh';
+    if (isSsdCategory) return 'SSD Price in Bangladesh';
+    if (isCasingCategory) return 'Computer Casing Price in Bangladesh';
+    if (isCpuCoolerCategory) return 'CPU Cooler Price in Bangladesh';
     return 'All Products';
   };
 
@@ -387,8 +467,14 @@ function ProductsPageContent() {
                     ? 'Desktop RAM'
                     : isMotherboardCategory
                       ? 'Motherboard'
+                      : isPsuCategory
+                        ? 'Power Supply'
                       : isSsdCategory
                         ? 'SSD'
+                        : isCasingCategory
+                          ? 'Casing'
+                          : isCpuCoolerCategory
+                            ? 'CPU Cooler'
                         : 'Products'}
             </span>
           </nav>
@@ -555,33 +641,119 @@ function ProductsPageContent() {
             </>
           )}
 
-          {/* SSD Category Section */}
-          {isSsdCategory && (
+          {/* Power Supply Category Section */}
+          {isPsuCategory && (
             <>
               <p className="text-sm text-gray-600 max-w-4xl mb-4">
-                SSD Best Price in BD 2026 begins at BDT 3,150/- and can go up to BDT 85,000/- depending on the brand and specifications. 
-                With a variety of 1126 items available at WS Computer City, where 223 items are in stock now & 1076 items offer you the best 
-                discount price in BD. Find the perfect SSD Components for your requirements. Search for SSD price in bd, 1tb SSD price in bd, 
-                256 GB SSD price in bd, 512GB SSD price in bd, portable SSD price in bd, m.2 SSD price in bd, nvme SSD price in bd.
+                Power Supply Price in Bangladesh covers reliable PSUs from leading brands. Filter by wattage,
+                80 Plus efficiency, modular type, and form factor to match your PC build.
               </p>
-              
-              {/* SSD Brands Grid - Similar to Tech Land design */}
+
               <div className="flex flex-wrap gap-2 mt-4">
-                {ssdBrands.map((brand) => {
-                  const brandSlug = brand.toLowerCase().replace(/\s+/g, '-');
-                  const isActive = brandParam === brandSlug;
+                {PSU_BRANDS.map((brand) => {
+                  const isActive = brandParam === brand.slug;
                   return (
                     <button
-                      key={brand}
+                      key={brand.slug}
                       type="button"
-                      onClick={() => handleSsdBrandClick(brand)}
-                      className={`px-3 py-1.5 text-sm rounded border transition-colors ${
+                      onClick={() => handlePsuBrandClick(brand.slug)}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
                         isActive
                           ? 'bg-blue-600 text-white border-blue-600'
                           : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600'
                       }`}
                     >
-                      {brand}
+                      {brand.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {/* SSD Category Section */}
+          {isSsdCategory && (
+            <>
+              <p className="text-sm text-gray-600 max-w-4xl mb-4">
+                SSD Price in Bangladesh covers SATA and NVMe drives from leading brands. Filter by capacity,
+                interface, form factor, PCIe generation, DRAM, technology, and read/write speed.
+              </p>
+
+              <div className="flex flex-wrap gap-2 mt-4">
+                {SSD_BRANDS.map((brand) => {
+                  const isActive = brandParam === brand.slug;
+                  return (
+                    <button
+                      key={brand.slug}
+                      type="button"
+                      onClick={() => handleSsdBrandClick(brand.slug)}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                        isActive
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600'
+                      }`}
+                    >
+                      {brand.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {/* Computer Casing Category Section */}
+          {isCasingCategory && (
+            <>
+              <p className="text-sm text-gray-600 max-w-4xl mb-4">
+                Computer Casing Price in Bangladesh covers mid tower, full tower, and mini cases from leading brands.
+                Filter by color, type, motherboard support, side panel, PSU inclusion, and special features.
+              </p>
+
+              <div className="flex flex-wrap gap-2 mt-4">
+                {CASING_BRANDS.map((brand) => {
+                  const isActive = brandParam === brand.slug;
+                  return (
+                    <button
+                      key={brand.slug}
+                      type="button"
+                      onClick={() => handleCasingBrandClick(brand.slug)}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                        isActive
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600'
+                      }`}
+                    >
+                      {brand.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {/* CPU Cooler Category Section */}
+          {isCpuCoolerCategory && (
+            <>
+              <p className="text-sm text-gray-600 max-w-4xl mb-4">
+                CPU Cooler Price in Bangladesh covers air and liquid coolers from leading brands. Filter by
+                processor type, socket, cooler type, fan size, fan speed, and RGB/ARGB features.
+              </p>
+
+              <div className="flex flex-wrap gap-2 mt-4">
+                {CPU_COOLER_BRANDS.map((brand) => {
+                  const isActive = brandParam === brand.slug;
+                  return (
+                    <button
+                      key={brand.slug}
+                      type="button"
+                      onClick={() => handleCpuCoolerBrandClick(brand.slug)}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                        isActive
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600'
+                      }`}
+                    >
+                      {brand.label}
                     </button>
                   );
                 })}
@@ -627,8 +799,39 @@ function ProductsPageContent() {
             </div>
           )}
 
+          {isPsuCategory && (
+            <div className="hidden lg:block w-[280px] flex-shrink-0">
+              <PsuFilters priceRange={priceRange} filterCounts={filterCounts} />
+            </div>
+          )}
+
+          {isSsdCategory && (
+            <div className="hidden lg:block w-[280px] flex-shrink-0">
+              <SsdFilters priceRange={priceRange} filterCounts={filterCounts} />
+            </div>
+          )}
+
+          {isCasingCategory && (
+            <div className="hidden lg:block w-[280px] flex-shrink-0">
+              <CasingFilters priceRange={priceRange} filterCounts={filterCounts} />
+            </div>
+          )}
+
+          {isCpuCoolerCategory && (
+            <div className="hidden lg:block w-[280px] flex-shrink-0">
+              <CpuCoolerFilters priceRange={priceRange} filterCounts={filterCounts} />
+            </div>
+          )}
+
           {/* Mobile Filter Button */}
-          {(isProcessorCategory || isGpuCategory || isRamCategory || isMotherboardCategory) && (
+          {(isProcessorCategory ||
+            isGpuCategory ||
+            isRamCategory ||
+            isMotherboardCategory ||
+            isPsuCategory ||
+            isSsdCategory ||
+            isCasingCategory ||
+            isCpuCoolerCategory) && (
             <button
               onClick={() => setShowMobileFilters(true)}
               className="lg:hidden fixed bottom-4 left-4 z-40 bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2"
@@ -639,7 +842,15 @@ function ProductsPageContent() {
           )}
 
           {/* Mobile Filters Overlay */}
-          {(isProcessorCategory || isGpuCategory || isRamCategory || isMotherboardCategory) && showMobileFilters && (
+          {(isProcessorCategory ||
+            isGpuCategory ||
+            isRamCategory ||
+            isMotherboardCategory ||
+            isPsuCategory ||
+            isSsdCategory ||
+            isCasingCategory ||
+            isCpuCoolerCategory) &&
+            showMobileFilters && (
             <div className="lg:hidden fixed inset-0 z-50 bg-black/50">
               <div className="absolute right-0 top-0 bottom-0 w-[320px] bg-white overflow-y-auto">
                 <div className="flex items-center justify-between p-4 border-b">
@@ -670,6 +881,18 @@ function ProductsPageContent() {
                 )}
                 {isMotherboardCategory && (
                   <MotherboardFilters priceRange={priceRange} filterCounts={filterCounts} />
+                )}
+                {isPsuCategory && (
+                  <PsuFilters priceRange={priceRange} filterCounts={filterCounts} />
+                )}
+                {isSsdCategory && (
+                  <SsdFilters priceRange={priceRange} filterCounts={filterCounts} />
+                )}
+                {isCasingCategory && (
+                  <CasingFilters priceRange={priceRange} filterCounts={filterCounts} />
+                )}
+                {isCpuCoolerCategory && (
+                  <CpuCoolerFilters priceRange={priceRange} filterCounts={filterCounts} />
                 )}
               </div>
             </div>

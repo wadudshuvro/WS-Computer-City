@@ -2,16 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import {
-  buildGpuCategoryWhere,
-  buildGpuFilterCounts,
-  buildGpuSpecCondition,
-  GPU_SPEC_FILTER_KEYS,
-} from '@/lib/gpuFilterQuery';
-import { resolveGpuChipsetBrand } from '@/lib/gpuFilterMappings';
+  buildCpuCoolerCategoryWhere,
+  buildCpuCoolerFilterCounts,
+  buildCpuCoolerSpecCondition,
+  CPU_COOLER_SPEC_FILTER_KEYS,
+} from '@/lib/cpuCoolerFilterQuery';
 
 /**
- * GET /api/products/gpu
- * Get graphics card products with Star Tech-style sidebar filtering
+ * GET /api/products/cpu-cooler
+ * CPU Cooler products with Star Tech-style sidebar filtering
  */
 export async function GET(req: NextRequest) {
   try {
@@ -24,28 +23,29 @@ export async function GET(req: NextRequest) {
 
     const sub = searchParams.get('sub');
     const type = searchParams.get('type');
+    const brands = searchParams.get('brand')?.split(',').filter(Boolean) || [];
     const stockStatuses = searchParams.get('stockStatus')?.split(',').filter(Boolean) || [];
     const minPrice = searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined;
     const maxPrice = searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined;
 
     const specFilters: Record<string, string[]> = {};
-    GPU_SPEC_FILTER_KEYS.forEach((key) => {
+    CPU_COOLER_SPEC_FILTER_KEYS.forEach((key) => {
       const value = searchParams.get(key);
       if (value) {
         specFilters[key] = value.split(',').filter(Boolean);
       }
     });
 
-    const chipsetBrand = resolveGpuChipsetBrand(sub, type);
-    const hasChipsetFilter = (specFilters.gpu_chipset?.length ?? 0) > 0;
-    const categoryWhere = await buildGpuCategoryWhere(sub, type, {
-      scopeAllGpus: hasChipsetFilter,
-    });
+    const categoryWhere = await buildCpuCoolerCategoryWhere(sub, type);
 
     const where: Prisma.ProductWhereInput = {
       isActive: true,
       ...categoryWhere,
     };
+
+    if (brands.length > 0) {
+      where.brand = { slug: { in: brands } };
+    }
 
     if (stockStatuses.length > 0) {
       where.stockStatus = { in: stockStatuses as Prisma.EnumStockStatusFilter['in'] };
@@ -78,14 +78,17 @@ export async function GET(req: NextRequest) {
       const specAndConditions: Prisma.ProductWhereInput[] = [];
 
       for (const [key, values] of Object.entries(specFilters)) {
-        const condition = buildGpuSpecCondition(key, values);
+        const condition = buildCpuCoolerSpecCondition(key, values);
         if (condition) {
           specAndConditions.push(condition);
         }
       }
 
       if (specAndConditions.length > 0) {
-        where.AND = [...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []), ...specAndConditions];
+        where.AND = [
+          ...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []),
+          ...specAndConditions,
+        ];
       }
     }
 
@@ -113,13 +116,9 @@ export async function GET(req: NextRequest) {
         include: {
           category: true,
           brand: true,
-          images: {
-            orderBy: { order: 'asc' },
-          },
+          images: { orderBy: { order: 'asc' } },
           specifications: {
-            include: {
-              specificationDefinition: true,
-            },
+            include: { specificationDefinition: true },
           },
         },
         skip: (page - 1) * limit,
@@ -128,14 +127,11 @@ export async function GET(req: NextRequest) {
       }),
       prisma.product.count({ where }),
       prisma.product.aggregate({
-        where: {
-          isActive: true,
-          ...(await buildGpuCategoryWhere(sub, type)),
-        },
+        where: { isActive: true, ...(await buildCpuCoolerCategoryWhere(sub, type)) },
         _min: { price: true },
         _max: { price: true },
       }),
-      getFilterCounts(chipsetBrand, sub, type),
+      getFilterCounts(sub, type),
     ]);
 
     const formattedProducts = products.map((product) => ({
@@ -146,14 +142,8 @@ export async function GET(req: NextRequest) {
       compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : undefined,
       shortDescription: product.shortDescription,
       stockStatus: product.stockStatus,
-      category: {
-        name: product.category.name,
-        slug: product.category.slug,
-      },
-      brand: {
-        name: product.brand.name,
-        slug: product.brand.slug,
-      },
+      category: { name: product.category.name, slug: product.category.slug },
+      brand: { name: product.brand.name, slug: product.brand.slug },
       images: product.images.map((img) => ({
         url: img.url,
         alt: img.alt,
@@ -179,13 +169,13 @@ export async function GET(req: NextRequest) {
       filters: {
         priceRange: {
           min: priceAggregation._min.price ? Number(priceAggregation._min.price) : 0,
-          max: priceAggregation._max.price ? Number(priceAggregation._max.price) : 4600000,
+          max: priceAggregation._max.price ? Number(priceAggregation._max.price) : 50000,
         },
         counts: filterCounts,
       },
     });
   } catch (error) {
-    console.error('Error fetching GPU products:', error);
+    console.error('Error fetching CPU cooler products:', error);
     return NextResponse.json(
       {
         error: {
@@ -199,14 +189,13 @@ export async function GET(req: NextRequest) {
 }
 
 async function getFilterCounts(
-  brand: 'nvidia' | 'amd',
   sub?: string | null,
   type?: string | null
 ): Promise<Record<string, Record<string, number>>> {
   try {
     const baseWhere: Prisma.ProductWhereInput = {
       isActive: true,
-      ...(await buildGpuCategoryWhere(sub, type)),
+      ...(await buildCpuCoolerCategoryWhere(sub, type)),
     };
 
     const stockCountsRaw = await prisma.product.groupBy({
@@ -220,35 +209,30 @@ async function getFilterCounts(
       stockCounts[sc.stockStatus] = sc._count;
     });
 
-    const manufacturerCountsRaw = await prisma.product.groupBy({
+    const brandCountsRaw = await prisma.product.groupBy({
       by: ['brandId'],
       where: baseWhere,
       _count: true,
     });
 
-    const brandIds = manufacturerCountsRaw.map((m) => m.brandId);
+    const brandIds = brandCountsRaw.map((m) => m.brandId);
     const brands = await prisma.brand.findMany({
       where: { id: { in: brandIds } },
       select: { id: true, slug: true },
     });
 
-    const manufacturerCounts: Record<string, number> = {};
-    manufacturerCountsRaw.forEach((mc) => {
-      const brandRecord = brands.find((b) => b.id === mc.brandId);
+    const brandCounts: Record<string, number> = {};
+    brandCountsRaw.forEach((bc) => {
+      const brandRecord = brands.find((b) => b.id === bc.brandId);
       if (brandRecord) {
-        manufacturerCounts[brandRecord.slug] = mc._count;
+        brandCounts[brandRecord.slug] = bc._count;
       }
     });
 
+    const specKeys = [...CPU_COOLER_SPEC_FILTER_KEYS, 'fan_speed_detail'];
     const specValuesByKey: Record<string, { value: string; count: number }[]> = {};
-    const countKeys = new Set<string>([
-      ...GPU_SPEC_FILTER_KEYS.filter((key) => key !== 'manufacturer'),
-      'hdmi',
-      'display_port',
-      'gpu_chipset',
-    ]);
 
-    for (const key of countKeys) {
+    for (const key of specKeys) {
       const specCounts = await prisma.productSpecification.groupBy({
         by: ['value'],
         where: {
@@ -264,9 +248,9 @@ async function getFilterCounts(
       }));
     }
 
-    return buildGpuFilterCounts(specValuesByKey, stockCounts, manufacturerCounts, brand);
+    return buildCpuCoolerFilterCounts(specValuesByKey, stockCounts, brandCounts);
   } catch (error) {
-    console.error('Error getting GPU filter counts:', error);
+    console.error('Error getting CPU cooler filter counts:', error);
     return {};
   }
 }
