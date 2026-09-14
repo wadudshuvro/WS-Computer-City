@@ -442,8 +442,10 @@ export const processorSpecifications: SpecificationField[] = [
     key: 'warranty',
     name: 'Warranty',
     type: 'text',
+    section: 'Warranty Information',
     placeholder: 'e.g., 3 Years',
-    required: false,
+    required: true,
+    helpText: 'Shown on the product page under Warranty Information',
   },
 ];
 

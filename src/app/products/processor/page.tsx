@@ -195,7 +195,7 @@ function ProcessorPageContent() {
           </h1>
           <p className="text-sm text-gray-600 max-w-4xl">
             Processor Price in BD 2026 begins at BDT 5,600/- and can go up to BDT 85,500/- depending on the brand and specifications. 
-            With a variety of 135 items available at WS Computer City, where 97 items are in stock now & 135 items offer you the best 
+            With a variety of 135 items available at LogicBay BD, where 97 items are in stock now & 135 items offer you the best 
             discount price in BD. Find the perfect Processor Components for your requirements.
           </p>
           
@@ -587,7 +587,7 @@ function ProcessorPageContent() {
               The central processor of a computer is called the CPU (Central Processing Unit), and most desktop CPUs are developed by Intel or AMD. 
               Modern processors include multiple cores that work together to execute instructions efficiently and improve multitasking performance.
               When upgrading or building a new computer, checking local pricing is important, such as the processor price in BD, to understand 
-              the cost of modern and efficient hardware. WS Computer City BD offers a wide selection of Intel processors in Bangladesh, 
+              the cost of modern and efficient hardware. LogicBay BD offers a wide selection of Intel processors in Bangladesh, 
               including Core i3, Core i5, Core i7, and Core i9 models.
             </p>
             

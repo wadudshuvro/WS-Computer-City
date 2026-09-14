@@ -1,0 +1,102 @@
+---
+description: LogicBay BD compact SaaS UI design system — reuse Radix/Tailwind primitives; no oversized type or excess whitespace
+globs: src/**/*.{tsx,css}
+alwaysApply: false
+---
+
+# LogicBay BD — UI Design System
+
+Apply this whenever creating or editing UI in `src/`. Production catalog + admin CMS: professional, compact, calm, scannable — **not** a marketing landing page.
+
+## Non-negotiables
+
+1. **Stack only:** Tailwind CSS + existing Radix wrappers in `src/components/ui/`. Do **not** add MUI, Ant, Chakra, shadcn CLI packages beyond what’s here, Bootstrap, etc.
+2. **Reuse first:** Prefer `src/components/ui/*` and shared domain components (`ProductSidebarFilters`, `AdminShell`, `Button`, etc.) over new one-offs.
+3. **Prefer shared over duplicated:** Extract repeated cards/buttons/fields into shared components; do not copy markup page-to-page.
+4. **Preserve behavior:** Do not change business logic, data fetching, URL filter contracts, or component public APIs unless required for the UI task.
+5. **Keep Radix:** Build on `@radix-ui/*` already in the project (Accordion, Checkbox, Label, Slider, Slot; Dialog/Select when adding primitives).
+6. **Accessibility:** Visible `focus-visible` rings; labels for inputs; keyboard-reachable controls; do not remove outlines without a ring replacement.
+7. **Responsive:** Preserve/improve breakpoints (`sm`/`md`/`lg`); never ship desktop-only layouts for new chrome without a mobile path.
+
+## Typography (Inter already on body)
+
+| Role | Classes | Notes |
+|------|---------|--------|
+| Page title | `text-xl font-semibold leading-snug` | Listing H1, admin page title |
+| Section title | `text-base font-semibold leading-snug` | Form sections, filter panel title |
+| Card title | `text-sm font-medium leading-snug` | Product name, card headers |
+| Body | `text-sm font-normal leading-relaxed` | Descriptions, dialog body |
+| Secondary | `text-sm text-muted-foreground` | Breadcrumbs, meta |
+| Caption | `text-xs font-medium` | Badges, table headers, counts |
+
+- **Avoid:** `text-3xl`, `text-4xl`, `text-5xl`, `text-8xl` in app UI. Home promo max `text-2xl font-semibold` if needed.
+- **Avoid:** defaulting to `font-bold` on headings — use `font-semibold` / `font-medium`. Reserve `font-bold` for **prices**.
+- Mega nav: compact Star Tech density — top `text-[14px] font-normal px-2.5 py-[7px]`; dropdown/flyout rows `text-[13px] px-3 py-[6px]`; solid `bg-nav text-white` on hover; never `overflow-x-auto` on the bar (clips flyouts).
+
+## Spacing (4px base — prefer compact)
+
+| Use | Prefer | Avoid |
+|-----|--------|--------|
+| Page X pad | `px-4 lg:px-6` | Habitual `px-8` on content |
+| Page / section Y | `py-3` / `py-4`, `gap-4` | Stacked `py-6`/`py-8` bands |
+| Card pad | `p-4` (forms `p-5` max) | `p-8`, `p-10`, `p-12` (except empty states ≤ `py-10`) |
+| Grids | `gap-3` / `gap-4` | `gap-8` in content grids |
+| Form fields | `space-y-4`, label `mb-1.5` | `space-y-8` between every field |
+| Form sections | `space-y-4` | `space-y-8` + decorative blocks |
+| Table cells | `px-3 py-2.5` | Large `py-4`/`px-5` unless needed |
+| Admin main | `px-6 py-4` | `px-8 py-6` as default |
+
+Do not add whitespace “for luxury.” Justify any `p-6`+ / `gap-6`+ / `space-y-6`+.
+
+## Component dimensions
+
+- Default control height: **`h-9`** + `text-sm` for Button, Input, Select.
+- Compact: `h-8` + `text-xs` (table actions, dense filters).
+- Rare large CTA: `h-10` only.
+- Match input/select/button heights in the same toolbar/form row.
+
+## Visual language
+
+- **Radius:** `rounded-md` controls/chips; `rounded-lg` cards/dialogs. Avoid `rounded-2xl` / `rounded-full` on cards and primary buttons (full only for FABs/avatars).
+- **Border:** `border border-border` (or `border-gray-200` only if matching local legacy — prefer tokens).
+- **Shadow:** `shadow-sm` cards; `shadow-md` max for dialogs/dropdowns/hover. No `shadow-xl`/`shadow-2xl`.
+- **Color:** Prefer CSS vars (`bg-primary`, `text-muted-foreground`, `bg-card`). No new gradient section headers (purple/orange/pink tiles). No rainbow admin decoration.
+- **Hover:** same hue / `hover:bg-muted` / `hover:bg-primary/90` — not a new palette.
+- **Focus:** `focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2`.
+
+## Components checklist
+
+- **Buttons:** One filled primary per region; use `Button` from `@/components/ui/button` when possible. No gradient button fills.
+- **Inputs/Selects/Textareas:** Shared height/radius/border; wire Radix Select when replacing custom dropdowns.
+- **Cards:** `rounded-lg border bg-card shadow-sm p-4`.
+- **Badges/chips:** `text-xs rounded-md` (not giant pills). Brand filter chips: `rounded-md h-8`; active = primary fill.
+- **Dialogs:** Prefer Radix Dialog pattern; compact header/body/footer (`px-4 py-3`).
+- **Tabs:** Underline style, `text-sm`, not oversized pills.
+- **Filters:** Prefer collapsed accordion sections by default (not expand-all) unless product requires otherwise.
+
+## Anti-patterns (reject in new UI)
+
+```tsx
+// ❌ BAD — marketing scale + excess space
+<h1 className="text-5xl font-bold p-12">…</h1>
+<div className="space-y-8 p-8 shadow-xl rounded-2xl">…
+
+// ✅ GOOD — compact SaaS
+<h1 className="text-xl font-semibold leading-snug">…</h1>
+<div className="space-y-4 p-4 shadow-sm rounded-lg border border-border">…
+```
+
+```tsx
+// ❌ BAD — duplicate page-local button
+<button className="bg-blue-600 px-8 py-3 rounded-lg">Save</button>
+
+// ✅ GOOD — shared primitive
+<Button type="submit">Save</Button>
+```
+
+## When adding UI
+
+1. Search `src/components/ui` and domain folders for an existing component.
+2. Extend Radix-based UI primitives if missing (Badge, Input, Dialog) — do not invent a parallel system.
+3. Apply typography + spacing tables above.
+4. Leave filter/API/auth/business logic unchanged unless the task explicitly requires it.

@@ -86,12 +86,22 @@ export async function GET(req: NextRequest) {
 async function getAvailableFilters(categorySlug?: string) {
   const { prisma } = await import('@/lib/prisma');
 
-  const where = categorySlug
-    ? {
-        category: { slug: categorySlug },
-        isActive: true,
+  let where: { isActive: boolean; categoryId?: { in: string[] }; category?: { slug: string } } = {
+    isActive: true,
+  };
+
+  if (categorySlug) {
+    if (categorySlug === 'components' || categorySlug === 'component') {
+      const categoryIds = await ProductService.getCategoryDescendantIds(categorySlug);
+      if (categoryIds.length > 0) {
+        where = { isActive: true, categoryId: { in: categoryIds } };
+      } else {
+        where = { isActive: true, category: { slug: categorySlug } };
       }
-    : { isActive: true };
+    } else {
+      where = { isActive: true, category: { slug: categorySlug } };
+    }
+  }
 
   // Get brands with product counts
   const brands = await prisma.brand.findMany({

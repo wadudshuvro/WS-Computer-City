@@ -1,0 +1,51 @@
+---
+description: Every product must include Warranty Information on the PDP (Star Tech–style section + warranty spec)
+globs: src/app/products/**/*.{tsx,ts},src/components/products/**/*.{tsx,ts},src/lib/**/*SpecDefinitions.ts,src/lib/categoryConfig.ts,src/app/admin/products/**/*.{tsx,ts}
+alwaysApply: true
+---
+
+# Product Details — Warranty Information (required)
+
+Every product on LogicBay BD **must** expose warranty on the product details page (PDP). Do not ship a category, CMS form, or PDP layout that omits warranty.
+
+## Source of truth
+
+- Store warranty as a product specification with key **`warranty`**.
+- Spec definition must use:
+  - `key: 'warranty'`
+  - `name: 'Warranty'` (or display label **Manufacturing Warranty** on the PDP row)
+  - `section: 'Warranty Information'`
+- Free-text product description alone is **not** enough. Warranty must be a structured field so it can render in the **Warranty Information** block.
+
+## PDP presentation (Star Tech–style)
+
+On `/products/[slug]` (and any shared PDP components), include a **Warranty Information** section:
+
+1. Bordered card / panel
+2. Header bar: light lavender/blue background, bold blue title **Warranty Information**
+3. Row(s): gray label on the left (e.g. **Manufacturing Warranty**), black value on the right (e.g. `03 Years (No Warranty for Fan or Cooler)`)
+4. Subtle divider under the row
+
+Render from `getSpecValue('warranty')` (or equivalent). If missing, still show the section with a clear fallback such as **No Warranty** — do not hide the whole block.
+
+Reference layout intent: Star Tech product page warranty panel (header bar + label/value row).
+
+## When adding a new product category
+
+In that category’s `*SpecDefinitions.ts` (and CMS field list / `categoryConfig` if used):
+
+1. Always add the `warranty` field under section **Warranty Information**
+2. Include `warranty` in the category’s PDP section map / keys (same pattern as GPU, RAM, Motherboard, PSU, SSD, Casing, CPU Cooler)
+3. Mark warranty as required in CMS create/edit when the form supports `isRequired`
+4. Seed/demo products must include a warranty value
+
+## CMS / admin
+
+- Product create/edit forms for every content type must collect **Warranty**.
+- Do not remove the warranty field from admin forms or API payloads when refactoring specs.
+
+## Do not
+
+- Drop `warranty` from a category’s spec definitions “to simplify”
+- Rely only on HTML/markdown in `description` for warranty
+- Hide the Warranty Information panel when the value is empty (show **No Warranty** instead)

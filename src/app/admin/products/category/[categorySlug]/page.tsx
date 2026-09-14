@@ -28,7 +28,7 @@ export default function CategoryProductsPage() {
       const query = new URLSearchParams({
         category: categorySlug,
         limit: '100',
-        sort: 'newest',
+        sort: 'updated',
       });
       if (search) query.set('search', search);
 

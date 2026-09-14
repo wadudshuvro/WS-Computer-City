@@ -4,6 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Pencil, Trash2, ExternalLink } from 'lucide-react';
 import { DeleteConfirmDialog } from '@/components/admin/DeleteConfirmDialog';
+import {
+  formatAbsoluteUpdatedAt,
+  formatRelativeUpdatedAt,
+} from '@/lib/formatRelativeTime';
 
 export interface AdminProduct {
   id: string;
@@ -18,6 +22,7 @@ export interface AdminProduct {
   isActive: boolean;
   isFeatured: boolean;
   updatedAt?: string;
+  createdAt?: string;
 }
 
 interface ProductEntriesTableProps {
@@ -71,6 +76,7 @@ export function ProductEntriesTable({ products, onDelete, deletingId }: ProductE
             <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Price</th>
             <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Stock</th>
             <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+            <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Updated</th>
             <th className="px-5 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
           </tr>
         </thead>
@@ -96,6 +102,14 @@ export function ProductEntriesTable({ products, onDelete, deletingId }: ProductE
                     Hidden
                   </span>
                 )}
+              </td>
+              <td className="px-5 py-4">
+                <span
+                  className="text-sm text-gray-600"
+                  title={formatAbsoluteUpdatedAt(product.updatedAt)}
+                >
+                  {formatRelativeUpdatedAt(product.updatedAt)}
+                </span>
               </td>
               <td className="px-5 py-4">
                 <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100">

@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import defaultTheme from 'tailwindcss/defaultTheme';
 
 const config: Config = {
   darkMode: ['class'],
@@ -10,12 +11,19 @@ const config: Config = {
   theme: {
     container: {
       center: true,
-      padding: '2rem',
+      // Compact page gutter (was 2rem); surfaces also use px-4
+      padding: {
+        DEFAULT: '1rem',
+        lg: '1.5rem',
+      },
       screens: {
         '2xl': '1400px',
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['var(--font-sans)', ...defaultTheme.fontFamily.sans],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -50,11 +58,41 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        success: {
+          DEFAULT: 'hsl(var(--success))',
+          foreground: 'hsl(var(--success-foreground))',
+        },
+        warning: {
+          DEFAULT: 'hsl(var(--warning))',
+          foreground: 'hsl(var(--warning-foreground))',
+        },
+        sidebar: {
+          DEFAULT: 'hsl(var(--sidebar))',
+          foreground: 'hsl(var(--sidebar-foreground))',
+          muted: 'hsl(var(--sidebar-muted))',
+          border: 'hsl(var(--sidebar-border))',
+        },
+        footer: 'hsl(var(--footer))',
+        nav: {
+          DEFAULT: 'hsl(var(--nav))',
+          foreground: 'hsl(var(--nav-foreground))',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+      },
+      boxShadow: {
+        card: 'var(--shadow-card)',
+        raised: 'var(--shadow-raised)',
+      },
+      spacing: {
+        /* Named aliases for design-system docs (map to existing scale) */
+        'page-x': '1rem',
+        'page-x-lg': '1.5rem',
+        'section': '1rem',
+        'card': '1rem',
       },
       keyframes: {
         'accordion-down': {
@@ -84,6 +122,34 @@ const config: Config = {
         DEFAULT: {
           css: {
             maxWidth: 'none',
+            color: 'hsl(var(--foreground))',
+            a: {
+              color: 'hsl(var(--primary))',
+              textDecoration: 'none',
+              '&:hover': {
+                textDecoration: 'underline',
+              },
+            },
+            h2: {
+              fontSize: '1rem',
+              fontWeight: '600',
+              lineHeight: '1.375',
+              marginTop: '1.25rem',
+              marginBottom: '0.5rem',
+            },
+            h3: {
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              lineHeight: '1.375',
+              marginTop: '1rem',
+              marginBottom: '0.375rem',
+            },
+            p: {
+              fontSize: '0.875rem',
+              lineHeight: '1.625',
+              marginTop: '0.5rem',
+              marginBottom: '0.5rem',
+            },
           },
         },
       },

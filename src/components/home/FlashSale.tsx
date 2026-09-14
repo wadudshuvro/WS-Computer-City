@@ -1,58 +1,51 @@
 import Link from 'next/link';
+import { ChevronLeft, ChevronRight, Zap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
 export function FlashSale() {
   return (
-    <section className="py-8 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-            <span className="text-red-500">⚡</span>
+    <section className="bg-background py-4">
+      <div className="container mx-auto">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h2 className="flex items-center gap-1.5 text-base font-semibold leading-snug text-foreground">
+            <Zap className="h-4 w-4 text-destructive" aria-hidden />
             Flash Sale
           </h2>
-          <div className="flex items-center gap-4">
-            <button className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors">
-              ‹
-            </button>
-            <button className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors">
-              ›
-            </button>
+          <div className="flex items-center gap-1">
+            <Button type="button" variant="outline" size="icon" className="h-8 w-8" aria-label="Previous">
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button type="button" variant="outline" size="icon" className="h-8 w-8" aria-label="Next">
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
-        {/* Flash Sale Products Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
           {[1, 2, 3, 4, 5].map((item) => (
-            <div
-              key={item}
-              className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow group"
-            >
-              <div className="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center text-4xl group-hover:scale-105 transition-transform">
-                🖥️
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium text-gray-800 line-clamp-2 group-hover:text-blue-600 transition-colors">
+            <Card key={item} className="overflow-hidden transition-shadow hover:shadow-md">
+              <CardContent className="p-3">
+                <div className="mb-2 flex aspect-square items-center justify-center rounded-md bg-muted text-3xl">
+                  🖥️
+                </div>
+                <h3 className="mb-1.5 line-clamp-2 text-sm font-medium leading-snug text-foreground">
                   Product Name Here
                 </h3>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg font-bold text-red-600">৳25,000</span>
-                  <span className="text-sm text-gray-500 line-through">৳30,000</span>
+                <div className="mb-1 flex items-baseline gap-2">
+                  <span className="text-base font-bold text-destructive">৳25,000</span>
+                  <span className="text-xs text-muted-foreground line-through">৳30,000</span>
                 </div>
-                <div className="flex items-center gap-1 text-xs text-gray-600">
-                  <span className="text-yellow-500">★★★★★</span>
-                  <span>(12)</span>
-                </div>
-              </div>
-            </div>
+                <p className="text-xs text-muted-foreground">★★★★★ (12)</p>
+              </CardContent>
+            </Card>
           ))}
         </div>
 
-        <div className="text-center mt-8">
-          <Link
-            href="/products"
-            className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-          >
-            View All Products →
-          </Link>
+        <div className="mt-4 flex justify-center">
+          <Button asChild size="default">
+            <Link href="/products">View all products</Link>
+          </Button>
         </div>
       </div>
     </section>

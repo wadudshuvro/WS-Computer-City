@@ -2,264 +2,46 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
-import { RAM_BRANDS } from '@/lib/ramSpecDefinitions';
-import { PSU_BRANDS } from '@/lib/psuSpecDefinitions';
-import { SSD_BRANDS } from '@/lib/ssdSpecDefinitions';
-import { CASING_BRANDS } from '@/lib/casingSpecDefinitions';
-import { CPU_COOLER_BRANDS } from '@/lib/cpuCoolerSpecDefinitions';
-
-interface SubCategory {
-  name: string;
-  slug: string;
-  /** Link override (e.g. Show All → parent category) */
-  href?: string;
-  /** Hide chevron even if used as a list item */
-  hideArrow?: boolean;
-  children?: SubCategory[];
-}
-
-interface Category {
-  name: string;
-  slug: string;
-  hasDropdown?: boolean;
-  subCategories?: SubCategory[];
-}
+import {
+  FALLBACK_MENU_TREE,
+  resolveMenuHref,
+  type MenuTreeItem,
+} from '@/lib/menu';
+import { enrichMenuWithBrandFlyouts } from '@/lib/componentBrandMenu';
 
 const HOVER_CLOSE_DELAY_MS = 280;
 
-/** Star Tech–style order for Desktop RAM brand flyout (rest appended after). */
-const DESKTOP_RAM_MENU_BRAND_ORDER = [
-  'team',
-  'colorful',
-  'corsair',
-  'kingston',
-  'pny',
-  'g-skill',
-  'aitc',
-  'lexar',
-  'netac',
-  'ocpc',
-  'oscoo',
-  'kingbank',
-] as const;
-
-/** Laptop RAM menu brands only (Star Tech reference). */
-const LAPTOP_RAM_MENU_BRANDS = [
-  { slug: 'team', label: 'TEAM' },
-  { slug: 'adata', label: 'Adata' },
-  { slug: 'g-skill', label: 'G.Skill' },
-  { slug: 'lexar', label: 'Lexar' },
-  { slug: 'corsair', label: 'Corsair' },
-  { slug: 'pny', label: 'PNY' },
-  { slug: 'ocpc', label: 'OCPC' },
-  { slug: 'netac', label: 'Netac' },
-] as const;
-
-function getDesktopRamBrandChildren(): SubCategory[] {
-  const bySlug = new Map(RAM_BRANDS.map((b) => [b.slug, b]));
-  const ordered: { slug: string; label: string }[] = [];
-  const seen = new Set<string>();
-
-  for (const slug of DESKTOP_RAM_MENU_BRAND_ORDER) {
-    const brand = bySlug.get(slug);
-    if (brand) {
-      ordered.push(brand);
-      seen.add(slug);
-    }
-  }
-
-  for (const brand of RAM_BRANDS) {
-    if (!seen.has(brand.slug)) {
-      ordered.push(brand);
-    }
-  }
-
-  return ordered.map((brand) => ({
-    name: brand.label,
-    slug: brand.slug,
-    href: `/products?category=components&sub=desktop-ram&brand=${brand.slug}`,
-  }));
-}
-
-function getLaptopRamBrandChildren(): SubCategory[] {
-  return LAPTOP_RAM_MENU_BRANDS.map((brand) => ({
-    name: brand.label,
-    slug: brand.slug,
-    href: `/products?category=components&sub=laptop-ram&brand=${brand.slug}`,
-  }));
-}
-
-function getPsuBrandChildren(): SubCategory[] {
-  return PSU_BRANDS.map((brand) => ({
-    name: brand.label,
-    slug: brand.slug,
-    href: `/products?category=components&sub=power-supply&brand=${brand.slug}`,
-  }));
-}
-
-function getSsdBrandChildren(): SubCategory[] {
-  return SSD_BRANDS.map((brand) => ({
-    name: brand.label,
-    slug: brand.slug,
-    href: `/products?category=components&sub=ssd&brand=${brand.slug}`,
-  }));
-}
-
-function getCasingBrandChildren(): SubCategory[] {
-  return CASING_BRANDS.map((brand) => ({
-    name: brand.label,
-    slug: brand.slug,
-    href: `/products?category=components&sub=computer-case&brand=${brand.slug}`,
-  }));
-}
-
-function getCpuCoolerBrandChildren(): SubCategory[] {
-  return CPU_COOLER_BRANDS.map((brand) => ({
-    name: brand.label,
-    slug: brand.slug,
-    href: `/products?category=components&sub=cpu-cooler&brand=${brand.slug}`,
-  }));
-}
-
-/** Top nav — Star Tech order, single line only */
-const categories: Category[] = [
-  {
-    name: 'Desktop',
-    slug: 'desktop',
-    hasDropdown: true,
-    subCategories: [
-      { name: 'Brand PC', slug: 'brand-pc' },
-      { name: 'Gaming PC', slug: 'gaming-pc' },
-      { name: 'Custom PC', slug: 'custom-pc' },
-    ],
-  },
-  {
-    name: 'Laptop',
-    slug: 'laptop',
-  },
-  {
-    name: 'Component',
-    slug: 'components',
-    hasDropdown: true,
-    subCategories: [
-      {
-        name: 'Processor',
-        slug: 'processor',
-        children: [
-          { name: 'Intel', slug: 'intel' },
-          { name: 'AMD Ryzen', slug: 'amd-ryzen' },
-        ],
-      },
-      { name: 'CPU Cooler', slug: 'cpu-cooler', children: getCpuCoolerBrandChildren() },
-      { name: 'Water / Liquid Cooling', slug: 'liquid-cooling' },
-      {
-        name: 'Motherboard',
-        slug: 'motherboard',
-        children: [
-          { name: 'Intel Motherboard', slug: 'intel-motherboard' },
-          { name: 'AMD Motherboard', slug: 'amd-motherboard' },
-        ],
-      },
-      {
-        name: 'Graphics Card',
-        slug: 'graphics-card',
-        children: [
-          { name: 'NVIDIA', slug: 'nvidia' },
-          { name: 'AMD', slug: 'amd-gpu' },
-        ],
-      },
-      {
-        name: 'RAM (Desktop)',
-        slug: 'desktop-ram',
-        children: getDesktopRamBrandChildren(),
-      },
-      {
-        name: 'RAM (Laptop)',
-        slug: 'laptop-ram',
-        children: getLaptopRamBrandChildren(),
-      },
-      {
-        name: 'Power Supply',
-        slug: 'power-supply',
-        children: getPsuBrandChildren(),
-      },
-      { name: 'Hard Disk Drive', slug: 'hdd' },
-      { name: 'Portable Hard Disk Drive', slug: 'portable-hdd' },
-      {
-        name: 'SSD',
-        slug: 'ssd',
-        children: getSsdBrandChildren(),
-      },
-      { name: 'Portable SSD', slug: 'portable-ssd' },
-      {
-        name: 'Casing',
-        slug: 'computer-case',
-        children: getCasingBrandChildren(),
-      },
-      { name: 'Casing Cooler', slug: 'casing-fan' },
-      { name: 'Optical Disk Drive', slug: 'optical-disk-drive' },
-      { name: 'Vertical GPU Holder', slug: 'gpu-vertical-mount' },
-      {
-        name: 'Show All Component',
-        slug: 'components',
-        href: '/products?category=components',
-        hideArrow: true,
-      },
-    ],
-  },
-  { name: 'Monitor', slug: 'monitor' },
-  { name: 'Power', slug: 'power' },
-  { name: 'Phone', slug: 'phone' },
-  { name: 'Tablet', slug: 'tablet' },
-  { name: 'Office Equipment', slug: 'office-equipment' },
-  { name: 'Camera', slug: 'camera' },
-  { name: 'Security', slug: 'security' },
-  {
-    name: 'Networking',
-    slug: 'networking',
-    hasDropdown: true,
-    subCategories: [
-      { name: 'Router', slug: 'router' },
-      { name: 'Switch', slug: 'switch' },
-      { name: 'Network Adapter', slug: 'network-adapter' },
-    ],
-  },
-  { name: 'Software', slug: 'software' },
-  { name: 'Server & Storage', slug: 'server-storage' },
-  {
-    name: 'Accessories',
-    slug: 'accessories',
-    hasDropdown: true,
-    subCategories: [
-      { name: 'Keyboard', slug: 'keyboard' },
-      { name: 'Mouse', slug: 'mouse' },
-      { name: 'Headphone', slug: 'headphone' },
-      { name: 'Webcam', slug: 'webcam' },
-      { name: 'Speaker', slug: 'speaker' },
-    ],
-  },
-  { name: 'Gadget', slug: 'gadget' },
-  { name: 'Gaming', slug: 'gaming' },
-  { name: 'TV', slug: 'tv' },
-  { name: 'Appliance', slug: 'appliance' },
-];
-
-function subCategoryHref(categorySlug: string, subCat: SubCategory): string {
-  if (subCat.href) return subCat.href;
-  return `/products?category=${categorySlug}&sub=${subCat.slug}`;
-}
-
-function childHref(categorySlug: string, child: SubCategory): string {
-  if (child.href) return child.href;
-  return `/products?category=${categorySlug}&sub=${child.slug}`;
-}
-
 export function MegaMenu() {
+  const router = useRouter();
+  const [menu, setMenu] = useState<MenuTreeItem[]>(() =>
+    enrichMenuWithBrandFlyouts(FALLBACK_MENU_TREE)
+  );
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [activeSubCategory, setActiveSubCategory] = useState<string | null>(null);
   const categoryCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const subCategoryCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/menus')
+      .then((res) => res.json())
+      .then((json) => {
+        if (cancelled) return;
+        if (Array.isArray(json.data) && json.data.length > 0) {
+          setMenu(enrichMenuWithBrandFlyouts(json.data));
+        }
+      })
+      .catch(() => {
+        /* keep fallback */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const navFallbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearTimer = (timer: { current: ReturnType<typeof setTimeout> | null }) => {
     if (timer.current) {
@@ -268,14 +50,84 @@ export function MegaMenu() {
     }
   };
 
-  const openCategory = useCallback((slug: string) => {
+  const urlsMatch = (href: string) => {
+    try {
+      const want = new URL(href, window.location.origin);
+      return (
+        window.location.pathname === want.pathname &&
+        window.location.search === want.search
+      );
+    } catch {
+      return false;
+    }
+  };
+
+  /**
+   * Soft nav via App Router; after long idle Next soft-nav can stall.
+   * We preventDefault (avoids filter blur races) then hard-navigate if URL
+   * never changes.
+   */
+  const navigateTo = useCallback(
+    (href: string) => {
+      const go = (event: React.MouseEvent<HTMLAnchorElement>) => {
+        if (
+          event.defaultPrevented ||
+          event.button !== 0 ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        ) {
+          return;
+        }
+        event.preventDefault();
+        clearTimer(categoryCloseTimer);
+        clearTimer(subCategoryCloseTimer);
+        clearTimer(navFallbackTimer);
+        setActiveCategory(null);
+        setActiveSubCategory(null);
+
+        try {
+          router.push(href);
+        } catch {
+          window.location.assign(href);
+          return;
+        }
+
+        navFallbackTimer.current = setTimeout(() => {
+          if (!urlsMatch(href)) {
+            window.location.assign(href);
+          }
+        }, 500);
+      };
+
+      return {
+        onMouseDown: go,
+        onClick: (event: React.MouseEvent<HTMLAnchorElement>) => {
+          if (
+            event.metaKey ||
+            event.ctrlKey ||
+            event.shiftKey ||
+            event.altKey ||
+            event.button !== 0
+          ) {
+            return;
+          }
+          event.preventDefault();
+        },
+      };
+    },
+    [router]
+  );
+
+  const openCategory = useCallback((id: string) => {
     clearTimer(categoryCloseTimer);
     clearTimer(subCategoryCloseTimer);
     setActiveCategory((prev) => {
-      if (prev !== slug) {
+      if (prev !== id) {
         setActiveSubCategory(null);
       }
-      return slug;
+      return id;
     });
   }, []);
 
@@ -287,9 +139,9 @@ export function MegaMenu() {
     }, HOVER_CLOSE_DELAY_MS);
   }, []);
 
-  const openSubCategory = useCallback((slug: string) => {
+  const openSubCategory = useCallback((id: string) => {
     clearTimer(subCategoryCloseTimer);
-    setActiveSubCategory(slug);
+    setActiveSubCategory(id);
   }, []);
 
   const scheduleCloseSubCategory = useCallback(() => {
@@ -303,29 +155,49 @@ export function MegaMenu() {
     return () => {
       clearTimer(categoryCloseTimer);
       clearTimer(subCategoryCloseTimer);
+      clearTimer(navFallbackTimer);
     };
   }, []);
 
+  // After long idle / tab sleep, soft-nav can break — warm the router on return.
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        try {
+          router.refresh();
+        } catch {
+          /* ignore */
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [router]);
+
   return (
-    <nav className="relative z-40 bg-white border-b border-gray-200 overflow-visible">
-      <div className="mx-auto max-w-[1600px] px-1 overflow-visible">
-        <ul className="relative z-40 flex flex-nowrap items-center justify-between gap-0 overflow-visible whitespace-nowrap text-[11px] font-semibold leading-none xl:text-[12px]">
-          {categories.map((category) => {
-            const isActive = activeCategory === category.slug;
-            const showDropdown =
-              Boolean(category.hasDropdown && category.subCategories?.length) && isActive;
+    <nav className="relative z-[200] overflow-visible border-b border-gray-200 bg-white">
+      <div className="container mx-auto overflow-visible">
+        {/* Compact Star Tech density — never overflow-x-auto (clips flyouts). */}
+        <ul className="relative z-[200] flex flex-nowrap items-center justify-start gap-0 overflow-visible whitespace-nowrap">
+          {menu.map((category) => {
+            const isActive = activeCategory === category.id;
+            const showDropdown = category.children.length > 0 && isActive;
+            const categoryHref = resolveMenuHref(category, category.slug);
 
             return (
               <li
-                key={category.slug}
+                key={category.id}
                 className="relative shrink-0 overflow-visible"
-                onMouseEnter={() => openCategory(category.slug)}
+                onMouseEnter={() => openCategory(category.id)}
                 onMouseLeave={scheduleCloseCategory}
               >
                 <Link
-                  href={`/products?category=${category.slug}`}
-                  className={`block px-1.5 py-3 transition-colors xl:px-2 ${
-                    isActive ? 'text-[#e85d04]' : 'text-gray-900 hover:text-[#e85d04]'
+                  href={categoryHref}
+                  {...navigateTo(categoryHref)}
+                  className={`block px-2.5 py-[7px] text-[14px] font-normal leading-none transition-colors ${
+                    isActive
+                      ? 'text-nav'
+                      : 'text-gray-800 hover:text-nav'
                   }`}
                 >
                   {category.name}
@@ -333,24 +205,40 @@ export function MegaMenu() {
 
                 {showDropdown && (
                   <div
-                    className="absolute left-0 top-full z-[60] min-w-[240px] border border-gray-200 border-t-2 border-t-[#e85d04] bg-white text-gray-800 shadow-[0_8px_24px_rgba(0,0,0,0.12)]"
-                    onMouseEnter={() => openCategory(category.slug)}
+                    className={`absolute left-0 top-full z-[300] overflow-visible border border-gray-200 border-t-[3px] border-t-nav bg-white text-gray-800 shadow-md ${
+                      category.slug === 'monitor' ? 'min-w-[440px]' : 'min-w-[210px]'
+                    }`}
+                    onMouseEnter={() => {
+                      clearTimer(categoryCloseTimer);
+                      openCategory(category.id);
+                    }}
                   >
-                    <ul className="py-1">
-                      {category.subCategories!.map((subCat) => {
-                        const hasChildren = Boolean(subCat.children?.length);
-                        const isSubActive = activeSubCategory === subCat.slug;
+                    <ul
+                      className={`overflow-visible py-0.5 ${
+                        category.slug === 'monitor'
+                          ? 'grid grid-flow-col grid-cols-2 grid-rows-[repeat(19,auto)]'
+                          : ''
+                      }`}
+                    >
+                      {category.children.map((subCat) => {
+                        const hasChildren = subCat.children.length > 0;
                         const showArrow = hasChildren && !subCat.hideArrow;
+                        const isSubActive = activeSubCategory === subCat.id;
+                        const subHref = resolveMenuHref(
+                          subCat,
+                          category.slug,
+                          category.slug
+                        );
 
                         return (
                           <li
-                            key={`${subCat.slug}-${subCat.name}`}
-                            className="relative"
+                            key={subCat.id}
+                            className="relative overflow-visible"
                             onMouseEnter={() => {
+                              clearTimer(subCategoryCloseTimer);
                               if (hasChildren) {
-                                openSubCategory(subCat.slug);
+                                openSubCategory(subCat.id);
                               } else {
-                                clearTimer(subCategoryCloseTimer);
                                 setActiveSubCategory(null);
                               }
                             }}
@@ -361,36 +249,52 @@ export function MegaMenu() {
                             }}
                           >
                             <Link
-                              href={subCategoryHref(category.slug, subCat)}
-                              className={`flex items-center justify-between gap-3 px-4 py-2 text-[13px] font-normal transition-colors ${
+                              href={subHref}
+                              {...navigateTo(subHref)}
+                              className={`flex items-center justify-between gap-2 px-3 py-[6px] text-[13px] font-normal leading-tight transition-colors ${
                                 isSubActive
-                                  ? 'bg-[#fff4ec] text-[#e85d04]'
-                                  : 'text-gray-800 hover:bg-[#fff4ec] hover:text-[#e85d04]'
+                                  ? 'bg-nav text-white'
+                                  : 'text-gray-800 hover:bg-nav hover:text-white'
                               }`}
                             >
                               <span>{subCat.name}</span>
                               {showArrow && (
-                                <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#f4a261]" />
+                                <ChevronRight
+                                  className={`h-3 w-3 shrink-0 ${
+                                    isSubActive ? 'text-white' : 'text-gray-400'
+                                  }`}
+                                />
                               )}
                             </Link>
 
                             {hasChildren && isSubActive && (
                               <div
-                                className="absolute left-full top-0 z-[70] -ml-px max-h-[70vh] min-w-[180px] overflow-y-auto border border-gray-200 bg-white text-gray-800 shadow-[0_8px_24px_rgba(0,0,0,0.12)]"
-                                onMouseEnter={() => openSubCategory(subCat.slug)}
+                                className="absolute left-full top-0 z-[310] -ml-px max-h-[70vh] min-w-[170px] overflow-y-auto border border-gray-200 bg-white text-gray-800 shadow-md"
+                                onMouseEnter={() => {
+                                  clearTimer(subCategoryCloseTimer);
+                                  openSubCategory(subCat.id);
+                                }}
                                 onMouseLeave={scheduleCloseSubCategory}
                               >
-                                <ul className="py-1">
-                                  {subCat.children!.map((child) => (
-                                    <li key={child.slug}>
-                                      <Link
-                                        href={childHref(category.slug, child)}
-                                        className="block px-4 py-2 text-[13px] font-normal text-gray-800 transition-colors hover:bg-[#fff4ec] hover:text-[#e85d04]"
-                                      >
-                                        {child.name}
-                                      </Link>
-                                    </li>
-                                  ))}
+                                <ul className="py-0.5">
+                                  {subCat.children.map((child) => {
+                                    const childLink = resolveMenuHref(
+                                      child,
+                                      category.slug,
+                                      subCat.slug
+                                    );
+                                    return (
+                                      <li key={child.id}>
+                                        <Link
+                                          href={childLink}
+                                          {...navigateTo(childLink)}
+                                          className="block px-3 py-[6px] text-[13px] font-normal leading-tight text-gray-800 transition-colors hover:bg-nav hover:text-white"
+                                        >
+                                          {child.name}
+                                        </Link>
+                                      </li>
+                                    );
+                                  })}
                                 </ul>
                               </div>
                             )}

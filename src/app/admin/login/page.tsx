@@ -41,7 +41,7 @@ export default function AdminLoginPage() {
         {/* Logo and Title */}
         <div className="text-center mb-8">
           <div className="inline-block bg-white rounded-2xl shadow-lg p-4 mb-4">
-            <h1 className="text-3xl font-bold text-gray-900">WS Computer City</h1>
+            <h1 className="text-3xl font-bold text-gray-900">LogicBay BD</h1>
           </div>
           <h2 className="text-2xl font-semibold text-gray-800">Admin Login</h2>
           <p className="text-gray-600 mt-2">Sign in to access the admin panel</p>

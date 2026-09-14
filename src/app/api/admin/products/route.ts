@@ -37,7 +37,8 @@ export async function GET(req: NextRequest) {
       maxPrice: searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined,
       stockStatus: searchParams.get('stockStatus')?.split(',') || undefined,
       search: searchParams.get('search') || undefined,
-      sort: searchParams.get('sort') || 'newest',
+      // CMS lists prefer last-edited first (Contentful-style Updated column)
+      sort: searchParams.get('sort') || 'updated',
       page: searchParams.get('page') ? Number(searchParams.get('page')) : 1,
       limit: searchParams.get('limit') ? Number(searchParams.get('limit')) : 20,
     };

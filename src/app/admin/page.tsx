@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AdminShell } from '@/components/admin/AdminShell';
-import { Package, FolderTree, Tag, ArrowRight } from 'lucide-react';
+import { Package, FolderTree, Tag, ArrowRight, Menu } from 'lucide-react';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -24,6 +24,14 @@ export default function AdminPage() {
       links: [
         { label: 'View all content types', href: '/admin/products' },
         { label: 'Add new entry', href: '/admin/products/new' },
+      ],
+    },
+    {
+      title: 'Menus',
+      description: 'Control the storefront top menu, sub-menus, and flyouts',
+      icon: Menu,
+      links: [
+        { label: 'Manage menus', href: '/admin/menus' },
       ],
     },
     {
@@ -47,8 +55,8 @@ export default function AdminPage() {
   ];
 
   return (
-    <AdminShell title="Dashboard" subtitle="Welcome to the WS Computer City Admin Panel">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <AdminShell title="Dashboard" subtitle="Welcome to the LogicBay BD Admin Panel">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
         {cards.map((card) => (
           <div key={card.title} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-3">

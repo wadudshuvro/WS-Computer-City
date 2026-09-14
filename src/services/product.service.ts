@@ -5,6 +5,32 @@ import { Prisma } from '@prisma/client';
 type SpecInput = { specificationDefinitionId?: string; key?: string; value: string };
 
 export class ProductService {
+  /** Collect category ID and all descendant category IDs (BFS). */
+  static async getCategoryDescendantIds(rootSlug: string): Promise<string[]> {
+    const root = await prisma.category.findFirst({
+      where: { slug: rootSlug },
+      select: { id: true },
+    });
+    if (!root) return [];
+
+    const ids: string[] = [];
+    const queue = [root.id];
+
+    while (queue.length > 0) {
+      const id = queue.shift()!;
+      ids.push(id);
+      const children = await prisma.category.findMany({
+        where: { parentId: id },
+        select: { id: true },
+      });
+      for (const child of children) {
+        queue.push(child.id);
+      }
+    }
+
+    return ids;
+  }
+
   /** Collect category ID and all ancestor category IDs for spec lookup */
   private static async getCategoryAncestorIds(
     tx: Prisma.TransactionClient,
@@ -25,7 +51,17 @@ export class ProductService {
     return ids;
   }
 
-  /** Resolve key-based specs to specificationDefinitionId using category hierarchy */
+  private static humanizeSpecKey(key: string): string {
+    return key
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  }
+
+  /**
+   * Resolve key-based specs to specificationDefinitionId using category hierarchy.
+   * If a CMS key has no DB definition yet, create one on the product category so
+   * fields like warranty are never silently dropped on save.
+   */
   private static async resolveSpecifications(
     tx: Prisma.TransactionClient,
     categoryId: string,
@@ -53,10 +89,27 @@ export class ProductService {
         const definitions = await tx.specificationDefinition.findMany({
           where: { key: spec.key, categoryId: { in: categoryIds } },
         });
-        const definition =
+        let definition =
           definitions.find((d) => d.categoryId === categoryId) ?? definitions[0];
 
-        if (definition && !seenDefinitionIds.has(definition.id)) {
+        if (!definition) {
+          definition = await tx.specificationDefinition.create({
+            data: {
+              categoryId,
+              key: spec.key,
+              name: this.humanizeSpecKey(spec.key),
+              dataType: 'TEXT',
+              isFilterable: false,
+              isRequired: spec.key === 'warranty',
+              order: spec.key === 'warranty' ? 900 : 500,
+            },
+          });
+          console.warn(
+            `[ProductService] Created missing spec definition "${spec.key}" for category ${categoryId}`
+          );
+        }
+
+        if (!seenDefinitionIds.has(definition.id)) {
           resolved.push({
             specificationDefinitionId: definition.id,
             value: spec.value.trim(),
@@ -150,31 +203,34 @@ export class ProductService {
   }
 
   /**
-   * Update a product
+   * Update a product.
+   * CMS contract: every non-empty field/spec in the payload must persist to Postgres
+   * and be readable again by public product APIs.
    */
   static async update(id: string, data: UpdateProductDTO) {
     return await prisma.$transaction(async (tx) => {
-      // Update main product data
+      // Update main product data — use !== undefined so legitimate values (incl. null clears) apply
       const product = await tx.product.update({
         where: { id },
         data: {
-          ...(data.name && { name: data.name }),
-          ...(data.slug && { slug: data.slug }),
-          ...(data.sku && { sku: data.sku }),
+          updatedAt: new Date(),
+          ...(data.name !== undefined && { name: data.name }),
+          ...(data.slug !== undefined && { slug: data.slug }),
+          ...(data.sku !== undefined && { sku: data.sku }),
           ...(data.description !== undefined && { description: data.description }),
           ...(data.shortDescription !== undefined && { shortDescription: data.shortDescription }),
-          ...(data.price && { price: new Prisma.Decimal(data.price) }),
+          ...(data.price !== undefined && { price: new Prisma.Decimal(data.price) }),
           ...(data.compareAtPrice !== undefined && {
             compareAtPrice: data.compareAtPrice ? new Prisma.Decimal(data.compareAtPrice) : null,
           }),
           ...(data.costPrice !== undefined && {
             costPrice: data.costPrice ? new Prisma.Decimal(data.costPrice) : null,
           }),
-          ...(data.stockStatus && { stockStatus: data.stockStatus }),
+          ...(data.stockStatus !== undefined && { stockStatus: data.stockStatus }),
           ...(data.stockQuantity !== undefined && { stockQuantity: data.stockQuantity }),
           ...(data.lowStockAlert !== undefined && { lowStockAlert: data.lowStockAlert }),
-          ...(data.categoryId && { categoryId: data.categoryId }),
-          ...(data.brandId && { brandId: data.brandId }),
+          ...(data.categoryId !== undefined && { categoryId: data.categoryId }),
+          ...(data.brandId !== undefined && { brandId: data.brandId }),
           ...(data.metaTitle !== undefined && { metaTitle: data.metaTitle }),
           ...(data.metaDescription !== undefined && { metaDescription: data.metaDescription }),
           ...(data.metaKeywords !== undefined && { metaKeywords: data.metaKeywords }),
@@ -185,10 +241,8 @@ export class ProductService {
 
       // Update images if provided
       if (data.images) {
-        // Delete existing images
         await tx.productImage.deleteMany({ where: { productId: id } });
-        
-        // Create new images
+
         await tx.productImage.createMany({
           data: data.images.map((img) => ({
             productId: id,
@@ -200,15 +254,24 @@ export class ProductService {
         });
       }
 
-      // Update specifications if provided
+      // Update specifications if provided — replace atomically; never drop unresolved keys
       if (data.specifications) {
+        const inputSpecs = data.specifications as SpecInput[];
+        const nonEmptyInput = inputSpecs.filter((s) => s.value?.trim());
+
         await tx.productSpecification.deleteMany({ where: { productId: id } });
 
         const dbSpecs = await this.resolveSpecifications(
           tx,
           data.categoryId || product.categoryId,
-          data.specifications as SpecInput[]
+          inputSpecs
         );
+
+        if (nonEmptyInput.length > 0 && dbSpecs.length === 0) {
+          throw new Error(
+            'Failed to save product specifications. No specification definitions could be resolved.'
+          );
+        }
 
         if (dbSpecs.length > 0) {
           await tx.productSpecification.createMany({
@@ -428,8 +491,12 @@ export class ProductService {
         });
 
         if (category) {
-          const categoryIds = [category.id, ...category.children.map((c) => c.id)];
-          where.categoryId = { in: categoryIds };
+          // Walk full tree so parent "components" includes leaf products (intel, nvidia, …)
+          const categoryIds =
+            slug === 'components' || slug === 'component'
+              ? await this.getCategoryDescendantIds(slug)
+              : [category.id, ...category.children.map((c) => c.id)];
+          where.categoryId = { in: categoryIds.length > 0 ? categoryIds : [category.id] };
         } else {
           where.category = { slug };
         }
@@ -665,6 +732,8 @@ export class ProductService {
         return { price: 'desc' };
       case 'name':
         return { name: 'asc' };
+      case 'updated':
+        return { updatedAt: 'desc' };
       case 'newest':
       default:
         return { createdAt: 'desc' };

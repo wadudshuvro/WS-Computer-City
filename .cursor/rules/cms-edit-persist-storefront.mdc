@@ -1,0 +1,30 @@
+---
+description: CMS product edits must always persist to Postgres and immediately reflect on the storefront. Never silently drop fields.
+alwaysApply: true
+---
+
+# CMS Edit → Database → Storefront (inviolable)
+
+LogicBay BD CMS must behave like a real CMS: **edit → save → database → live site**.
+
+## Contract
+
+1. **Admin edit save** (`PUT /api/admin/products/[id]`) must write every submitted product field and non-empty specification to **local PostgreSQL**.
+2. **No silent drops.** Specs sent by key (e.g. `warranty`) must resolve to a `specificationDefinition` (create the definition if missing) and persist as `productSpecification` rows.
+3. **Storefront reads the same DB.** Public product APIs must return saved values with **no stale cache**.
+4. **After save**, revalidate storefront paths so Next.js cache cannot hide updates.
+5. **Validation failures** must return field-level `details` to the CMS UI.
+6. **SEO meta from CMS must drive the page.** `/products/[slug]` uses server `generateMetadata` from `metaTitle` / `metaDescription` / `metaKeywords`. Never leave the PDP as client-only with only the root layout title.
+
+## Do not
+
+- Drop CMS form fields because a DB spec definition is missing
+- Cache product detail responses so old CMS data still shows after edit
+- Remove `generateMetadata` from `/products/[slug]` or hardcode the site-wide title on product pages
+
+## When adding a category or CMS field
+
+1. Add the field to category spec definitions / `categoryConfig`
+2. Ensure the edit/create form submits it
+3. Confirm `ProductService.update` persists it
+4. Confirm PDP / listing reads and displays it

@@ -101,7 +101,7 @@ export interface FilterDefinition {
   showClearButton?: boolean;
 }
 
-export type ProcessorBrand = 'intel' | 'amd';
+export type ProcessorBrand = 'intel' | 'amd' | 'all';
 
 const priceRangeFilter: FilterDefinition = {
   key: 'priceRange',
@@ -119,6 +119,22 @@ const stockStatusFilter: FilterDefinition = {
     { value: 'IN_STOCK', label: 'In Stock' },
     { value: 'PRE_ORDER', label: 'Pre Order' },
     { value: 'UPCOMING', label: 'Up Coming' },
+  ],
+};
+
+/** Price + availability only — Show All Component overview */
+export function getComponentsOverviewFilters(): FilterDefinition[] {
+  return [priceRangeFilter, stockStatusFilter];
+}
+
+const processorBrandFilter: FilterDefinition = {
+  key: 'brand',
+  name: 'Brand',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: [
+    { value: 'intel', label: 'Intel' },
+    { value: 'amd', label: 'AMD' },
   ],
 };
 
@@ -312,6 +328,10 @@ const cacheFilter: FilterDefinition = {
 };
 
 export function getProcessorFilters(brand: ProcessorBrand): FilterDefinition[] {
+  if (brand === 'all') {
+    return [priceRangeFilter, stockStatusFilter, processorBrandFilter];
+  }
+
   const isAmd = brand === 'amd';
 
   return [

@@ -7,7 +7,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* About */}
           <div>
-            <h3 className="text-white font-bold text-lg mb-4">WS Computer City</h3>
+            <h3 className="text-white font-bold text-lg mb-4">LogicBay BD</h3>
             <p className="text-sm mb-4">
               Your trusted destination for computer hardware and technology products in Bangladesh.
             </p>
@@ -67,7 +67,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-gray-700 mt-8 pt-8 text-center text-sm">
-          <p>&copy; 2026 WS Computer City. All rights reserved.</p>
+          <p>&copy; 2026 LogicBay BD. All rights reserved.</p>
           <p className="mt-2">
             <Link href="/admin/login" className="text-blue-400 hover:text-blue-300 transition-colors">
               Admin Login

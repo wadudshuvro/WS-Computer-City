@@ -2,50 +2,99 @@
 @tailwind components;
 @tailwind utilities;
 
+/**
+ * LogicBay BD design tokens — compact professional SaaS foundation.
+ * Prefer these CSS variables / Tailwind semantic colors over one-off hex in new UI.
+ */
 @layer base {
   :root {
+    /* Surfaces */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Brand primary ≈ Tailwind blue-600 (existing CTAs) */
+    --primary: 221 83% 53%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
+
+    /* Quiet secondary / muted canvas (≈ admin #f7f9fc) */
+    --secondary: 214 32% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 214 33% 98%;
+    --muted-foreground: 215 16% 47%;
+
+    /* Accent = subtle surface (not decorative). Nav highlight is --nav. */
+    --accent: 214 32% 96%;
+    --accent-foreground: 222 47% 11%;
+
+    /* Status */
+    --destructive: 0 72% 51%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --success: 152 61% 38%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 222 47% 11%;
+
+    /* Chrome (header / admin sidebar / footer — documented for migration) */
+    --sidebar: 220 24% 14%;
+    --sidebar-foreground: 210 20% 92%;
+    --sidebar-muted: 218 18% 22%;
+    --sidebar-border: 220 16% 22%;
+    --footer: 221 45% 17%;
+
+    /* Mega-menu active (existing #e85d04) — use sparingly via text-nav / bg-nav */
+    --nav: 24 95% 46%;
+    --nav-foreground: 0 0% 100%;
+
+    /* Controls */
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
+
+    /* Radius: 8px base → rounded-lg; md/sm derived in Tailwind */
     --radius: 0.5rem;
+
+    /* Elevation (optional utilities: shadow-card / shadow-raised) */
+    --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+    --shadow-raised: 0 4px 6px -1px rgb(15 23 42 / 0.08), 0 2px 4px -2px rgb(15 23 42 / 0.06);
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 222 47% 7%;
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 222 47% 9%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 222 47% 9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 217 25% 18%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
+    --muted: 217 25% 16%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 25% 18%;
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 63% 45%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --success: 152 55% 42%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 222 47% 11%;
+    --sidebar: 222 47% 7%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-muted: 217 25% 14%;
+    --sidebar-border: 217 25% 18%;
+    --footer: 222 47% 7%;
+    --nav: 24 95% 50%;
+    --nav-foreground: 0 0% 100%;
+    --border: 217 25% 18%;
+    --input: 217 25% 18%;
+    --ring: 224 76% 48%;
+    --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.35);
+    --shadow-raised: 0 4px 6px -1px rgb(0 0 0 / 0.45);
   }
 }
 
@@ -53,7 +102,37 @@
   * {
     @apply border-border;
   }
+
+  html {
+    @apply antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground text-sm font-normal leading-normal;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  /* Compact SaaS defaults when elements omit explicit type classes */
+  h1 {
+    @apply text-xl font-semibold leading-snug tracking-tight text-foreground;
+  }
+
+  h2 {
+    @apply text-base font-semibold leading-snug text-foreground;
+  }
+
+  h3 {
+    @apply text-sm font-medium leading-snug text-foreground;
+  }
+
+  h4,
+  h5,
+  h6 {
+    @apply text-sm font-medium leading-snug text-foreground;
+  }
+
+  small {
+    @apply text-xs font-medium leading-normal text-muted-foreground;
   }
 }

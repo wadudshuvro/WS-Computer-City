@@ -2,18 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ProductService } from '@/services/product.service';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/products/[slug]
- * Get a single product by slug with all details
+ * Get a single product by slug with all details (always fresh from DB).
  */
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { slug: string } }
+  _req: NextRequest,
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = params;
+    const { slug } = await params;
 
-    // Fetch product using the service
     const product = await ProductService.getBySlug(slug);
 
     if (!product) {
@@ -28,7 +29,6 @@ export async function GET(
       );
     }
 
-    // Get related products from the same category
     const relatedProducts = await prisma.product.findMany({
       where: {
         isActive: true,
@@ -48,7 +48,6 @@ export async function GET(
       orderBy: { createdAt: 'desc' },
     });
 
-    // Format the product for response
     const formattedProduct = {
       id: product.id,
       name: product.name,
@@ -92,7 +91,6 @@ export async function GET(
       })),
     };
 
-    // Format related products
     const formattedRelatedProducts = relatedProducts.map((p) => ({
       id: p.id,
       name: p.name,
@@ -110,10 +108,17 @@ export async function GET(
       })),
     }));
 
-    return NextResponse.json({
-      data: formattedProduct,
-      relatedProducts: formattedRelatedProducts,
-    });
+    return NextResponse.json(
+      {
+        data: formattedProduct,
+        relatedProducts: formattedRelatedProducts,
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, max-age=0',
+        },
+      }
+    );
   } catch (error) {
     console.error('Error fetching product:', error);
     return NextResponse.json(

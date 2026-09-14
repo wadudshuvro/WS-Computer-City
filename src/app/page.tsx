@@ -4,8 +4,8 @@ import { FlashSale } from '@/components/home/FlashSale';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main>
+    <div className="min-h-screen bg-muted">
+      <main className="flex flex-col">
         <HeroSlider />
         <CategoryGrid />
         <FlashSale />

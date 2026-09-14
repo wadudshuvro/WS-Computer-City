@@ -246,7 +246,7 @@ export async function GET(req: NextRequest) {
  * These counts show how many products have each specification value
  */
 async function getFilterCounts(
-  brand: 'intel' | 'amd',
+  brand: 'intel' | 'amd' | 'all',
   sub?: string | null,
   brands: string[] = []
 ): Promise<Record<string, Record<string, number>>> {
@@ -257,12 +257,25 @@ async function getFilterCounts(
 
     if (brands.length === 1) {
       baseWhere.category = { slug: brands[0] === 'amd' ? 'amd' : 'intel' };
+    } else if (brands.length > 1) {
+      baseWhere.category = { slug: { in: ['intel', 'amd'] } };
     } else if (sub === 'intel') {
       baseWhere.category = { slug: 'intel' };
     } else if (sub === 'amd' || sub === 'amd-ryzen') {
       baseWhere.category = { slug: 'amd' };
+    } else if (brand === 'amd') {
+      baseWhere.category = { slug: 'amd' };
+    } else if (brand === 'intel') {
+      baseWhere.category = { slug: 'intel' };
     } else {
-      baseWhere.category = { slug: brand === 'amd' ? 'amd' : 'intel' };
+      baseWhere.category = {
+        OR: [
+          { slug: 'processor' },
+          { parent: { slug: 'processor' } },
+          { slug: 'intel' },
+          { slug: 'amd' },
+        ],
+      };
     }
 
     const stockCountsRaw = await prisma.product.groupBy({
@@ -294,7 +307,30 @@ async function getFilterCounts(
       }));
     }
 
-    return buildProcessorFilterCounts(specValuesByKey, stockCounts, brand);
+    const counts = buildProcessorFilterCounts(specValuesByKey, stockCounts, brand);
+
+    if (brand === 'all') {
+      const brandGroup = await prisma.product.groupBy({
+        by: ['brandId'],
+        where: baseWhere,
+        _count: true,
+      });
+      const brandIds = brandGroup.map((b) => b.brandId);
+      const brandRows = await prisma.brand.findMany({
+        where: { id: { in: brandIds } },
+        select: { id: true, slug: true },
+      });
+      const byId = new Map(brandRows.map((b) => [b.id, b.slug]));
+      counts.brand = {};
+      for (const row of brandGroup) {
+        const slug = byId.get(row.brandId);
+        if (slug === 'intel' || slug === 'amd') {
+          counts.brand[slug] = row._count;
+        }
+      }
+    }
+
+    return counts;
   } catch (error) {
     console.error('Error getting filter counts:', error);
     return {};

@@ -21,21 +21,21 @@ const categories = [
 
 export function CategoryGrid() {
   return (
-    <section className="py-8 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+    <section className="border-b border-border bg-background py-4">
+      <div className="container mx-auto">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 md:gap-3 lg:grid-cols-8">
           {categories.map((category) => (
             <Link
               key={category.slug}
               href={`/products?category=${category.slug}`}
-              className="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-lg hover:shadow-lg hover:border-blue-500 transition-all group"
+              className="group flex flex-col items-center justify-center rounded-lg border border-border bg-card p-3 text-center shadow-card transition-colors hover:border-primary/40 hover:bg-muted/40"
             >
-              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">
+              <span className="mb-1.5 text-2xl leading-none" aria-hidden>
                 {category.icon}
-              </div>
-              <h3 className="text-sm font-medium text-gray-800 text-center group-hover:text-blue-600 transition-colors">
+              </span>
+              <span className="text-xs font-medium leading-snug text-foreground group-hover:text-primary">
                 {category.name}
-              </h3>
+              </span>
             </Link>
           ))}
         </div>

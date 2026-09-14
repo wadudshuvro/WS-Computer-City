@@ -1,9 +1,21 @@
 import { z } from 'zod';
 import { StockStatus } from '@prisma/client';
 
+/** Accept absolute http(s) URLs or site-relative paths used by CMS uploads. */
+const imageUrlSchema = z
+  .string()
+  .min(1, 'Image URL is required')
+  .refine(
+    (value) =>
+      /^https?:\/\//i.test(value) ||
+      value.startsWith('/') ||
+      value.startsWith('data:image/'),
+    { message: 'Invalid image URL' }
+  );
+
 // Product Image Schema
 export const productImageSchema = z.object({
-  url: z.string().url('Invalid image URL'),
+  url: imageUrlSchema,
   alt: z.string().optional(),
   order: z.number().int().min(0).default(0),
   isPrimary: z.boolean().default(false),
@@ -13,7 +25,7 @@ export const productImageSchema = z.object({
 export const productSpecificationSchema = z.union([
   // Database specification (with CUID)
   z.object({
-    specificationDefinitionId: z.string().cuid('Invalid specification definition ID'),
+    specificationDefinitionId: z.string().min(1, 'Invalid specification definition ID'),
     value: z.string().min(1, 'Specification value is required'),
   }),
   // Category-based specification (with key)
@@ -22,9 +34,6 @@ export const productSpecificationSchema = z.union([
     value: z.string().min(1, 'Specification value is required'),
   }),
 ]);
-
-// Helper to transform empty strings to undefined
-const emptyStringToUndefined = z.string().transform((val) => val === '' ? undefined : val);
 
 // Create Product Schema
 const baseProductSchema = z.object({
@@ -38,33 +47,36 @@ const baseProductSchema = z.object({
     .string()
     .min(3, 'SKU must be at least 3 characters')
     .max(100)
-    .regex(/^[A-Z0-9-]+$/, 'SKU must be uppercase alphanumeric with hyphens'),
+    .transform((val) => val.trim().toUpperCase())
+    .refine((val) => /^[A-Z0-9-]+$/.test(val), {
+      message: 'SKU must be alphanumeric with hyphens',
+    }),
   description: z.string().optional().nullable(),
-  shortDescription: z.string().max(500).optional().nullable(),
-  
+  shortDescription: z.string().max(2000).optional().nullable(),
+
   // Pricing
   price: z.number().positive('Price must be positive'),
   compareAtPrice: z.number().positive().optional().nullable(),
   costPrice: z.number().positive().optional().nullable(),
-  
+
   // Stock
   stockStatus: z.nativeEnum(StockStatus),
   stockQuantity: z.number().int().min(0, 'Stock quantity cannot be negative').default(0),
   lowStockAlert: z.number().int().min(0).default(5),
-  
+
   // Relations
-  categoryId: z.string().cuid('Invalid category ID'),
-  brandId: z.string().cuid('Invalid brand ID'),
-  
+  categoryId: z.string().min(1, 'Invalid category ID'),
+  brandId: z.string().min(1, 'Invalid brand ID'),
+
   // SEO
-  metaTitle: z.string().max(60).optional().nullable(),
-  metaDescription: z.string().max(160).optional().nullable(),
+  metaTitle: z.string().max(120).optional().nullable(),
+  metaDescription: z.string().max(320).optional().nullable(),
   metaKeywords: z.string().optional().nullable(),
-  
+
   // Features
   isFeatured: z.boolean().default(false),
   isActive: z.boolean().default(true),
-  
+
   // Nested
   images: z.array(productImageSchema).min(1, 'At least one image is required'),
   specifications: z.array(productSpecificationSchema).optional(),
@@ -85,7 +97,22 @@ export const createProductSchema = baseProductSchema.refine(
 );
 
 // Update Product Schema (all fields optional)
-export const updateProductSchema = baseProductSchema.partial();
+export const updateProductSchema = baseProductSchema.partial().refine(
+  (data) => {
+    if (
+      data.compareAtPrice != null &&
+      data.price != null &&
+      data.compareAtPrice <= data.price
+    ) {
+      return false;
+    }
+    return true;
+  },
+  {
+    message: 'Compare at price must be greater than selling price',
+    path: ['compareAtPrice'],
+  }
+);
 
 // Product Filter Schema
 export const productFilterSchema = z.object({
@@ -95,7 +122,7 @@ export const productFilterSchema = z.object({
   maxPrice: z.number().positive().optional(),
   stockStatus: z.array(z.nativeEnum(StockStatus)).or(z.nativeEnum(StockStatus)).optional(),
   search: z.string().optional(),
-  sort: z.enum(['price_asc', 'price_desc', 'newest', 'name']).default('newest'),
+  sort: z.enum(['price_asc', 'price_desc', 'newest', 'updated', 'name']).default('newest'),
   page: z.number().int().positive().default(1),
   limit: z.number().int().min(1).max(100).default(20),
   specs: z.record(z.string()).optional(), // Dynamic specification filters

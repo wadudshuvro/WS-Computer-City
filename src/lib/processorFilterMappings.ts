@@ -173,9 +173,15 @@ export const PROCESSOR_SPEC_FILTER_KEYS = [
   'cache_size',
 ] as const;
 
-export function resolveProcessorBrand(brandParam?: string | null, sub?: string | null): ProcessorBrand {
+export function resolveProcessorBrand(
+  brandParam?: string | null,
+  sub?: string | null
+): ProcessorBrand {
   if (brandParam === 'amd' || sub === 'amd' || sub === 'amd-ryzen') {
     return 'amd';
   }
-  return 'intel';
+  if (brandParam === 'intel' || sub === 'intel') {
+    return 'intel';
+  }
+  return 'all';
 }

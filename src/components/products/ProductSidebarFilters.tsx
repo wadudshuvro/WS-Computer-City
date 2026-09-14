@@ -133,7 +133,16 @@ export function ProductSidebarFilters({
       }
 
       params.set('page', '1');
-      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+
+      const nextQuery = params.toString();
+      const currentQuery = new URLSearchParams(searchParams.toString());
+      currentQuery.set('page', '1');
+      // Avoid fighting mega-menu navigation with a no-op / stale filter push.
+      if (nextQuery === currentQuery.toString()) {
+        return;
+      }
+
+      router.push(`${pathname}?${nextQuery}`, { scroll: false });
     },
     [currentPriceRange, filters, pathname, priceRange, router, searchParams]
   );
@@ -155,15 +164,36 @@ export function ProductSidebarFilters({
     pushFiltersToUrl(nextFilters);
   };
 
-  const handlePriceChange = (values: number[]) => {
-    const range: [number, number] = [values[0], values[1]];
+  const hasActiveFilters =
+    Object.values(selectedFilters).some((values) => values.length > 0) ||
+    currentPriceRange[0] !== priceRange.min ||
+    currentPriceRange[1] !== priceRange.max;
+
+  const getCount = (filterKey: string, value: string): number => {
+    return filterCounts[filterKey]?.[value] || 0;
+  };
+
+  // Open every filter section by default (Price, Brand, Chipset, etc.)
+  const defaultExpandedItems = filters.map(
+    (filter, index) => `${filter.key}-${index}`
+  );
+
+  /** Fine step so both thumbs can move; coarse 1000 + minStepsBetweenThumbs locks a flat catalog. */
+  const PRICE_STEP = 100;
+  const catalogSpan = priceRange.max - priceRange.min;
+  const sliderMin = catalogSpan > 0 ? Math.min(0, priceRange.min) : 0;
+  const sliderMax =
+    catalogSpan > 0
+      ? Math.max(priceRange.max, priceRange.min + PRICE_STEP)
+      : Math.max(priceRange.max + 50_000, 100_000);
+
+  const handlePriceChange = (range: [number, number]) => {
     setCurrentPriceRange(range);
     setPriceInputMin(range[0].toString());
     setPriceInputMax(range[1].toString());
   };
 
-  const handlePriceCommit = (values: number[]) => {
-    const range: [number, number] = [values[0], values[1]];
+  const handlePriceCommit = (range: [number, number]) => {
     setCurrentPriceRange(range);
     setPriceInputMin(range[0].toString());
     setPriceInputMax(range[1].toString());
@@ -174,11 +204,11 @@ export function ProductSidebarFilters({
     let min = Number(minRaw);
     let max = Number(maxRaw);
 
-    if (isNaN(min)) min = priceRange.min;
-    if (isNaN(max)) max = priceRange.max;
+    if (isNaN(min)) min = sliderMin;
+    if (isNaN(max)) max = sliderMax;
 
-    min = Math.max(priceRange.min, Math.min(min, priceRange.max));
-    max = Math.max(priceRange.min, Math.min(max, priceRange.max));
+    min = Math.max(sliderMin, Math.min(min, sliderMax));
+    max = Math.max(sliderMin, Math.min(max, sliderMax));
 
     if (min > max) {
       return [max, min];
@@ -198,13 +228,13 @@ export function ProductSidebarFilters({
     if (type === 'min') {
       setPriceInputMin(value);
       const numValue = Number(value);
-      if (!isNaN(numValue) && numValue >= priceRange.min && numValue < currentPriceRange[1]) {
+      if (!isNaN(numValue) && numValue >= sliderMin && numValue <= currentPriceRange[1]) {
         setCurrentPriceRange([numValue, currentPriceRange[1]]);
       }
     } else {
       setPriceInputMax(value);
       const numValue = Number(value);
-      if (!isNaN(numValue) && numValue <= priceRange.max && numValue > currentPriceRange[0]) {
+      if (!isNaN(numValue) && numValue <= sliderMax && numValue >= currentPriceRange[0]) {
         setCurrentPriceRange([currentPriceRange[0], numValue]);
       }
     }
@@ -233,20 +263,12 @@ export function ProductSidebarFilters({
     pushFiltersToUrl(nextFilters);
   };
 
-  const hasActiveFilters =
-    Object.values(selectedFilters).some((values) => values.length > 0) ||
-    currentPriceRange[0] !== priceRange.min ||
-    currentPriceRange[1] !== priceRange.max;
-
-  const getCount = (filterKey: string, value: string): number => {
-    return filterCounts[filterKey]?.[value] || 0;
-  };
-
-  // Open every filter section by default (Price, Brand, Chipset, etc.)
-  const defaultExpandedItems = filters.map(
-    (filter, index) => `${filter.key}-${index}`
+  const sliderLow = Math.min(Math.max(currentPriceRange[0], sliderMin), sliderMax);
+  const sliderHigh = Math.max(
+    Math.min(Math.max(currentPriceRange[1], sliderMin), sliderMax),
+    sliderLow
   );
-
+  const sliderValue: [number, number] = [sliderLow, sliderHigh];
   if (!mounted) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -293,21 +315,21 @@ export function ProductSidebarFilters({
               </AccordionTrigger>
               <AccordionContent className="pb-4">
                 {filter.key === 'priceRange' ? (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <Slider
-                      min={priceRange.min}
-                      max={priceRange.max}
-                      step={1000}
-                      value={currentPriceRange}
+                      min={sliderMin}
+                      max={sliderMax}
+                      step={PRICE_STEP}
+                      value={sliderValue}
                       onValueChange={handlePriceChange}
                       onValueCommit={handlePriceCommit}
                       className="w-full"
                     />
                     <div className="flex items-center gap-2">
                       <div className="flex-1">
-                        <label className="text-xs text-gray-500 mb-1 block">Min</label>
+                        <label className="mb-1 block text-xs text-muted-foreground">Min</label>
                         <div className="relative">
-                          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+                          <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                             ৳
                           </span>
                           <input
@@ -320,15 +342,15 @@ export function ProductSidebarFilters({
                                 e.currentTarget.blur();
                               }
                             }}
-                            className="w-full pl-6 pr-2 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="h-9 w-full rounded-md border border-input bg-background py-1 pl-6 pr-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                           />
                         </div>
                       </div>
-                      <span className="text-gray-400 mt-5">to</span>
+                      <span className="mt-5 text-xs text-muted-foreground">to</span>
                       <div className="flex-1">
-                        <label className="text-xs text-gray-500 mb-1 block">Max</label>
+                        <label className="mb-1 block text-xs text-muted-foreground">Max</label>
                         <div className="relative">
-                          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+                          <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                             ৳
                           </span>
                           <input
@@ -341,7 +363,7 @@ export function ProductSidebarFilters({
                                 e.currentTarget.blur();
                               }
                             }}
-                            className="w-full pl-6 pr-2 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="h-9 w-full rounded-md border border-input bg-background py-1 pl-6 pr-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                           />
                         </div>
                       </div>

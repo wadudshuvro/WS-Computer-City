@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutGrid, Package, FolderTree, Tag, Home, LogOut } from 'lucide-react';
+import { LayoutGrid, Package, FolderTree, Tag, Home, LogOut, Menu } from 'lucide-react';
 
 interface AdminShellProps {
   children: React.ReactNode;
@@ -15,6 +15,7 @@ interface AdminShellProps {
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutGrid, exact: true },
   { href: '/admin/products', label: 'Products', icon: Package, exact: false },
+  { href: '/admin/menus', label: 'Menus', icon: Menu, exact: false },
   { href: '/admin/categories', label: 'Categories', icon: FolderTree, exact: true },
   { href: '/admin/brands', label: 'Brands', icon: Tag, exact: true },
 ];
@@ -37,7 +38,7 @@ export function AdminShell({ children, title, subtitle, breadcrumbs, actions }: 
       {/* Sidebar */}
       <aside className="w-56 bg-[#1e2a3b] text-white flex flex-col shrink-0">
         <div className="px-5 py-5 border-b border-white/10">
-          <p className="text-xs uppercase tracking-widest text-blue-300 font-semibold">WS Computer City</p>
+          <p className="text-xs uppercase tracking-widest text-blue-300 font-semibold">LogicBay BD</p>
           <p className="text-lg font-bold mt-1">Admin CMS</p>
         </div>
 

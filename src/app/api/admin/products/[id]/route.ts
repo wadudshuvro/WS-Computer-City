@@ -75,7 +75,7 @@ export async function GET(
 
 /**
  * PUT /api/admin/products/[id]
- * Update a product
+ * Update a product — persists to Postgres and revalidates storefront paths.
  */
 export async function PUT(
   req: NextRequest,
@@ -87,7 +87,11 @@ export async function PUT(
 
     const existingProduct = await prisma.product.findUnique({
       where: { id },
-      select: { id: true, slug: true, category: { select: { slug: true } } },
+      select: {
+        id: true,
+        slug: true,
+        category: { select: { slug: true, parent: { select: { slug: true } } } },
+      },
     });
 
     if (!existingProduct) {
@@ -105,8 +109,23 @@ export async function PUT(
     const validated = updateProductSchema.parse(body);
     const updatedProduct = await ProductService.update(id, validated);
 
+    const newSlug = updatedProduct?.slug ?? existingProduct.slug;
+    const categorySlug =
+      updatedProduct?.category?.slug ?? existingProduct.category.slug;
+    const parentSlug =
+      existingProduct.category.parent?.slug ?? 'components';
+
+    // Bust Next.js cache so storefront reflects CMS edits immediately
     revalidatePath('/products');
-    revalidatePath(`/products/${updatedProduct?.slug ?? existingProduct.slug}`);
+    revalidatePath(`/products/${existingProduct.slug}`);
+    if (newSlug !== existingProduct.slug) {
+      revalidatePath(`/products/${newSlug}`);
+    }
+    revalidatePath(`/products/category/${categorySlug}`);
+    revalidatePath(`/admin/products/category/${categorySlug}`);
+    // Soft-nav listing URLs used by mega menu / filters
+    revalidatePath(`/products?category=${parentSlug}`);
+    revalidatePath(`/products?category=${parentSlug}&sub=${categorySlug}`);
 
     return NextResponse.json({
       data: updatedProduct,
@@ -128,7 +147,7 @@ export async function PUT(
 
     console.error('Error updating product:', error);
 
-    const prismaError = error as { code?: string; meta?: { target?: string[] } };
+    const prismaError = error as { code?: string; meta?: { target?: string[] }; message?: string };
     if (prismaError.code === 'P2002') {
       return NextResponse.json(
         {
@@ -138,6 +157,18 @@ export async function PUT(
           },
         },
         { status: 409 }
+      );
+    }
+
+    if (error instanceof Error && error.message.includes('specifications')) {
+      return NextResponse.json(
+        {
+          error: {
+            code: 'SPEC_SAVE_ERROR',
+            message: error.message,
+          },
+        },
+        { status: 400 }
       );
     }
 

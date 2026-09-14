@@ -39,4 +39,4 @@ Follow the existing GPU / RAM / Motherboard pattern:
 5. Wire `products/page.tsx`: category detection, API fetch, sidebar, mobile filters, **single-select brand pills**
 6. CMS brand list only for that component via `componentBrandConfig.ts` (avoid circular imports with `filterConfig.ts`)
 
-Reference implementations: Motherboard (`handleMotherboardBrandClick`), Desktop RAM (`handleRamBrandClick`), SSD (`handleSsdBrandClick`).
+Reference implementations: Motherboard (`handleMotherboardBrandClick`), Desktop RAM (`handleRamBrandClick`), SSD (`handleSsdBrandClick`), Graphics Card manufacturer pills (`handleGpuManufacturerClick` — uses `manufacturer` param, still single-select).

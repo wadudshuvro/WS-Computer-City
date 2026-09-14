@@ -214,9 +214,17 @@ export function ProductFilters({ filters }: ProductFiltersProps) {
           <AccordionContent>
             <div className="space-y-4">
               <Slider
-                min={filters.priceRange.min}
-                max={filters.priceRange.max}
-                step={1000}
+                min={
+                  filters.priceRange.max > filters.priceRange.min
+                    ? Math.min(0, filters.priceRange.min)
+                    : 0
+                }
+                max={
+                  filters.priceRange.max > filters.priceRange.min
+                    ? filters.priceRange.max
+                    : Math.max(filters.priceRange.max + 50_000, 100_000)
+                }
+                step={100}
                 value={priceRange}
                 onValueChange={setPriceRange}
                 className="w-full"

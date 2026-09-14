@@ -8,6 +8,11 @@ import { PsuFilters } from '@/components/products/PsuFilters';
 import { SsdFilters } from '@/components/products/SsdFilters';
 import { CasingFilters } from '@/components/products/CasingFilters';
 import { CpuCoolerFilters } from '@/components/products/CpuCoolerFilters';
+import { ComponentsOverviewFilters } from '@/components/products/ComponentsOverviewFilters';
+import {
+  COMPONENT_OVERVIEW_PILLS,
+  componentOverviewHref,
+} from '@/lib/componentOverviewConfig';
 import { processorSortOptions, GPU_MANUFACTURER_BRANDS, ramSortOptions } from '@/lib/filterConfig';
 import { PROCESSOR_SPEC_FILTER_KEYS } from '@/lib/processorFilterMappings';
 import { GPU_SPEC_FILTER_KEYS } from '@/lib/gpuFilterMappings';
@@ -43,6 +48,10 @@ interface Product {
     url: string;
     alt?: string;
     isPrimary: boolean;
+  }>;
+  specifications?: Array<{
+    specificationDefinition: { key: string; name: string };
+    value: string;
   }>;
 }
 
@@ -84,14 +93,20 @@ function ProductsPageContent() {
 
   const brandSlugs = brandParam ? brandParam.split(',').filter(Boolean) : [];
 
-  const activeProcessorBrandTab: 'intel' | 'amd' =
+  /** Active AMD/Intel pill — empty means show all processors */
+  const activeProcessorBrandFilter: 'intel' | 'amd' | null =
     brandSlugs.length === 1 && brandSlugs[0] === 'amd'
       ? 'amd'
       : brandSlugs.length === 1 && brandSlugs[0] === 'intel'
         ? 'intel'
         : subCategory === 'amd' || subCategory === 'amd-ryzen'
           ? 'amd'
-          : 'intel';
+          : subCategory === 'intel'
+            ? 'intel'
+            : null;
+
+  const processorFilterBrand: 'intel' | 'amd' | 'all' =
+    activeProcessorBrandFilter ?? 'all';
   
   // Check if we're on graphics card category (including nvidia and amd-gpu subcategories)
   const isGpuCategory =
@@ -143,13 +158,27 @@ function ProductsPageContent() {
     categoryParam === 'power-supply' ||
     categoryParam === 'psu';
 
+  /** Show All Component — Star Tech–style overview (no sub) */
+  const isComponentsOverview = categoryParam === 'components' && !subCategory;
+
   // Active brand tab based on category type
   const activeGpuBrandTab =
     subCategory === 'amd-gpu' || typeParam === 'amd-gpu' ? 'amd' : 'nvidia';
 
+  const searchQuery = searchParams.toString();
+
+  useEffect(() => {
+    if (isProcessorCategory) {
+      setPriceRange({ min: 0, max: 85000 });
+    }
+  }, [isProcessorCategory]);
+
   useEffect(() => {
     fetchProducts();
-  }, [searchParams]);
+    // Close mobile filters when category/query changes via mega menu.
+    setShowMobileFilters(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- refetch whenever the URL query string changes
+  }, [searchQuery]);
 
   const fetchProducts = async () => {
     try {
@@ -162,7 +191,7 @@ function ProductsPageContent() {
         params.set('limit', itemsPerPage.toString());
       }
 
-      // Only derive brand from sub tab when user has not set a brand filter
+      // Mega-menu leaf (intel / amd-ryzen) still scopes brand; parent Processor shows all
       if (isProcessorCategory && !params.has('brand')) {
         if (!params.has('category')) {
           params.set('category', 'components');
@@ -172,6 +201,7 @@ function ProductsPageContent() {
         } else if (subCategory === 'amd' || subCategory === 'amd-ryzen') {
           params.set('brand', 'amd');
         }
+        // sub=processor (or missing) → no brand → all Intel + AMD
       }
 
       // DDR4 / DDR5 menu items → Desktop RAM + memory type filter
@@ -213,7 +243,12 @@ function ProductsPageContent() {
       
       if (data.filters) {
         setFilterCounts(data.filters.counts || {});
-        setPriceRange(data.filters.priceRange || { min: 0, max: 1000000 });
+        if (isProcessorCategory) {
+          // Star Tech–style fixed slider domain for processors
+          setPriceRange({ min: 0, max: 85000 });
+        } else {
+          setPriceRange(data.filters.priceRange || { min: 0, max: 1000000 });
+        }
       }
     } catch (error: any) {
       console.error('Error fetching products:', error);
@@ -240,12 +275,19 @@ function ProductsPageContent() {
   const handleProcessorBrandTabChange = (brand: 'intel' | 'amd') => {
     const params = new URLSearchParams();
     params.set('category', 'components');
-    params.set('sub', brand === 'amd' ? 'amd-ryzen' : 'intel');
-    params.set('brand', brand);
+    params.set('sub', 'processor');
     params.set('page', '1');
     PROCESSOR_SPEC_FILTER_KEYS.forEach((key) => params.delete(key));
     params.delete('minPrice');
     params.delete('maxPrice');
+    params.delete('stockStatus');
+
+    // Single-select pill: click again to clear and show all processors
+    if (activeProcessorBrandFilter === brand) {
+      params.delete('brand');
+    } else {
+      params.set('brand', brand);
+    }
     router.push(`/products?${params.toString()}`);
   };
 
@@ -263,17 +305,13 @@ function ProductsPageContent() {
 
   const handleGpuManufacturerClick = (manufacturerSlug: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    const current = params.get('manufacturer')?.split(',').filter(Boolean) || [];
+    const current = params.get('manufacturer');
 
-    if (current.includes(manufacturerSlug)) {
-      const next = current.filter((v) => v !== manufacturerSlug);
-      if (next.length > 0) {
-        params.set('manufacturer', next.join(','));
-      } else {
-        params.delete('manufacturer');
-      }
+    // Single-select (same as Motherboard / RAM pills): toggle one brand only
+    if (current === manufacturerSlug) {
+      params.delete('manufacturer');
     } else {
-      params.set('manufacturer', [...current, manufacturerSlug].join(','));
+      params.set('manufacturer', manufacturerSlug);
     }
     params.set('page', '1');
     router.push(`/products?${params.toString()}`);
@@ -429,7 +467,8 @@ function ProductsPageContent() {
 
   // Get page title based on category
   const getPageTitle = () => {
-    if (isProcessorCategory) return 'Processor Price In BD 2026';
+    if (isComponentsOverview) return 'Computer Components Price in Bangladesh';
+    if (isProcessorCategory) return 'Processor Price in Bangladesh';
     if (isGpuCategory) return 'Graphics Card Price In BD 2026';
     if (isRamCategory) return 'Desktop RAM Price in Bangladesh';
     if (isMotherboardCategory) return 'Motherboard Price in Bangladesh';
@@ -450,33 +489,42 @@ function ProductsPageContent() {
               Home
             </Link>
             <ChevronRight className="w-4 h-4 text-gray-400" />
-            {categoryParam && (
+            {isComponentsOverview ? (
+              <span className="text-gray-900 font-medium">Component</span>
+            ) : (
               <>
-                <Link href="/products" className="text-gray-500 hover:text-blue-600">
-                  {categoryParam === 'components' ? 'Components' : categoryParam}
-                </Link>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
+                {categoryParam && (
+                  <>
+                    <Link
+                      href="/products?category=components"
+                      className="text-gray-500 hover:text-blue-600"
+                    >
+                      {categoryParam === 'components' ? 'Component' : categoryParam}
+                    </Link>
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                  </>
+                )}
+                <span className="text-gray-900 font-medium">
+                  {isProcessorCategory
+                    ? 'Processor'
+                    : isGpuCategory
+                      ? 'Graphics Card'
+                      : isRamCategory
+                        ? 'Desktop RAM'
+                        : isMotherboardCategory
+                          ? 'Motherboard'
+                          : isPsuCategory
+                            ? 'Power Supply'
+                            : isSsdCategory
+                              ? 'SSD'
+                              : isCasingCategory
+                                ? 'Casing'
+                                : isCpuCoolerCategory
+                                  ? 'CPU Cooler'
+                                  : 'Products'}
+                </span>
               </>
             )}
-            <span className="text-gray-900 font-medium">
-              {isProcessorCategory
-                ? 'Processor'
-                : isGpuCategory
-                  ? 'Graphics Card'
-                  : isRamCategory
-                    ? 'Desktop RAM'
-                    : isMotherboardCategory
-                      ? 'Motherboard'
-                      : isPsuCategory
-                        ? 'Power Supply'
-                      : isSsdCategory
-                        ? 'SSD'
-                        : isCasingCategory
-                          ? 'Casing'
-                          : isCpuCoolerCategory
-                            ? 'CPU Cooler'
-                        : 'Products'}
-            </span>
           </nav>
         </div>
       </div>
@@ -484,41 +532,66 @@ function ProductsPageContent() {
       {/* Page Header */}
       <div className="bg-white border-b">
         <div className="max-w-[1400px] mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <h1
+            className={`text-2xl font-bold mb-2 ${
+              isComponentsOverview || isProcessorCategory ? 'text-blue-600' : 'text-gray-900'
+            }`}
+          >
             {getPageTitle()}
           </h1>
+          {isComponentsOverview && (
+            <>
+              <p className="text-sm text-gray-600 max-w-4xl">
+                Looking for Computer Components price in Bangladesh? LogicBay BD offers a wide range
+                of PC components including processors, motherboards, graphics cards, RAM, storage,
+                power supplies, coolers, and cases. Browse by category below or filter by price to
+                find the right parts for your build.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {COMPONENT_OVERVIEW_PILLS.map((pill) => (
+                  <Link
+                    key={pill.subSlug}
+                    href={componentOverviewHref(pill.subSlug)}
+                    className="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 transition-colors hover:border-blue-500 hover:text-blue-600"
+                  >
+                    {pill.label}
+                  </Link>
+                ))}
+              </div>
+            </>
+          )}
           {isProcessorCategory && (
             <>
               <p className="text-sm text-gray-600 max-w-4xl">
-                Processor Price in BD 2026 begins at BDT 5,600/- and can go up to BDT 85,500/- depending on the brand and specifications. 
-                With a variety of 135 items available at WS Computer City, where 97 items are in stock now & 135 items offer you the best 
-                discount price in BD. Find the perfect Processor Components for your requirements.
+                Processor Price in Bangladesh starts from budget CPUs to high-end Intel Core and AMD
+                Ryzen models. Compare speed, cores, socket, and cache — then filter by brand and
+                availability to find the right processor for your build at LogicBay BD.
               </p>
-              
-              {/* Sub-category tabs - filter by brand */}
-              <div className="flex gap-4 mt-4">
-                <button
-                  type="button"
-                  onClick={() => handleProcessorBrandTabChange('intel')}
-                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                    activeProcessorBrandTab === 'intel'
-                      ? 'text-blue-600 border-blue-600'
-                      : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  Intel
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleProcessorBrandTabChange('amd')}
-                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                    activeProcessorBrandTab === 'amd'
-                      ? 'text-blue-600 border-blue-600'
-                      : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  AMD Ryzen
-                </button>
+
+              {/* Star Tech–style brand pills (single family at a time) */}
+              <div className="mt-4 flex flex-wrap gap-2">
+                {(
+                  [
+                    { id: 'amd' as const, label: 'AMD' },
+                    { id: 'intel' as const, label: 'Intel' },
+                  ] as const
+                ).map((pill) => {
+                  const isActive = activeProcessorBrandFilter === pill.id;
+                  return (
+                    <button
+                      key={pill.id}
+                      type="button"
+                      onClick={() => handleProcessorBrandTabChange(pill.id)}
+                      className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
+                        isActive
+                          ? 'border-blue-600 bg-blue-600 text-white'
+                          : 'border-gray-300 bg-white text-gray-700 hover:border-blue-500 hover:text-blue-600'
+                      }`}
+                    >
+                      {pill.label}
+                    </button>
+                  );
+                })}
               </div>
             </>
           )}
@@ -527,7 +600,7 @@ function ProductsPageContent() {
             <>
               <p className="text-sm text-gray-600 max-w-4xl">
                 Graphics Card Price in BD 2026 starts from BDT 8,500/- and can go up to BDT 250,000/- depending on the brand and specifications. 
-                WS Computer City offers a wide selection of NVIDIA GeForce and AMD Radeon graphics cards for gaming, content creation, and professional workloads.
+                LogicBay BD offers a wide selection of NVIDIA GeForce and AMD Radeon graphics cards for gaming, content creation, and professional workloads.
               </p>
               
               {/* Sub-category tabs - filter by GPU brand */}
@@ -556,11 +629,10 @@ function ProductsPageContent() {
                 </button>
               </div>
 
-              {/* Manufacturer brand pills */}
+              {/* Manufacturer brand pills — single-select */}
               <div className="flex flex-wrap gap-2 mt-4">
                 {GPU_MANUFACTURER_BRANDS.map((brand) => {
-                  const selectedManufacturers = searchParams.get('manufacturer')?.split(',').filter(Boolean) || [];
-                  const isActive = selectedManufacturers.includes(brand.value);
+                  const isActive = searchParams.get('manufacturer') === brand.value;
                   return (
                     <button
                       key={brand.value}
@@ -585,7 +657,7 @@ function ProductsPageContent() {
             <>
               <p className="text-sm text-gray-600 max-w-4xl mb-4">
                 Desktop RAM Price in BD 2026 begins at BDT 1,500/- and can go up to BDT 45,000/- depending on the brand,
-                capacity, and speed. WS Computer City offers DDR4 and DDR5 desktop memory from leading brands including
+                capacity, and speed. LogicBay BD offers DDR4 and DDR5 desktop memory from leading brands including
                 Kingston, Corsair, G.SKILL, Team, and more.
               </p>
 
@@ -767,10 +839,19 @@ function ProductsPageContent() {
       <div className="max-w-[1400px] mx-auto px-4 py-6">
         <div className="flex gap-6">
           {/* Sidebar Filters - Desktop */}
+          {isComponentsOverview && (
+            <div className="hidden lg:block w-[280px] flex-shrink-0">
+              <ComponentsOverviewFilters
+                priceRange={priceRange}
+                filterCounts={filterCounts}
+              />
+            </div>
+          )}
+
           {isProcessorCategory && (
             <div className="hidden lg:block w-[280px] flex-shrink-0">
               <ProcessorFilters
-                brand={activeProcessorBrandTab}
+                brand={processorFilterBrand}
                 priceRange={priceRange}
                 filterCounts={filterCounts}
               />
@@ -824,7 +905,8 @@ function ProductsPageContent() {
           )}
 
           {/* Mobile Filter Button */}
-          {(isProcessorCategory ||
+          {(isComponentsOverview ||
+            isProcessorCategory ||
             isGpuCategory ||
             isRamCategory ||
             isMotherboardCategory ||
@@ -842,7 +924,8 @@ function ProductsPageContent() {
           )}
 
           {/* Mobile Filters Overlay */}
-          {(isProcessorCategory ||
+          {(isComponentsOverview ||
+            isProcessorCategory ||
             isGpuCategory ||
             isRamCategory ||
             isMotherboardCategory ||
@@ -851,7 +934,7 @@ function ProductsPageContent() {
             isCasingCategory ||
             isCpuCoolerCategory) &&
             showMobileFilters && (
-            <div className="lg:hidden fixed inset-0 z-50 bg-black/50">
+            <div className="lg:hidden fixed inset-0 z-[150] bg-black/50">
               <div className="absolute right-0 top-0 bottom-0 w-[320px] bg-white overflow-y-auto">
                 <div className="flex items-center justify-between p-4 border-b">
                   <h2 className="text-lg font-semibold">Filters</h2>
@@ -862,9 +945,15 @@ function ProductsPageContent() {
                     <X className="w-5 h-5" />
                   </button>
                 </div>
+                {isComponentsOverview && (
+                  <ComponentsOverviewFilters
+                    priceRange={priceRange}
+                    filterCounts={filterCounts}
+                  />
+                )}
                 {isProcessorCategory && (
                   <ProcessorFilters
-                    brand={activeProcessorBrandTab}
+                    brand={processorFilterBrand}
                     priceRange={priceRange}
                     filterCounts={filterCounts}
                   />
@@ -901,16 +990,37 @@ function ProductsPageContent() {
           {/* Products Section */}
           <div className="flex-1">
             {/* Toolbar */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  {/* Sort Dropdown */}
+            <div className="mb-4 rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  {isComponentsOverview && (
+                    <h2 className="text-base font-semibold text-gray-900">Component</h2>
+                  )}
                   {isProcessorCategory && (
-                    <div className="flex items-center gap-2">
+                    <h2 className="text-base font-semibold text-gray-900">Processor</h2>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <span className="hidden sm:inline">Show:</span>
+                    <select
+                      defaultValue="30"
+                      className="rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="20">20</option>
+                      <option value="30">30</option>
+                      <option value="50">50</option>
+                    </select>
+                  </div>
+
+                  {isProcessorCategory && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <span className="hidden sm:inline">Sort By:</span>
                       <select
                         value={currentSort}
                         onChange={(e) => handleSortChange(e.target.value)}
-                        className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                       >
                         {processorSortOptions.map((option) => (
                           <option key={option.value} value={option.value}>
@@ -920,37 +1030,21 @@ function ProductsPageContent() {
                       </select>
                     </div>
                   )}
-                  
-                  {/* Items per page */}
-                  <div className="flex items-center gap-2">
-                    <select
-                      defaultValue="30"
-                      className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="20">20</option>
-                      <option value="30">30</option>
-                      <option value="50">50</option>
-                    </select>
-                  </div>
-                </div>
 
-                <div className="flex items-center gap-4">
-                  {/* Product Count */}
                   <span className="text-sm text-gray-600">
                     Showing {products.length} out of {totalProducts} products
                   </span>
 
-                  {/* View Mode Toggle */}
-                  <div className="flex items-center border border-gray-300 rounded-md">
+                  <div className="flex items-center rounded-md border border-gray-300">
                     <button
                       onClick={() => setViewMode('grid')}
-                      className={`p-2 ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                      className={`p-1.5 ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                     >
                       <Grid className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setViewMode('list')}
-                      className={`p-2 ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                      className={`p-1.5 ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                     >
                       <List className="w-4 h-4" />
                     </button>
@@ -1004,81 +1098,109 @@ function ProductsPageContent() {
                       ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
                       : 0;
                     const stockBadge = getStockStatusBadge(product.stockStatus);
+                    const PROCESSOR_CARD_SPEC_KEYS = [
+                      'base_clock',
+                      'boost_clock',
+                      'number_of_cores',
+                      'number_of_threads',
+                      'socket_type',
+                      'cache_size',
+                      'generation',
+                    ];
+                    const processorCardSpecs = isProcessorCategory
+                      ? (product.specifications || [])
+                          .filter((s) =>
+                            PROCESSOR_CARD_SPEC_KEYS.includes(s.specificationDefinition.key)
+                          )
+                          .slice(0, 4)
+                      : [];
 
                     return viewMode === 'grid' ? (
                       // Grid View Card
                       <div
                         key={product.id}
-                        className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow group relative"
+                        className="bg-white border border-gray-200 hover:shadow-md transition-shadow group relative"
                       >
-                        {/* Discount Badge */}
+                        {/* Discount Badge — Star Tech style ribbon */}
                         {discount > 0 && (
-                          <div className="absolute top-3 left-3 z-10">
-                            <span className="bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded">
-                              Save: ৳ {(product.compareAtPrice! - product.price).toLocaleString()}
+                          <div className="absolute top-2 left-0 z-10">
+                            <span className="rounded-r bg-violet-600 px-2 py-1 text-xs font-semibold text-white">
+                              Save: {(product.compareAtPrice! - product.price).toLocaleString()}৳
                             </span>
                           </div>
                         )}
 
                         {/* Product Image */}
-                        <div className="relative aspect-square bg-gray-100 rounded-t-lg overflow-hidden">
+                        <div className="relative aspect-square overflow-hidden bg-white">
                           {primaryImage ? (
                             <img
                               src={primaryImage.url}
                               alt={primaryImage.alt || product.name}
-                              className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+                              className="h-full w-full object-contain p-3 group-hover:scale-105 transition-transform duration-300"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            <div className="flex h-full w-full items-center justify-center text-gray-400">
                               No Image
                             </div>
                           )}
                           
                           {/* Quick Actions */}
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                            <button className="bg-white p-2 rounded-full shadow hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                          <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/0 opacity-0 transition-all group-hover:bg-black/10 group-hover:opacity-100">
+                            <button className="rounded-full bg-white p-2 shadow hover:bg-blue-50 hover:text-blue-600 transition-colors">
                               <Heart className="w-5 h-5" />
                             </button>
-                            <button className="bg-white p-2 rounded-full shadow hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                            <button className="rounded-full bg-white p-2 shadow hover:bg-blue-50 hover:text-blue-600 transition-colors">
                               <Eye className="w-5 h-5" />
                             </button>
                           </div>
                         </div>
 
                         {/* Product Info */}
-                        <div className="p-4">
-                          {/* Product Name */}
+                        <div className="p-3">
                           <Link href={`/products/${product.slug}`}>
-                            <h3 className="font-medium text-gray-900 mb-2 line-clamp-2 min-h-[2.5rem] hover:text-blue-600 transition-colors">
+                            <h3 className="mb-2 min-h-[2.5rem] text-sm font-semibold text-gray-900 line-clamp-2 transition-colors hover:text-blue-600">
                               {product.name}
                             </h3>
                           </Link>
 
+                          {processorCardSpecs.length > 0 && (
+                            <ul className="mb-3 space-y-0.5 text-xs">
+                              {processorCardSpecs.map((spec) => (
+                                <li key={spec.specificationDefinition.key} className="flex gap-1">
+                                  <span className="text-gray-500">
+                                    {spec.specificationDefinition.name}:
+                                  </span>
+                                  <span className="text-gray-900">{spec.value}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+
                           {/* Price */}
-                          <div className="flex items-baseline gap-2 mb-3">
-                            <span className="text-xl font-bold text-blue-600">
-                              ৳ {product.price.toLocaleString()}
+                          <div className="mb-2 flex items-baseline gap-2">
+                            <span className="text-lg font-bold text-gray-900">
+                              {product.price.toLocaleString()}৳
                             </span>
                             {product.compareAtPrice && (
                               <span className="text-sm text-gray-500 line-through">
-                                ৳ {product.compareAtPrice.toLocaleString()}
+                                {product.compareAtPrice.toLocaleString()}৳
                               </span>
                             )}
                           </div>
 
                           {/* Stock Status */}
                           <div className="mb-3">
-                            <span className={`${stockBadge.className} text-white text-xs px-2 py-1 rounded`}>
+                            <span className={`${stockBadge.className} rounded px-2 py-0.5 text-xs text-white`}>
                               {stockBadge.text}
                             </span>
                           </div>
 
                           {/* Action Buttons */}
                           <div className="flex gap-2">
-                            <button className="flex-1 bg-orange-500 text-white py-2 rounded hover:bg-orange-600 transition-colors text-sm font-medium">
-                              <ShoppingCart className="w-4 h-4 inline mr-1" />
+                            <button className="flex-1 rounded bg-orange-500 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600">
+                              <ShoppingCart className="mr-1 inline w-4 h-4" />
                             </button>
-                            <button className="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors text-sm font-medium">
+                            <button className="flex-1 rounded bg-blue-600 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
                               Buy Now
                             </button>
                           </div>
@@ -1205,6 +1327,24 @@ function ProductsPageContent() {
         </div>
       </div>
 
+      {/* SEO Content Section (Show All Component) */}
+      {isComponentsOverview && (
+        <div className="bg-white border-t mt-8">
+          <div className="max-w-[1400px] mx-auto px-4 py-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
+              Computer Components Price in Bangladesh
+            </h2>
+            <div className="prose prose-sm max-w-none text-gray-600">
+              <p>
+                Build or upgrade your PC with components from LogicBay BD. Choose processors, motherboards,
+                graphics cards, memory, storage, power supplies, cooling, and cases — filter by price or jump
+                to a category using the pills above to see detailed specs and brand options.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* SEO Content Section (Only for processor category) */}
       {isProcessorCategory && (
         <div className="bg-white border-t mt-8">
@@ -1218,7 +1358,7 @@ function ProductsPageContent() {
                 The central processor of a computer is called the CPU (Central Processing Unit), and most desktop CPUs are developed by Intel or AMD. 
                 Modern processors include multiple cores that work together to execute instructions efficiently and improve multitasking performance.
                 When upgrading or building a new computer, checking local pricing is important, such as the processor price in BD, to understand 
-                the cost of modern and efficient hardware. WS Computer City BD offers a wide selection of Intel processors in Bangladesh, 
+                the cost of modern and efficient hardware. LogicBay BD offers a wide selection of Intel processors in Bangladesh, 
                 including Core i3, Core i5, Core i7, and Core i9 models.
               </p>
               
@@ -1251,7 +1391,7 @@ function ProductsPageContent() {
               <p>
                 A graphics card (GPU) is a specialized electronic circuit designed to rapidly manipulate and alter memory to accelerate 
                 the creation of images for display. Modern graphics cards are essential for gaming, video editing, 3D rendering, and 
-                machine learning tasks. WS Computer City BD offers a comprehensive selection of graphics cards from leading manufacturers 
+                machine learning tasks. LogicBay BD offers a comprehensive selection of graphics cards from leading manufacturers 
                 including NVIDIA and AMD.
               </p>
               
@@ -1285,7 +1425,7 @@ function ProductsPageContent() {
                 A Solid State Drive (SSD) is a storage device that uses flash memory to store data permanently. Unlike traditional 
                 Hard Disk Drives (HDDs), SSDs have no moving parts, making them faster, more durable, and more energy-efficient. 
                 SSDs significantly improve system boot times, application loading speeds, and overall computer responsiveness. 
-                WS Computer City BD offers a wide selection of SSDs from leading brands including Samsung, Kingston, Crucial, 
+                LogicBay BD offers a wide selection of SSDs from leading brands including Samsung, Kingston, Crucial, 
                 Western Digital, and many more.
               </p>
               

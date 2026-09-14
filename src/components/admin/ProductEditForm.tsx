@@ -375,6 +375,17 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
     if (!formData.categoryId) newErrors.categoryId = 'Category is required';
     if (!formData.brandId) newErrors.brandId = 'Brand is required';
 
+    categorySpecs.forEach((spec) => {
+      const value = categorySpecifications[spec.key];
+      const empty =
+        value === undefined ||
+        value === null ||
+        (Array.isArray(value) ? value.length === 0 : String(value).trim() === '');
+      if (spec.required && empty) {
+        newErrors[`catSpec_${spec.key}`] = `${spec.name} is required`;
+      }
+    });
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -416,12 +427,27 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
 
       const payload = {
         ...formData,
+        sku: formData.sku.trim().toUpperCase(),
+        description: formData.description || null,
+        shortDescription: formData.shortDescription || null,
         price: parseFloat(formData.price),
-        compareAtPrice: formData.compareAtPrice ? parseFloat(formData.compareAtPrice) : undefined,
-        costPrice: formData.costPrice ? parseFloat(formData.costPrice) : undefined,
-        stockQuantity: parseInt(formData.stockQuantity),
-        lowStockAlert: parseInt(formData.lowStockAlert),
-        images: images.filter(img => img.url),
+        compareAtPrice: formData.compareAtPrice
+          ? parseFloat(formData.compareAtPrice)
+          : null,
+        costPrice: formData.costPrice ? parseFloat(formData.costPrice) : null,
+        stockQuantity: parseInt(formData.stockQuantity, 10) || 0,
+        lowStockAlert: parseInt(formData.lowStockAlert, 10) || 0,
+        metaTitle: formData.metaTitle || null,
+        metaDescription: formData.metaDescription || null,
+        metaKeywords: formData.metaKeywords || null,
+        images: images
+          .filter((img) => img.url)
+          .map((img) => ({
+            url: img.url,
+            alt: img.alt || undefined,
+            order: img.order,
+            isPrimary: img.isPrimary,
+          })),
         specifications: allSpecifications,
       };
 
@@ -434,12 +460,28 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.error?.details && Array.isArray(data.error.details)) {
+          const errorMessages = data.error.details
+            .map((e: { path?: (string | number)[]; message?: string }) => {
+              const path = e.path?.join('.') || 'Field';
+              return `• ${path}: ${e.message}`;
+            })
+            .join('\n');
+          throw new Error(`Validation failed:\n\n${errorMessages}`);
+        }
         throw new Error(data.error?.message || 'Failed to update product');
       }
 
-      alert('Product updated successfully!');
-      const categorySlug = product.category.slug;
+      // Confirm DB round-trip: saved payload must come back from the API response
+      const saved = data.data;
+      if (!saved?.id) {
+        throw new Error('Update appeared to succeed but no product was returned from the server');
+      }
+
+      alert('Product updated successfully! Changes are saved and will show on the website.');
+      const categorySlug = saved.category?.slug || product.category.slug;
       router.push(`/admin/products/category/${categorySlug}`);
+      router.refresh();
     } catch (error: any) {
       console.error('Error updating product:', error);
       alert(error.message || 'Failed to update product');

@@ -40,7 +40,7 @@ const nextConfig = {
 
   // Environment variables available to the browser
   env: {
-    NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || 'WS Computer City',
+    NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || 'LogicBay BD',
   },
 
   // Redirect trailing slashes

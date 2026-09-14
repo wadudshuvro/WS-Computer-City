@@ -1,26 +1,29 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
 const slides = [
   {
     id: 1,
     title: 'Free Delivery',
-    subtitle: 'On All Orders',
+    subtitle: 'On all orders',
     bgColor: 'from-slate-800 via-[#1e2636] to-[#1a1f2e]',
     image: '📦',
   },
   {
     id: 2,
     title: 'B2B Reseller',
-    subtitle: 'Special Offers',
+    subtitle: 'Special offers',
     bgColor: 'from-teal-700 via-teal-800 to-[#1a1f2e]',
     image: '🤝',
   },
   {
     id: 3,
     title: 'Latest Products',
-    subtitle: 'Best Prices in Bangladesh',
+    subtitle: 'Best prices in Bangladesh',
     bgColor: 'from-cyan-700 via-sky-800 to-[#152238]',
     image: '💰',
   },
@@ -46,11 +49,11 @@ export function HeroSlider() {
   };
 
   return (
-    <section className="relative bg-slate-100 overflow-hidden">
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Hero Slider */}
-          <div className="lg:col-span-2 relative h-[400px] rounded-2xl overflow-hidden">
+    <section className="relative overflow-hidden bg-muted">
+      <div className="container mx-auto py-4">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-3 lg:gap-4">
+          {/* Main hero */}
+          <div className="relative h-[260px] overflow-hidden rounded-lg sm:h-[280px] lg:col-span-2">
             <div
               className="absolute inset-0 flex transition-transform duration-500 ease-in-out"
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}
@@ -58,72 +61,102 @@ export function HeroSlider() {
               {slides.map((slide) => (
                 <div
                   key={slide.id}
-                  className={`min-w-full h-full bg-gradient-to-r ${slide.bgColor} flex items-center justify-center text-white p-12`}
+                  className={`flex min-w-full items-center justify-center bg-gradient-to-r p-6 text-white ${slide.bgColor}`}
                 >
-                  <div className="text-center">
-                    <div className="text-8xl mb-6">{slide.image}</div>
-                    <h2 className="text-5xl font-bold mb-4">{slide.title}</h2>
-                    <p className="text-2xl mb-8">{slide.subtitle}</p>
-                    <button className="bg-white text-[#1a1f2e] px-8 py-3 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
+                  <div className="max-w-md text-center">
+                    <div className="mb-3 text-4xl" aria-hidden>
+                      {slide.image}
+                    </div>
+                    <h2 className="mb-1 text-2xl font-semibold leading-snug tracking-tight">
+                      {slide.title}
+                    </h2>
+                    <p className="mb-4 text-sm text-white/85">{slide.subtitle}</p>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="default"
+                      className="bg-white text-sidebar hover:bg-white/90"
+                    >
                       Shop Now
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Navigation Arrows */}
-            <button
+            <Button
+              type="button"
+              variant="secondary"
+              size="icon"
               onClick={prevSlide}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+              aria-label="Previous slide"
+              className="absolute left-3 top-1/2 h-8 w-8 -translate-y-1/2 bg-white/90 text-foreground hover:bg-white"
             >
-              ‹
-            </button>
-            <button
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="icon"
               onClick={nextSlide}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+              aria-label="Next slide"
+              className="absolute right-3 top-1/2 h-8 w-8 -translate-y-1/2 bg-white/90 text-foreground hover:bg-white"
             >
-              ›
-            </button>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
 
-            {/* Dots */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+            <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
               {slides.map((_, index) => (
                 <button
                   key={index}
+                  type="button"
                   onClick={() => setCurrentSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-colors ${
-                    currentSlide === index ? 'bg-white' : 'bg-white/50'
+                  aria-label={`Go to slide ${index + 1}`}
+                  className={`h-1.5 rounded-full transition-all ${
+                    currentSlide === index ? 'w-4 bg-white' : 'w-1.5 bg-white/50'
                   }`}
                 />
               ))}
             </div>
           </div>
 
-          {/* Side Banners */}
-          <div className="space-y-6">
-            {/* Branch Info */}
-            <div className="bg-gradient-to-br from-[#2d3548] to-[#1a1f2e] text-white p-6 rounded-2xl h-[190px] flex flex-col justify-center border border-white/10">
-              <h3 className="text-2xl font-bold mb-2">BANANI BRANCH</h3>
-              <p className="text-sm mb-3">Concord Colosseum, 156 Kemal Ataturk Ave, Dhaka 1213, Dhaka.</p>
-              <div className="flex gap-2 text-xs mb-3">
-                <span>01324294311</span>
-                <span>01322921936</span>
-                <span>01701663681</span>
-              </div>
-              <button className="bg-teal-500 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-teal-600 transition-colors w-fit">
-                GET DIRECTION
-              </button>
-            </div>
+          {/* Side panels */}
+          <div className="flex flex-col gap-3">
+            <Card className="flex flex-1 flex-col justify-center border-0 bg-gradient-to-br from-[#2d3548] to-sidebar text-white shadow-none">
+              <CardContent className="p-4">
+                <h3 className="mb-1 text-base font-semibold leading-snug">Banani Branch</h3>
+                <p className="mb-2 text-xs leading-relaxed text-white/75">
+                  Concord Colosseum, 156 Kemal Ataturk Ave, Dhaka 1213
+                </p>
+                <p className="mb-3 text-xs text-white/70">
+                  01324294311 · 01322921936 · 01701663681
+                </p>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="h-8 bg-teal-600 text-white hover:bg-teal-700"
+                >
+                  Get direction
+                </Button>
+              </CardContent>
+            </Card>
 
-            {/* B2B Banner */}
-            <div className="bg-gradient-to-br from-teal-600 to-[#1a1f2e] text-white p-6 rounded-2xl h-[190px] flex flex-col justify-center border border-white/10">
-              <h3 className="text-2xl font-bold mb-2">FOR B2B / RESELLER</h3>
-              <p className="text-sm mb-4">Special pricing for bulk orders</p>
-              <button className="bg-white/15 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-white/25 transition-colors w-fit ring-1 ring-white/20">
-                CLICK HERE
-              </button>
-            </div>
+            <Card className="flex flex-1 flex-col justify-center border-0 bg-gradient-to-br from-teal-700 to-sidebar text-white shadow-none">
+              <CardContent className="p-4">
+                <h3 className="mb-1 text-base font-semibold leading-snug">B2B / Reseller</h3>
+                <p className="mb-3 text-xs leading-relaxed text-white/80">
+                  Special pricing for bulk orders
+                </p>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 border-white/25 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+                >
+                  Learn more
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

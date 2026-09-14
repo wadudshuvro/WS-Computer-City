@@ -94,6 +94,9 @@ model Category {
   // Specification definitions specific to this category
   specificationDefinitions SpecificationDefinition[]
 
+  // Optional nav links pointing at this category
+  menuItems MenuItem[]
+
   @@index([parentId])
   @@index([slug])
   @@map("categories")
@@ -269,4 +272,33 @@ model FilterableSpecification {
   @@index([key])
   @@index([categoryId])
   @@map("filterable_specifications")
+}
+
+// ============================================
+// STOREFRONT MEGA MENU (CMS-managed tree)
+// ============================================
+
+model MenuItem {
+  id         String   @id @default(cuid())
+  name       String
+  slug       String
+  parentId   String?
+  level      Int      @default(0) // 0=top, 1=sub, 2=child
+  sortOrder  Int      @default(0)
+  href       String? // optional custom URL override
+  categoryId String? // optional link to product Category
+  isVisible  Boolean  @default(true)
+  hideArrow  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  parent   MenuItem?  @relation("MenuTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children MenuItem[] @relation("MenuTree")
+  category Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([parentId, sortOrder])
+  @@index([level, sortOrder])
+  @@index([isVisible])
+  @@index([slug])
+  @@map("menu_items")
 }

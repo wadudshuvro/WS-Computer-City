@@ -1,39 +1,57 @@
 import Link from 'next/link';
+import { Heart, Scale, Search, ShoppingCart, User } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { MegaMenu } from './MegaMenu';
 
 export function Header() {
   return (
-    <header className="relative z-50 bg-[#1a1f2e] text-white overflow-visible">
-      {/* Top Bar */}
-      <div className="border-b border-gray-700">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <Link href="/" className="flex items-center">
-              <h1 className="text-2xl font-bold tracking-wider">TECHLAND</h1>
-            </Link>
+    <header className="relative z-[200] overflow-visible bg-sidebar text-sidebar-foreground">
+      {/* Top bar — brand + utility actions */}
+      <div className="border-b border-sidebar-border">
+        <div className="container mx-auto flex items-center justify-between gap-3 py-2">
+          <Link href="/" className="shrink-0">
+            <span className="text-xl font-semibold tracking-tight text-white">
+              LogicBay BD
+            </span>
+          </Link>
 
-            {/* Top Right Actions */}
-            <div className="flex items-center gap-4">
-              <button className="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600 transition-colors text-sm">
-                🔥 OFFERS
-              </button>
-              <button className="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600 transition-colors text-sm">
-                🛠️ TOOLS
-              </button>
-              <button className="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600 transition-colors text-sm">
-                💻 PC BUILDER
-              </button>
-            </div>
+          <div className="hidden items-center gap-2 sm:flex">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="h-8 border-0 bg-sidebar-muted text-sidebar-foreground hover:bg-sidebar-muted/80 hover:text-white"
+            >
+              Offers
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="h-8 border-0 bg-sidebar-muted text-sidebar-foreground hover:bg-sidebar-muted/80 hover:text-white"
+            >
+              Tools
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="h-8 border-0 bg-sidebar-muted text-sidebar-foreground hover:bg-sidebar-muted/80 hover:text-white"
+            >
+              PC Builder
+            </Button>
           </div>
         </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center gap-4">
-          {/* Category Dropdown */}
-          <select className="bg-gray-700 text-white px-4 py-3 rounded-lg min-w-[180px] focus:outline-none focus:ring-2 focus:ring-blue-500">
+      {/* Search row */}
+      <div className="container mx-auto py-2.5">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <select
+            aria-label="Category"
+            className="hidden h-9 min-w-[140px] shrink-0 rounded-md border-0 bg-sidebar-muted px-3 text-sm text-sidebar-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:block"
+          >
             <option>All Category</option>
             <option>Laptop</option>
             <option>Desktop</option>
@@ -41,46 +59,74 @@ export function Header() {
             <option>Accessories</option>
           </select>
 
-          {/* Search Input */}
-          <div className="flex-1 flex">
-            <input
-              type="text"
-              placeholder="Search for products..."
-              className="flex-1 px-4 py-3 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+          <div className="flex min-w-0 flex-1">
+            <Input
+              type="search"
+              placeholder="Search products…"
+              aria-label="Search products"
+              className="h-9 rounded-r-none border-0 bg-white text-foreground shadow-none focus-visible:ring-offset-0"
             />
-            <button className="bg-blue-600 px-6 py-3 rounded-r-lg hover:bg-blue-700 transition-colors">
-              🔍
-            </button>
+            <Button
+              type="button"
+              size="icon"
+              className="h-9 w-9 shrink-0 rounded-l-none"
+              aria-label="Search"
+            >
+              <Search className="h-4 w-4" />
+            </Button>
           </div>
 
-          {/* Right Icons */}
-          <div className="flex items-center gap-4">
-            <button className="relative p-2 hover:bg-gray-700 rounded-lg transition-colors">
-              🛒
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+          <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="relative h-9 w-9 text-sidebar-foreground hover:bg-sidebar-muted hover:text-white"
+              aria-label="Cart"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              <span className="absolute right-1 top-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-destructive px-0.5 text-[10px] font-medium text-destructive-foreground">
                 0
               </span>
-            </button>
-            <button className="relative p-2 hover:bg-gray-700 rounded-lg transition-colors">
-              ❤️
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="relative hidden h-9 w-9 text-sidebar-foreground hover:bg-sidebar-muted hover:text-white sm:inline-flex"
+              aria-label="Wishlist"
+            >
+              <Heart className="h-4 w-4" />
+              <span className="absolute right-1 top-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-destructive px-0.5 text-[10px] font-medium text-destructive-foreground">
                 0
               </span>
-            </button>
-            <button className="relative p-2 hover:bg-gray-700 rounded-lg transition-colors">
-              ⚖️
-              <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="relative hidden h-9 w-9 text-sidebar-foreground hover:bg-sidebar-muted hover:text-white sm:inline-flex"
+              aria-label="Compare"
+            >
+              <Scale className="h-4 w-4" />
+              <span className="absolute right-1 top-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-primary px-0.5 text-[10px] font-medium text-primary-foreground">
                 0
               </span>
-            </button>
-            <Link href="/admin/login" className="p-2 hover:bg-gray-700 rounded-lg transition-colors">
-              👤
-            </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 text-sidebar-foreground hover:bg-sidebar-muted hover:text-white"
+              asChild
+            >
+              <Link href="/admin/login" aria-label="Account">
+                <User className="h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
 
-      {/* Mega Menu Navigation */}
       <MegaMenu />
     </header>
   );
