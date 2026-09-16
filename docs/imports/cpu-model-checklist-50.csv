@@ -1,0 +1,51 @@
+priority,brand_slug,suggested_name,model_number,notes
+1,intel,Intel Core i5-14600K Desktop Processor,i5-14600K,Example already in main CSV
+2,amd,AMD Ryzen 7 7800X3D Desktop Processor,Ryzen 7 7800X3D,Example already in main CSV
+3,intel,Intel Core Ultra 7 265K Desktop Processor,Ultra 7 265K,Example already in main CSV
+4,amd,AMD Ryzen 5 7600 Desktop Processor,Ryzen 5 7600,Example already in main CSV
+5,intel,Intel Core i7-14700K Desktop Processor,i7-14700K,Example already in main CSV
+6,amd,AMD Ryzen 9 7950X Desktop Processor,Ryzen 9 7950X,Example already in main CSV
+7,intel,Intel Core i3-14100 Desktop Processor,i3-14100,Example already in main CSV
+8,amd,AMD Ryzen 5 5600 Desktop Processor,Ryzen 5 5600,Example already in main CSV
+9,intel,Intel Core i5-14400 Desktop Processor,i5-14400,Add full row to main CSV when you stock it
+10,intel,Intel Core i5-14500 Desktop Processor,i5-14500,Add full row to main CSV when you stock it
+11,intel,Intel Core i7-14700F Desktop Processor,i7-14700F,Add full row to main CSV when you stock it
+12,intel,Intel Core i9-14900K Desktop Processor,i9-14900K,Add full row to main CSV when you stock it
+13,intel,Intel Core i3-12100 Desktop Processor,i3-12100,Add full row to main CSV when you stock it
+14,intel,Intel Core i5-12400 Desktop Processor,i5-12400,Add full row to main CSV when you stock it
+15,intel,Intel Core i5-13400 Desktop Processor,i5-13400,Add full row to main CSV when you stock it
+16,intel,Intel Core i7-13700K Desktop Processor,i7-13700K,Add full row to main CSV when you stock it
+17,intel,Intel Core Ultra 5 225 Desktop Processor,Ultra 5 225,Add full row to main CSV when you stock it
+18,intel,Intel Core Ultra 5 245K Desktop Processor,Ultra 5 245K,Add full row to main CSV when you stock it
+19,intel,Intel Core Ultra 9 285K Desktop Processor,Ultra 9 285K,Add full row to main CSV when you stock it
+20,amd,AMD Ryzen 5 5500 Desktop Processor,Ryzen 5 5500,Add full row to main CSV when you stock it
+21,amd,AMD Ryzen 5 5600X Desktop Processor,Ryzen 5 5600X,Add full row to main CSV when you stock it
+22,amd,AMD Ryzen 7 5700X Desktop Processor,Ryzen 7 5700X,Add full row to main CSV when you stock it
+23,amd,AMD Ryzen 7 5700X3D Desktop Processor,Ryzen 7 5700X3D,Add full row to main CSV when you stock it
+24,amd,AMD Ryzen 5 7500F Desktop Processor,Ryzen 5 7500F,Add full row to main CSV when you stock it
+25,amd,AMD Ryzen 5 7600X Desktop Processor,Ryzen 5 7600X,Add full row to main CSV when you stock it
+26,amd,AMD Ryzen 7 7700 Desktop Processor,Ryzen 7 7700,Add full row to main CSV when you stock it
+27,amd,AMD Ryzen 7 7700X Desktop Processor,Ryzen 7 7700X,Add full row to main CSV when you stock it
+28,amd,AMD Ryzen 9 7900X Desktop Processor,Ryzen 9 7900X,Add full row to main CSV when you stock it
+29,amd,AMD Ryzen 5 8400F Desktop Processor,Ryzen 5 8400F,Add full row to main CSV when you stock it
+30,amd,AMD Ryzen 5 8500G Desktop Processor,Ryzen 5 8500G,Add full row to main CSV when you stock it
+31,amd,AMD Ryzen 5 8600G Desktop Processor,Ryzen 5 8600G,Add full row to main CSV when you stock it
+32,amd,AMD Ryzen 7 8700G Desktop Processor,Ryzen 7 8700G,Add full row to main CSV when you stock it
+33,amd,AMD Ryzen 5 9600X Desktop Processor,Ryzen 5 9600X,Add full row to main CSV when you stock it
+34,amd,AMD Ryzen 7 9700X Desktop Processor,Ryzen 7 9700X,Add full row to main CSV when you stock it
+35,amd,AMD Ryzen 9 9900X Desktop Processor,Ryzen 9 9900X,Add full row to main CSV when you stock it
+36,amd,AMD Ryzen 9 9950X Desktop Processor,Ryzen 9 9950X,Add full row to main CSV when you stock it
+37,intel,Intel Core i5-14600KF Desktop Processor,i5-14600KF,No iGPU variant
+38,intel,Intel Core i7-14700KF Desktop Processor,i7-14700KF,No iGPU variant
+39,intel,Intel Core i9-14900KF Desktop Processor,i9-14900KF,No iGPU variant
+40,intel,Intel Core i5-12400F Desktop Processor,i5-12400F,No iGPU variant
+41,amd,AMD Ryzen 7 5800X Desktop Processor,Ryzen 7 5800X,Add full row to main CSV when you stock it
+42,amd,AMD Ryzen 7 5800X3D Desktop Processor,Ryzen 7 5800X3D,Add full row to main CSV when you stock it
+43,amd,AMD Ryzen 9 5900X Desktop Processor,Ryzen 9 5900X,Add full row to main CSV when you stock it
+44,intel,Intel Pentium Gold G7400 Desktop Processor,G7400,Add full row to main CSV when you stock it
+45,amd,AMD Athlon 3000G Desktop Processor,Athlon 3000G,Legacy / budget — confirm still stocking
+46,intel,Intel Core i9-13900K Desktop Processor,i9-13900K,Add full row to main CSV when you stock it
+47,amd,AMD Ryzen 9 7900 Desktop Processor,Ryzen 9 7900,Add full row to main CSV when you stock it
+48,intel,Intel Core Ultra 7 265KF Desktop Processor,Ultra 7 265KF,No iGPU variant
+49,amd,AMD Ryzen 7 9800X3D Desktop Processor,Ryzen 7 9800X3D,Add full row to main CSV when you stock it
+50,amd,AMD Ryzen 9 9950X3D Desktop Processor,Ryzen 9 9950X3D,Add full row to main CSV when you stock it

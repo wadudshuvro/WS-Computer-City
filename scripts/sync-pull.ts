@@ -20,8 +20,8 @@ function main() {
   console.log('  SYNC FROM GITHUB (code + database)');
   console.log('========================================');
 
-  // Day-to-day sync targets develop (integration). main is for releases only.
-  // Fall back to main if develop is not on the remote yet.
+  // Day-to-day sync targets develop. main is kept in sync by sync:push
+  // (develop → main) so the GitHub default branch also shows latest backups/.
   const developOk =
     tryRun('git fetch origin develop') && tryRun('git pull origin develop');
 

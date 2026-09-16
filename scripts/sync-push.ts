@@ -14,6 +14,10 @@ function run(command: string, allowFail = false) {
   }
 }
 
+function currentBranch(): string {
+  return execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf8' }).trim();
+}
+
 function main() {
   const date = new Date().toISOString().slice(0, 16).replace('T', ' ');
 
@@ -44,10 +48,29 @@ function main() {
     console.log('\nℹ️  Nothing new to commit (database may already be saved today).');
   }
 
+  const branch = currentBranch();
   run('git push -u origin HEAD');
 
+  // GitHub default UI is often `main`. Keep main identical to develop so
+  // backups/ always appear when browsing the repo without switching branches.
+  if (branch === 'develop') {
+    console.log('\n📌 Updating main to match develop (so GitHub default shows latest backups)...\n');
+    const mainOk = run('git push origin develop:main', true);
+    if (!mainOk) {
+      console.warn('\n⚠️  Could not update origin/main from develop.');
+      console.warn('   Run manually: git push origin develop:main\n');
+    } else {
+      console.log('✅ origin/main now matches develop (includes latest backups/).');
+    }
+  } else if (branch !== 'main') {
+    console.warn(
+      `\n⚠️  You are on "${branch}". Day-to-day sync should use develop so main can be updated.\n`
+    );
+  }
+
   console.log('\n✅ Done! Office/home can now pull your latest products.');
-  console.log('   On the other PC run: npm run sync:pull\n');
+  console.log('   On the other PC run: npm run sync:pull');
+  console.log('   Confirm backups on GitHub: backups/db-backup-*.sql on develop AND main\n');
 }
 
 main();

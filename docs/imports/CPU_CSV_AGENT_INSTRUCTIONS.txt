@@ -1,0 +1,104 @@
+CPU CSV → Processor CMS import instructions
+==========================================
+
+File: docs/imports/cpu-processors-import-template.csv
+
+Purpose
+-------
+This CSV matches LogicBay BD Processor CMS fields (ProductEntryForm + processorSpecifications
+in src/lib/categoryConfig.ts). Use it to create products under the Processor category.
+
+IMPORTANT legal / data rules
+----------------------------
+- Do NOT scrape or copy product text, prices, or images from startech.com.bd or other retailers.
+- Specs in example rows are public manufacturer model facts (Intel / AMD). Prices are placeholders.
+- Before publishing: set YOUR price, stock, warranty text, images you own/license, and your own descriptions.
+
+What the agent must do
+----------------------
+1. Open Admin → Products → Add (or use POST /api/admin/products).
+2. For each CSV row:
+   a. Category: Processor (category_slug = processor). Resolve categoryId from DB by slug.
+   b. Brand: brand_slug must be "intel" or "amd". Resolve brandId from DB.
+   c. Fill all base product fields from the CSV.
+   d. Fill EVERY Processor CMS specification field (keys below) — same as the CMS form.
+   e. warranty is REQUIRED (structured spec key "warranty", section Warranty Information).
+   f. At least one image is required by validation.
+3. Replace REPLACE_WITH_YOUR_PRICE with a real positive number (BDT) before create.
+4. Select / multiselect values MUST match allowed options exactly (see below).
+5. After create, verify one Intel and one AMD PDP shows specs + Warranty Information.
+
+Base product columns
+--------------------
+name, slug, sku, brand_slug, category_slug, shortDescription, description,
+price, compareAtPrice, costPrice, stockStatus, stockQuantity, lowStockAlert,
+isFeatured, isActive, image_url, image_alt, metaTitle, metaDescription, metaKeywords
+
+stockStatus allowed: IN_STOCK | OUT_OF_STOCK | PRE_ORDER | DISCONTINUED
+sku: uppercase letters, numbers, hyphens only (e.g. CPU-I5-14600K)
+slug: lowercase-with-hyphens
+
+Processor CMS specification keys (must persist as productSpecification)
+----------------------------------------------------------------------
+processor_model          (select, required)
+model_number             (text, required)
+number_of_cores          (select, required)   e.g. "6 Core"
+number_of_threads        (select, required)   e.g. "12 Threads"
+base_clock               (number GHz, required)
+boost_clock              (number GHz, required)
+socket_type              (select, required)
+generation               (select, required)
+cache_size               (select, optional)
+l2_cache                 (text, optional)
+tdp                      (select, required)   e.g. "65W"
+integrated_graphics      (select, optional)
+memory_type              (select, optional)
+max_memory_speed         (select, optional)
+max_memory_size          (text, optional)
+pcie_version             (select, optional)
+processor_features       (multiselect, optional) — comma-separated in CSV; send as joined string
+unlocked                 (boolean, optional)  true/false
+cooler_included          (boolean, optional)  true/false
+warranty                 (text, required)     e.g. "3 Years"
+
+When creating via API, send specifications as:
+  { "key": "warranty", "value": "3 Years" }
+(and the same pattern for every other key). Do not drop keys if a DB definition is missing —
+ensure definition exists (scripts/add-processor-specifications.ts) then save.
+
+Allowed select values (must match exactly)
+------------------------------------------
+processor_model (Intel): Intel Core i3 | Intel Core i5 | Intel Core i7 | Intel Core i9 |
+  Intel Core Ultra 5 | Intel Core Ultra 7 | Intel Core Ultra 9 | Intel Pentium | Intel Celeron | Intel Xeon
+processor_model (AMD): Ryzen 3 | Ryzen 5 | Ryzen 7 | Ryzen 9 | Ryzen Threadripper | AMD Athlon | AMD A-Series
+
+number_of_cores: 2 Core, 4 Core, 6 Core, 8 Core, 10 Core, 12 Core, 14 Core, 16 Core,
+  20 Core, 24 Core, 28 Core, 32 Core, 64 Core
+number_of_threads: 2 Threads, 4 Threads, 6 Threads, 8 Threads, 12 Threads, 16 Threads,
+  20 Threads, 24 Threads, 28 Threads, 32 Threads, 48 Threads, 64 Threads, 128 Threads
+
+socket_type Intel: LGA 1700 | LGA 1851 | FCLGA1851 | LGA 1200 | LGA 1151 | LGA 2066 | LGA 4677
+socket_type AMD: AM5 | AM4 | sTRX4 | sWRX8 | TR4
+
+generation Intel: 14th Gen (Raptor Lake Refresh) | 13th Gen (Raptor Lake) | 12th Gen (Alder Lake) |
+  11th Gen (Rocket Lake) | 10th Gen (Comet Lake) | Ultra Series 1 | Ultra Series 2
+generation AMD: Ryzen 9000 Series | Ryzen 8000 Series | Ryzen 7000 Series | Ryzen 6000 Series |
+  Ryzen 5000 Series | Ryzen 4000 Series | Ryzen 3000 Series
+
+tdp: 35W | 45W | 55W | 60W | 65W | 80W | 95W | 105W | 120W | 125W | 150W | 170W | 180W | 253W | 350W
+
+How to grow from 8 examples to ~50
+---------------------------------
+1. Use docs/imports/cpu-model-checklist-50.csv for a list of ~50 common desktop CPU models.
+2. For each checklist model you actually stock, copy a similar row in the main CSV and fill all columns.
+3. Keep column headers unchanged.
+4. Fill manufacturer specs; leave price as REPLACE_WITH_YOUR_PRICE until you set real BDT prices.
+5. Use your own product images under /uploads/... (do not hotlink competitor CDNs).
+6. Re-run agent import for new rows only (skip existing SKUs/slugs).
+
+Suggested agent prompt
+----------------------
+"Read docs/imports/cpu-processors-import-template.csv and docs/imports/CPU_CSV_AGENT_INSTRUCTIONS.txt.
+For each row: create a Processor product in CMS with all base fields and all specification keys,
+including warranty. Resolve category slug processor and brand_slug intel/amd to IDs.
+Ask me for real prices if still REPLACE_WITH_YOUR_PRICE. Do not scrape Star Tech."

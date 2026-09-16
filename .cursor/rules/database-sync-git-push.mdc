@@ -11,6 +11,7 @@ alwaysApply: true
 - **`git pull` alone does NOT sync products.** Office/home each have separate DBs.
 - Same Cursor account does **not** sync the database.
 - Products only move: `sync:push` → GitHub `backups/` → `sync:pull`.
+- Day-to-day work branch: **`develop`**. GitHub’s default UI is often **`main`** — both must get the latest `backups/` or the other PC / GitHub view looks “empty.”
 
 ## DB connection (both PCs)
 
@@ -23,23 +24,26 @@ alwaysApply: true
 Do **all** of this (prefer `npm run sync:push`):
 
 1. Ensure PostgreSQL is reachable (`DATABASE_URL` in `.env`).
-2. Run **`npm run sync:push`** — creates SQL + JSON under `backups/`, commits, pushes.
-3. If `sync:push` fails mid-way, fall back:
+2. Prefer branch **`develop`**. Run **`npm run sync:push`** — SQL + JSON under `backups/`, commit, push.
+3. **`sync:push` must also update `main`** (mirror `develop` → `main`) so the GitHub default branch shows today’s backup. If the script skips this, manually: `git push origin develop:main`.
+4. If `sync:push` fails mid-way, fall back:
    - `npm run db:backup` (needs `pg_dump`; check `C:\Program Files\PostgreSQL\*\bin\`)
    - `npm run db:export`
    - Commit `backups/db-backup-*.sql` and `backups/export-*.json` + code
-   - Push to `origin`
-4. Confirm GitHub has a **latest** `backups/db-backup-*.sql` (preferred) and/or `export-*.json`.
-5. Tell user the other PC must run: **`npm run sync:pull`** then **`npm run dev`**.
+   - Push `develop`, then `git push origin develop:main`
+5. Confirm **latest** `backups/db-backup-*.sql` (and/or `export-*.json`) exists on **both** `origin/develop` and `origin/main` (not only develop).
+6. Tell user the other PC must run: **`npm run sync:pull`** then **`npm run dev`**.
 
 ## When user says “pull”, “start work”, “morning”, or “sync from github”
 
-1. Run **`npm run sync:pull`** (pull + restore DB from `backups/`).
+1. Run **`npm run sync:pull`** (pulls **`develop`** + restore DB from `backups/`).
 2. Then **`npm run dev`** if they want the site.
 3. Never tell them plain `git pull` is enough for product data.
+4. If GitHub `backups/` on **main** looks old, check **`develop`** too — then fix by syncing `main` from `develop`.
 
 ## Do not
 
 - Push code without backing up DB if products may have changed.
+- Leave today’s backup only on `develop` while `main` stays months behind.
 - Commit `.env`.
 - Point `DATABASE_URL` at Supabase for local sync.
