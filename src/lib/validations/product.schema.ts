@@ -122,7 +122,9 @@ export const productFilterSchema = z.object({
   maxPrice: z.number().positive().optional(),
   stockStatus: z.array(z.nativeEnum(StockStatus)).or(z.nativeEnum(StockStatus)).optional(),
   search: z.string().optional(),
-  sort: z.enum(['price_asc', 'price_desc', 'newest', 'updated', 'name']).default('newest'),
+  sort: z
+    .enum(['default', 'price_asc', 'price_desc', 'newest', 'updated', 'name'])
+    .default('default'),
   page: z.number().int().positive().default(1),
   limit: z.number().int().min(1).max(100).default(20),
   specs: z.record(z.string()).optional(), // Dynamic specification filters

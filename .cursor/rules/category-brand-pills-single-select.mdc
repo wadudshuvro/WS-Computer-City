@@ -36,7 +36,7 @@ Follow the existing GPU / RAM / Motherboard pattern:
 2. Filter mappings + query helpers
 3. Dedicated API route (`/api/products/<category>`)
 4. `*Filters.tsx` sidebar wrapper + `get*Filters()` in `filterConfig.ts`
-5. Wire `products/page.tsx`: category detection, API fetch, sidebar, mobile filters, **single-select brand pills**
+5. Wire `products/page.tsx`: category detection, API fetch, sidebar, mobile filters, **single-select brand pills**, and **Sort By** (`categorySortOptions`: Default, Price Low>High, Price High>Low — see `category-page-sort-by.mdc`)
 6. CMS brand list only for that component via `componentBrandConfig.ts` (avoid circular imports with `filterConfig.ts`)
 
 Reference implementations: Motherboard (`handleMotherboardBrandClick`), Desktop RAM (`handleRamBrandClick`), SSD (`handleSsdBrandClick`), Graphics Card manufacturer pills (`handleGpuManufacturerClick` — uses `manufacturer` param, still single-select).

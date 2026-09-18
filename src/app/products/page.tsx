@@ -13,7 +13,7 @@ import {
   COMPONENT_OVERVIEW_PILLS,
   componentOverviewHref,
 } from '@/lib/componentOverviewConfig';
-import { processorSortOptions, GPU_MANUFACTURER_BRANDS, ramSortOptions } from '@/lib/filterConfig';
+import { categorySortOptions, GPU_MANUFACTURER_BRANDS } from '@/lib/filterConfig';
 import { PROCESSOR_SPEC_FILTER_KEYS } from '@/lib/processorFilterMappings';
 import { GPU_SPEC_FILTER_KEYS } from '@/lib/gpuFilterMappings';
 import { RAM_SPEC_FILTER_KEYS } from '@/lib/ramFilterMappings';
@@ -82,7 +82,7 @@ function ProductsPageContent() {
   const subCategory = searchParams.get('sub');
   const typeParam = searchParams.get('type');
   const brandParam = searchParams.get('brand') || '';
-  const itemsPerPage = 30;
+  const itemsPerPage = Number(searchParams.get('limit')) || 20;
 
   const PROCESSOR_SUB_SLUGS = ['processor', 'intel', 'amd', 'amd-ryzen'] as const;
 
@@ -260,7 +260,18 @@ function ProductsPageContent() {
 
   const handleSortChange = (sort: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set('sort', sort);
+    if (sort === 'default') {
+      params.delete('sort');
+    } else {
+      params.set('sort', sort);
+    }
+    params.set('page', '1');
+    router.push(`/products?${params.toString()}`);
+  };
+
+  const handleLimitChange = (limit: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('limit', limit);
     params.set('page', '1');
     router.push(`/products?${params.toString()}`);
   };
@@ -479,50 +490,123 @@ function ProductsPageContent() {
     return 'All Products';
   };
 
+  /** Short category name for breadcrumb / toolbar (Star Tech style) */
+  const getCategoryShortName = () => {
+    if (isComponentsOverview) return 'Component';
+    if (isProcessorCategory) return 'Processor';
+    if (isGpuCategory) return 'Graphics Card';
+    if (isRamCategory) return 'Desktop RAM';
+    if (isMotherboardCategory) return 'Motherboard';
+    if (isPsuCategory) return 'Power Supply';
+    if (isSsdCategory) return 'SSD';
+    if (isCasingCategory) return 'Casing';
+    if (isCpuCoolerCategory) return 'CPU Cooler';
+    return 'Products';
+  };
+
+  /**
+   * Active brand / maker pill label when a single filter is selected
+   * (e.g. brand=asus-amd → "ASUS (AMD)", manufacturer=asus → "ASUS").
+   */
+  const getActiveBrandFilterLabel = (): string | null => {
+    if (isMotherboardCategory && brandParam) {
+      return MOTHERBOARD_BRANDS.find((b) => b.slug === brandParam)?.label ?? null;
+    }
+    if (isRamCategory && brandParam) {
+      return RAM_BRANDS.find((b) => b.slug === brandParam)?.label ?? null;
+    }
+    if (isPsuCategory && brandParam) {
+      return PSU_BRANDS.find((b) => b.slug === brandParam)?.label ?? null;
+    }
+    if (isSsdCategory && brandParam) {
+      return SSD_BRANDS.find((b) => b.slug === brandParam)?.label ?? null;
+    }
+    if (isCasingCategory && brandParam) {
+      return CASING_BRANDS.find((b) => b.slug === brandParam)?.label ?? null;
+    }
+    if (isCpuCoolerCategory && brandParam) {
+      return CPU_COOLER_BRANDS.find((b) => b.slug === brandParam)?.label ?? null;
+    }
+    if (isProcessorCategory && activeProcessorBrandFilter) {
+      return activeProcessorBrandFilter === 'amd' ? 'AMD' : 'Intel';
+    }
+    if (isGpuCategory) {
+      const manufacturer = searchParams.get('manufacturer');
+      if (manufacturer) {
+        return GPU_MANUFACTURER_BRANDS.find((b) => b.value === manufacturer)?.label ?? null;
+      }
+      // Chipset leaf routes only (not the generic graphics-card listing)
+      if (subCategory === 'nvidia' || typeParam === 'nvidia') return 'NVIDIA';
+      if (subCategory === 'amd-gpu' || typeParam === 'amd-gpu') return 'AMD Radeon';
+    }
+    return null;
+  };
+
+  const activeBrandFilterLabel = getActiveBrandFilterLabel();
+  const categoryShortName = getCategoryShortName();
+  const toolbarListingTitle = activeBrandFilterLabel || categoryShortName;
+
+  /** Category listing URL without brand/manufacturer filter (breadcrumb parent) */
+  const getCategoryListingHref = () => {
+    const params = new URLSearchParams();
+    params.set('category', categoryParam || 'components');
+    if (isProcessorCategory) {
+      params.set('sub', 'processor');
+    } else if (isGpuCategory) {
+      params.set('sub', 'graphics-card');
+    } else if (isRamCategory) {
+      params.set('sub', subCategory === 'laptop-ram' ? 'laptop-ram' : 'desktop-ram');
+    } else if (isMotherboardCategory) {
+      params.set('sub', 'motherboard');
+    } else if (isPsuCategory) {
+      params.set('sub', 'power-supply');
+    } else if (isSsdCategory) {
+      params.set('sub', 'ssd');
+    } else if (isCasingCategory) {
+      params.set('sub', 'computer-case');
+    } else if (isCpuCoolerCategory) {
+      params.set('sub', 'cpu-cooler');
+    } else if (subCategory) {
+      params.set('sub', subCategory);
+    }
+    return `/products?${params.toString()}`;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Breadcrumb */}
       <div className="bg-white border-b">
         <div className="max-w-[1400px] mx-auto px-4 py-3">
-          <nav className="flex items-center gap-2 text-sm">
+          <nav className="flex flex-wrap items-center gap-2 text-sm" aria-label="Breadcrumb">
             <Link href="/" className="text-gray-500 hover:text-blue-600">
               Home
             </Link>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
+            <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
             {isComponentsOverview ? (
               <span className="text-gray-900 font-medium">Component</span>
             ) : (
               <>
-                {categoryParam && (
+                <Link
+                  href="/products?category=components"
+                  className="text-gray-500 hover:text-blue-600"
+                >
+                  Component
+                </Link>
+                <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
+                {activeBrandFilterLabel ? (
                   <>
                     <Link
-                      href="/products?category=components"
+                      href={getCategoryListingHref()}
                       className="text-gray-500 hover:text-blue-600"
                     >
-                      {categoryParam === 'components' ? 'Component' : categoryParam}
+                      {categoryShortName}
                     </Link>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                    <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
+                    <span className="text-gray-900 font-medium">{activeBrandFilterLabel}</span>
                   </>
+                ) : (
+                  <span className="text-gray-900 font-medium">{categoryShortName}</span>
                 )}
-                <span className="text-gray-900 font-medium">
-                  {isProcessorCategory
-                    ? 'Processor'
-                    : isGpuCategory
-                      ? 'Graphics Card'
-                      : isRamCategory
-                        ? 'Desktop RAM'
-                        : isMotherboardCategory
-                          ? 'Motherboard'
-                          : isPsuCategory
-                            ? 'Power Supply'
-                            : isSsdCategory
-                              ? 'SSD'
-                              : isCasingCategory
-                                ? 'Casing'
-                                : isCpuCoolerCategory
-                                  ? 'CPU Cooler'
-                                  : 'Products'}
-                </span>
               </>
             )}
           </nav>
@@ -992,12 +1076,14 @@ function ProductsPageContent() {
             {/* Toolbar */}
             <div className="mb-4 rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  {!isComponentsOverview && (
+                    <h2 className="text-base font-semibold text-gray-900 truncate">
+                      {toolbarListingTitle}
+                    </h2>
+                  )}
                   {isComponentsOverview && (
                     <h2 className="text-base font-semibold text-gray-900">Component</h2>
-                  )}
-                  {isProcessorCategory && (
-                    <h2 className="text-base font-semibold text-gray-900">Processor</h2>
                   )}
                 </div>
 
@@ -1005,7 +1091,8 @@ function ProductsPageContent() {
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <span className="hidden sm:inline">Show:</span>
                     <select
-                      defaultValue="30"
+                      value={String(itemsPerPage)}
+                      onChange={(e) => handleLimitChange(e.target.value)}
                       className="rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="20">20</option>
@@ -1014,26 +1101,21 @@ function ProductsPageContent() {
                     </select>
                   </div>
 
-                  {isProcessorCategory && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <span className="hidden sm:inline">Sort By:</span>
-                      <select
-                        value={currentSort}
-                        onChange={(e) => handleSortChange(e.target.value)}
-                        className="rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                      >
-                        {processorSortOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
-                  <span className="text-sm text-gray-600">
-                    Showing {products.length} out of {totalProducts} products
-                  </span>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <span className="hidden sm:inline">Sort By:</span>
+                    <select
+                      value={currentSort}
+                      onChange={(e) => handleSortChange(e.target.value)}
+                      className="rounded-md border border-gray-300 px-2.5 py-1.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                      aria-label="Sort products by"
+                    >
+                      {categorySortOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
                   <div className="flex items-center rounded-md border border-gray-300">
                     <button

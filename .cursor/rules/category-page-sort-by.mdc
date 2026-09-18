@@ -1,0 +1,45 @@
+---
+description: Every storefront category listing must include Sort By (Default, Price Low>High, Price High>Low)
+alwaysApply: true
+---
+
+# Category Page — Sort By (required)
+
+Every product **category listing** on LogicBay BD must include a working **Sort By** control. This is a default feature — do not ship a new category page without it.
+
+## Required options (exact labels)
+
+1. **Default** (`sort=default` or omit param)
+2. **Price (Low > High)** (`sort=price_asc`)
+3. **Price (High > Low)** (`sort=price_desc`)
+
+Shared source of truth: `categorySortOptions` in `src/lib/filterConfig.ts`.
+
+## UI placement
+
+On the category toolbar next to **Show:** (page size), include:
+
+- Label: **Sort By:**
+- `<select>` bound to the `sort` URL query param
+- Changing sort resets `page` to `1`
+
+Reference: Star Tech–style toolbar on `/products?category=...&sub=...` ([`src/app/products/page.tsx`](src/app/products/page.tsx)).
+
+## Backend
+
+- Category APIs (`/api/products`, `/api/products/processor`, `gpu`, `ram`, `motherboard`, `ssd`, `psu`, `casing`, `cpu-cooler`) must honor `sort=price_asc` and `sort=price_desc`.
+- `default` → newest / catalog default order (`createdAt desc` is fine).
+- Generic filter schema must allow `default` (see `productFilterSchema`).
+
+## When adding a new product category
+
+1. Reuse `categorySortOptions` (do not invent a one-off sort list without Default + price asc/desc).
+2. Wire the toolbar Sort By on the listing page (shared `products/page.tsx` path or dedicated page).
+3. Confirm the category API applies `orderBy` for `price_asc` / `price_desc`.
+4. Do **not** hide Sort By behind a category flag (e.g. “processors only”).
+
+## Do not
+
+- Ship a category listing with only Show: and no Sort By
+- Use labels that omit price high/low (Minimum: Default + Low>High + High>Low)
+- Sort only on the client after fetching an unsorted full list — sorting must happen in the API/DB query

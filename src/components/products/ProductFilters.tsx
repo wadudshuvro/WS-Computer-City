@@ -173,14 +173,13 @@ export function ProductFilters({ filters }: ProductFiltersProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Filters</h2>
-        {hasActiveFilters && (
+      {hasActiveFilters && (
+        <div className="flex items-center justify-end">
           <Button variant="ghost" size="sm" onClick={clearFilters}>
             Clear All
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
       <Accordion type="multiple" defaultValue={['brands', 'price', 'stock']} className="w-full">
         {/* Brand Filter */}

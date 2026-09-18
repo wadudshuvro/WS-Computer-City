@@ -735,7 +735,10 @@ export class ProductService {
       case 'updated':
         return { updatedAt: 'desc' };
       case 'newest':
+        return { createdAt: 'desc' };
+      case 'default':
       default:
+        // Category pages: Default = newest first (same as Star Tech–style “Default”)
         return { createdAt: 'desc' };
     }
   }

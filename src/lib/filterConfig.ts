@@ -360,16 +360,20 @@ export const PROCESSOR_BRAND_SPEC_FILTER_KEYS = [
   'cache_size',
 ] as const;
 
-// Sort options for processor page
-export const processorSortOptions = [
+/**
+ * Default Sort By options for EVERY storefront category listing page.
+ * Keep in sync with category APIs (`price_asc` / `price_desc` / `default`).
+ */
+export const categorySortOptions = [
   { value: 'default', label: 'Default' },
-  { value: 'price_asc', label: 'Price: Low to High' },
-  { value: 'price_desc', label: 'Price: High to Low' },
-  { value: 'newest', label: 'Newest First' },
-  { value: 'name', label: 'Name: A to Z' },
-];
+  { value: 'price_asc', label: 'Price (Low > High)' },
+  { value: 'price_desc', label: 'Price (High > Low)' },
+] as const;
 
-export const gpuSortOptions = processorSortOptions;
+/** @deprecated Use categorySortOptions — kept as alias for existing imports */
+export const processorSortOptions = categorySortOptions;
+
+export const gpuSortOptions = categorySortOptions;
 
 export type GpuChipsetBrand = 'nvidia' | 'amd';
 
@@ -529,7 +533,7 @@ export function getRamFilters(): FilterDefinition[] {
   ];
 }
 
-export const ramSortOptions = processorSortOptions;
+export const ramSortOptions = categorySortOptions;
 
 export { RAM_BRANDS };
 
@@ -616,7 +620,7 @@ export function getMotherboardFilters(): FilterDefinition[] {
   ];
 }
 
-export const motherboardSortOptions = processorSortOptions;
+export const motherboardSortOptions = categorySortOptions;
 
 const psuStockStatusFilter: FilterDefinition = {
   key: 'stockStatus',
@@ -683,7 +687,7 @@ export function getPsuFilters(): FilterDefinition[] {
   ];
 }
 
-export const psuSortOptions = processorSortOptions;
+export const psuSortOptions = categorySortOptions;
 
 const ssdStockStatusFilter: FilterDefinition = {
   key: 'stockStatus',
@@ -786,7 +790,7 @@ export function getSsdFilters(): FilterDefinition[] {
   ];
 }
 
-export const ssdSortOptions = processorSortOptions;
+export const ssdSortOptions = categorySortOptions;
 
 const casingStockStatusFilter: FilterDefinition = {
   key: 'stockStatus',
@@ -871,7 +875,7 @@ export function getCasingFilters(): FilterDefinition[] {
   ];
 }
 
-export const casingSortOptions = processorSortOptions;
+export const casingSortOptions = categorySortOptions;
 
 const cpuCoolerStockStatusFilter: FilterDefinition = {
   key: 'stockStatus',
@@ -956,7 +960,7 @@ export function getCpuCoolerFilters(): FilterDefinition[] {
   ];
 }
 
-export const cpuCoolerSortOptions = processorSortOptions;
+export const cpuCoolerSortOptions = categorySortOptions;
 
 // Get filter config by category
 export function getFilterConfig(category: string, brand: ProcessorBrand = 'intel'): FilterDefinition[] {

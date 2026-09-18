@@ -1,7 +1,7 @@
 'use client';
 
 import { ProcessorFilters } from '@/components/products/ProcessorFilters';
-import { processorSortOptions } from '@/lib/filterConfig';
+import { categorySortOptions } from '@/lib/filterConfig';
 import { PROCESSOR_SPEC_FILTER_KEYS } from '@/lib/processorFilterMappings';
 import { ChevronRight, Eye, Grid, Heart, List, ShoppingCart, SlidersHorizontal, X } from 'lucide-react';
 import Link from 'next/link';
@@ -278,12 +278,14 @@ function ProcessorPageContent() {
                 <div className="flex items-center gap-4">
                   {/* Sort Dropdown */}
                   <div className="flex items-center gap-2">
+                    <span className="hidden sm:inline text-sm text-gray-600">Sort By:</span>
                     <select
                       value={currentSort}
                       onChange={(e) => handleSortChange(e.target.value)}
                       className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      aria-label="Sort products by"
                     >
-                      {processorSortOptions.map((option) => (
+                      {categorySortOptions.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
                         </option>
@@ -305,11 +307,6 @@ function ProcessorPageContent() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  {/* Product Count */}
-                  <span className="text-sm text-gray-600">
-                    Showing {products.length} out of {totalProducts} products
-                  </span>
-
                   {/* View Mode Toggle */}
                   <div className="flex items-center border border-gray-300 rounded-md">
                     <button

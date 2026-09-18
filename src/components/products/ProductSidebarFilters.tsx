@@ -272,25 +272,23 @@ export function ProductSidebarFilters({
   if (!mounted) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
-        <p className="text-sm text-gray-500 mt-3">Loading filters...</p>
+        <p className="text-sm text-gray-500">Loading filters...</p>
       </div>
     );
   }
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
-        {hasActiveFilters && (
+      {hasActiveFilters && (
+        <div className="flex items-center justify-end p-4 border-b border-gray-200">
           <button
             onClick={clearAllFilters}
             className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
           >
             Clear All
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="p-4">
         <Accordion

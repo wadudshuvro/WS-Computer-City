@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
-\restrict 6uBUsaE74PLAgb8D4EzD87mWnFzvh4UnVcih8HXxa1HisqRfCM9LYIy2rkVdzLv
+\restrict 8o0UYcQcvetCfOP91a4M1peUwADWW0fxug7U1Qggs7Yw2ITkjBhPuvHA3l7J1mx
 
--- Dumped from database version 18.4
--- Dumped by pg_dump version 18.4
+-- Dumped from database version 18.6
+-- Dumped by pg_dump version 18.6
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -2375,5 +2375,5 @@ ALTER TABLE ONLY public.specification_definitions
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 6uBUsaE74PLAgb8D4EzD87mWnFzvh4UnVcih8HXxa1HisqRfCM9LYIy2rkVdzLv
+\unrestrict 8o0UYcQcvetCfOP91a4M1peUwADWW0fxug7U1Qggs7Yw2ITkjBhPuvHA3l7J1mx
 
