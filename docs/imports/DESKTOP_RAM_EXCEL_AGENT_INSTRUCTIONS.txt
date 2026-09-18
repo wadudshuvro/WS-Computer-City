@@ -1,0 +1,94 @@
+Desktop RAM Excel → CMS import instructions
+===========================================
+
+Files
+-----
+docs/imports/desktop-ram-cms-import-30.xlsx   ← pass THIS to the agent (30 batch)
+docs/imports/desktop-ram-cms-import-30.csv    ← same 30-row data
+docs/imports/desktop-ram-cms-import.csv       ← used by the import script
+docs/imports/desktop-ram-models-checklist.csv
+docs/imports/startech-desktop-ram-list.json
+
+Source list
+-----------
+Desktop RAM model names were collected from the Star Tech category listing
+(https://www.startech.com.bd/component/ram — titles + listing URLs only).
+Laptop / SO-DIMM titles are skipped when detected in the listing name.
+
+IMPORTANT legal / data rules
+----------------------------
+- Do NOT copy product descriptions, bullet marketing text, prices, or images from
+  startech.com.bd or other retailers into LogicBay BD.
+- Fill technical specs from manufacturer datasheets
+  (Kingston / Corsair / G.SKILL / TeamGroup / ADATA / Crucial / etc.).
+- Set YOUR BDT prices, stock, warranty wording, images you own/license, and your own copy.
+- source_list_url is a research bookmark only — not content to paste.
+
+What the agent / editor must do
+-------------------------------
+1. Open desktop-ram-cms-import-30.xlsx (sheet: Desktop RAM 30).
+2. For each model you actually sell:
+   a. Keep stock_decision = STOCK (or set SKIP if not stocking)
+   b. Replace REPLACE_WITH_YOUR_PRICE with your real BDT price
+   c. Confirm brand_slug matches RAM_BRANDS (kingston, corsair, team, g-skill, …)
+   d. Keep category_slug = desktop-ram
+   e. Fill EVERY Desktop RAM CMS specification column (keys below)
+   f. Keep warranty filled (required structured field on PDP)
+   g. Point image_url at /uploads/ram/your-file.jpg (local file under public/uploads/ram/)
+   h. Rewrite shortDescription / description in your own words
+3. Save / export CSV over docs/imports/desktop-ram-cms-import.csv, then run:
+     npx tsx scripts/import-desktop-ram-csv.ts
+4. Download / refresh PDP images into public/uploads/ram and wire CMS image URLs:
+     npx tsx scripts/download-desktop-ram-images.ts
+5. Verify storefront: /products?category=components&sub=ram (or desktop-ram route)
+6. Open a PDP and confirm product image + Warranty Information + Memory specs.
+
+Base product columns
+--------------------
+stock_decision, name, slug, sku, brand_slug, category_slug,
+shortDescription, description, price, compareAtPrice, costPrice,
+stockStatus, stockQuantity, lowStockAlert, isFeatured, isActive,
+image_url, image_alt, metaTitle, metaDescription, metaKeywords, source_list_url
+
+stock_decision: REVIEW | STOCK | SKIP
+stockStatus: IN_STOCK | OUT_OF_STOCK | PRE_ORDER | DISCONTINUED
+sku: uppercase letters, numbers, hyphens only
+slug: lowercase-with-hyphens
+category_slug: desktop-ram
+
+Desktop RAM CMS specification keys (must persist as productSpecification)
+------------------------------------------------------------------------
+memory_type     (SELECT, required)  DDR3 | DDR4 | DDR5
+speed           (SELECT, required)  e.g. 3200 MHz | 5600 MHz  (exact RAM_SPEED_OPTIONS)
+latency         (text)              e.g. 16-18-18-36
+capacity        (SELECT, required)  e.g. 8GB | 16GB | 32GB  (exact RAM_SIZE_OPTIONS)
+voltage         (text)              e.g. 1.35V
+other_features  (text)              e.g. XMP 3.0, EXPO
+color           (text)              e.g. Black
+ram_features    (SELECT)            ARGB | RGB RAM | Heatsink
+warranty        (text, required)    e.g. Lifetime | 3 Years
+
+When creating via API / ProductService, send specifications as:
+  { "key": "warranty", "value": "Lifetime" }
+(and the same pattern for every other key).
+
+Brand slugs (must match RAM_BRANDS in src/lib/ramSpecDefinitions.ts)
+--------------------------------------------------------------------
+kingston | team | corsair | pny | adata | ocpc | lexar | aitc | apacer |
+g-skill | xoc | neo-forza | gigabyte | patriot | colorful | hikvision |
+oscoo | kimtigo | hiksemi | addlink | netac | crucial | transcend |
+kingspec | kingbank | dahua | smart | thermaltake | abmoto | pc-power |
+twinmos | walton | microfrom | hp | geil | biostar
+
+Suggested agent prompt
+----------------------
+"Read docs/imports/desktop-ram-cms-import-30.xlsx and
+docs/imports/DESKTOP_RAM_EXCEL_AGENT_INSTRUCTIONS.txt.
+For STOCK rows: fill manufacturer specs, my BDT prices, my images, and my
+descriptions. Do not scrape or paste Star Tech PDP content. Then wait for my
+OK before running npx tsx scripts/import-desktop-ram-csv.ts."
+
+Rebuild listing + Excel (if needed)
+-----------------------------------
+npx tsx scripts/scrape-startech-desktop-ram-list.ts
+npx tsx scripts/build-desktop-ram-import-excel-30.ts

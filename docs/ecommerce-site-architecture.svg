@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1180" viewBox="0 0 1400 1180" role="img" aria-labelledby="title desc">
+  <title id="title">E-commerce site architecture overview</title>
+  <desc id="desc">Diagram showing domain, hosting, application, database, admin updates, deployment flow, and local development flow for a Next.js ecommerce website.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3563e9" />
+    </marker>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #1f2937; }
+      .title { font-size: 34px; font-weight: bold; }
+      .subtitle { font-size: 18px; fill: #475569; }
+      .section { font-size: 22px; font-weight: bold; }
+      .box-title { font-size: 20px; font-weight: bold; }
+      .box-text { font-size: 16px; fill: #334155; }
+      .small { font-size: 15px; fill: #475569; }
+      .line { stroke: #3563e9; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .soft-line { stroke: #64748b; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .note { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2; }
+      .primary { fill: #eff6ff; stroke: #93c5fd; stroke-width: 2.5; }
+      .success { fill: #ecfdf5; stroke: #86efac; stroke-width: 2.5; }
+      .warning { fill: #fffbeb; stroke: #fcd34d; stroke-width: 2.5; }
+      .muted { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2.5; }
+      .accent { fill: #eef2ff; stroke: #a5b4fc; stroke-width: 2.5; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1400" height="1180" fill="#ffffff" />
+  <text x="60" y="60" class="title">E-commerce Website Architecture</text>
+  <text x="60" y="92" class="subtitle">This project stack: Next.js, Prisma, PostgreSQL, NextAuth, Admin Panel, GitHub sync backups</text>
+
+  <text x="60" y="145" class="section">1. Live Production Flow</text>
+
+  <rect x="60" y="180" width="230" height="110" rx="16" class="warning" />
+  <text x="85" y="215" class="box-title">Domain + DNS</text>
+  <text x="85" y="244" class="box-text">Example: Namecheap /</text>
+  <text x="85" y="267" class="box-text">Cloudflare DNS</text>
+
+  <rect x="340" y="180" width="250" height="110" rx="16" class="primary" />
+  <text x="365" y="215" class="box-title">Hosting + CDN</text>
+  <text x="365" y="244" class="box-text">Example: Vercel</text>
+  <text x="365" y="267" class="box-text">Builds and serves Next.js app</text>
+
+  <rect x="640" y="180" width="270" height="110" rx="16" class="accent" />
+  <text x="665" y="215" class="box-title">Next.js Application</text>
+  <text x="665" y="244" class="box-text">Homepage, product pages,</text>
+  <text x="665" y="267" class="box-text">cart, filters, admin pages</text>
+
+  <rect x="960" y="180" width="200" height="110" rx="16" class="muted" />
+  <text x="985" y="215" class="box-title">API + Auth</text>
+  <text x="985" y="244" class="box-text">Next.js API routes</text>
+  <text x="985" y="267" class="box-text">and NextAuth</text>
+
+  <rect x="1210" y="180" width="150" height="110" rx="16" class="success" />
+  <text x="1235" y="215" class="box-title">Database</text>
+  <text x="1235" y="244" class="box-text">PostgreSQL</text>
+  <text x="1235" y="267" class="box-text">via Prisma ORM</text>
+
+  <path d="M290 235 H340" class="line" />
+  <path d="M590 235 H640" class="line" />
+  <path d="M910 235 H960" class="line" />
+  <path d="M1160 235 H1210" class="line" />
+
+  <rect x="640" y="340" width="310" height="140" rx="16" class="success" />
+  <text x="665" y="375" class="box-title">Admin Product Update</text>
+  <text x="665" y="404" class="box-text">Admin logs into back office,</text>
+  <text x="665" y="427" class="box-text">adds product, edits price, stock,</text>
+  <text x="665" y="450" class="box-text">brand, images, specifications</text>
+
+  <rect x="1010" y="340" width="250" height="140" rx="16" class="accent" />
+  <text x="1035" y="375" class="box-title">What happens next?</text>
+  <text x="1035" y="404" class="box-text">API validates data, writes</text>
+  <text x="1035" y="427" class="box-text">to PostgreSQL, then refreshes</text>
+  <text x="1035" y="450" class="box-text">cache / revalidates pages</text>
+
+  <path d="M795 290 V340" class="line" />
+  <path d="M950 410 H1010" class="line" />
+  <path d="M1210 290 V340" class="soft-line" />
+  <path d="M1210 340 V305" class="soft-line" />
+  <path d="M1160 410 H1210" class="soft-line" />
+
+  <rect x="60" y="530" width="610" height="215" rx="16" class="note" />
+  <text x="85" y="565" class="box-title">2. Where things usually live</text>
+  <text x="85" y="600" class="box-text">Domain:</text>
+  <text x="190" y="600" class="box-text">Namecheap / GoDaddy / Cloudflare Registrar</text>
+  <text x="85" y="632" class="box-text">DNS:</text>
+  <text x="190" y="632" class="box-text">Cloudflare DNS or registrar DNS records</text>
+  <text x="85" y="664" class="box-text">App Hosting:</text>
+  <text x="190" y="664" class="box-text">Vercel for Next.js (very common)</text>
+  <text x="85" y="696" class="box-text">Database Hosting:</text>
+  <text x="190" y="696" class="box-text">Managed PostgreSQL such as Neon or AWS RDS</text>
+  <text x="85" y="728" class="box-text">Images / Files:</text>
+  <text x="190" y="728" class="box-text">UploadThing, S3, or Cloudflare R2</text>
+
+  <rect x="720" y="530" width="640" height="215" rx="16" class="note" />
+  <text x="745" y="565" class="box-title">3. This project's development pattern</text>
+  <text x="745" y="600" class="box-text">Developer laptop:</text>
+  <text x="930" y="600" class="box-text">Next.js app + local PostgreSQL</text>
+  <text x="745" y="632" class="box-text">ORM:</text>
+  <text x="930" y="632" class="box-text">Prisma maps app code to PostgreSQL tables</text>
+  <text x="745" y="664" class="box-text">Auth:</text>
+  <text x="930" y="664" class="box-text">NextAuth protects admin pages</text>
+  <text x="745" y="696" class="box-text">Code sync:</text>
+  <text x="930" y="696" class="box-text">Git + GitHub</text>
+  <text x="745" y="728" class="box-text">Data sync in this repo:</text>
+  <text x="930" y="728" class="box-text">backup SQL / JSON files pushed to GitHub</text>
+
+  <text x="60" y="800" class="section">4. Dev to Live Deployment Flow</text>
+
+  <rect x="60" y="835" width="220" height="110" rx="16" class="muted" />
+  <text x="85" y="870" class="box-title">Developer PC</text>
+  <text x="85" y="899" class="box-text">Code changes locally</text>
+  <text x="85" y="922" class="box-text">Runs and tests app</text>
+
+  <rect x="330" y="835" width="220" height="110" rx="16" class="warning" />
+  <text x="355" y="870" class="box-title">GitHub</text>
+  <text x="355" y="899" class="box-text">Stores code history</text>
+  <text x="355" y="922" class="box-text">Can trigger deploy</text>
+
+  <rect x="600" y="835" width="240" height="110" rx="16" class="primary" />
+  <text x="625" y="870" class="box-title">CI / Build</text>
+  <text x="625" y="899" class="box-text">Vercel build runs</text>
+  <text x="625" y="922" class="box-text">and creates live bundle</text>
+
+  <rect x="890" y="835" width="220" height="110" rx="16" class="accent" />
+  <text x="915" y="870" class="box-title">Production App</text>
+  <text x="915" y="899" class="box-text">New code goes live</text>
+  <text x="915" y="922" class="box-text">for real visitors</text>
+
+  <rect x="1160" y="835" width="200" height="110" rx="16" class="success" />
+  <text x="1185" y="870" class="box-title">Visitors</text>
+  <text x="1185" y="899" class="box-text">See latest live site</text>
+  <text x="1185" y="922" class="box-text">through domain</text>
+
+  <path d="M280 890 H330" class="line" />
+  <path d="M550 890 H600" class="line" />
+  <path d="M840 890 H890" class="line" />
+  <path d="M1110 890 H1160" class="line" />
+
+  <rect x="60" y="990" width="1300" height="140" rx="16" class="note" />
+  <text x="85" y="1025" class="box-title">5. Beginner summary</text>
+  <text x="85" y="1060" class="box-text">1) Domain points to hosting.</text>
+  <text x="360" y="1060" class="box-text">2) Hosting runs the website app.</text>
+  <text x="670" y="1060" class="box-text">3) App reads/writes data in PostgreSQL.</text>
+  <text x="1040" y="1060" class="box-text">4) Admin updates products from the back office.</text>
+  <text x="85" y="1094" class="box-text">5) Code changes usually need deploy.</text>
+  <text x="430" y="1094" class="box-text">6) Data changes usually appear after DB write + cache refresh/revalidation.</text>
+</svg>

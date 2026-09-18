@@ -1,0 +1,93 @@
+Motherboard Excel → CMS import instructions
+============================================
+
+Files
+-----
+docs/imports/motherboard-cms-import.xlsx   ← pass THIS to the agent
+docs/imports/motherboard-cms-import.csv    ← same data; used by the import script
+docs/imports/motherboard-models-checklist.csv
+docs/imports/startech-motherboard-list.json
+
+Source list
+-----------
+517 motherboard model names were collected from the Star Tech category listing
+(https://www.startech.com.bd/component/motherboard — titles + listing URLs only).
+
+IMPORTANT legal / data rules
+----------------------------
+- Do NOT copy product descriptions, bullet marketing text, prices, or images from
+  startech.com.bd or other retailers into LogicBay BD.
+- Fill technical specs from manufacturer datasheets (ASUS / MSI / Gigabyte / ASRock / etc.).
+- Set YOUR BDT prices, stock, warranty wording, images you own/license, and your own copy.
+- source_list_url is a research bookmark only — not content to paste.
+
+What the agent must do
+----------------------
+1. Open motherboard-cms-import.xlsx (sheet: Motherboard Import).
+2. For each model you actually sell:
+   a. Set stock_decision = STOCK
+   b. Replace REPLACE_WITH_YOUR_PRICE with your real BDT price
+   c. Confirm brand_slug (msi-intel, asus-amd, gigabyte-intel, asrock-amd, colorful-*, …)
+   d. Confirm category_slug (intel-motherboard | amd-motherboard)
+   e. Fill EVERY Motherboard CMS specification column (keys below)
+   f. Keep warranty filled (required structured field)
+   g. Point image_url at /uploads/motherboards/your-file.jpg (local under public/uploads/motherboards/)
+   h. Rewrite shortDescription / description in your own words
+3. Set stock_decision = SKIP for models you will not stock.
+4. Save / export CSV if you edited the xlsx, then run:
+     npx tsx scripts/import-motherboard-csv.ts
+5. Download / refresh PDP images:
+     npx tsx scripts/download-motherboard-images.ts
+6. Verify storefront: /products?category=components&sub=motherboard
+7. Open one Intel and one AMD PDP and confirm product image + Warranty Information.
+
+Base product columns
+--------------------
+stock_decision, name, slug, sku, brand_slug, category_slug, processor_type,
+shortDescription, description, price, compareAtPrice, costPrice,
+stockStatus, stockQuantity, lowStockAlert, isFeatured, isActive,
+image_url, image_alt, metaTitle, metaDescription, metaKeywords, source_list_url
+
+stock_decision: REVIEW | STOCK | SKIP
+stockStatus: IN_STOCK | OUT_OF_STOCK | PRE_ORDER | DISCONTINUED
+sku: uppercase letters, numbers, hyphens only
+slug: lowercase-with-hyphens
+
+Motherboard CMS specification keys (must persist as productSpecification)
+------------------------------------------------------------------------
+supported_cpu      (text, required)  e.g. Support Intel Core 14th/13th/12th Gen, LGA 1700
+chipset            (text, required)  e.g. Intel H610 Chipset
+memory_size        (text)            e.g. 64GB
+memory_type        (text)            DDR3 | DDR4 | DDR5
+storage_slots      (text)            e.g. 2
+graphics           (text)            e.g. 1x HDMI, 1x VGA
+audio              (text)            e.g. Realtek ALC897 Codec
+ports_connectors   (text, multiline) HDMI / USB / LAN / Wireless / TPM (one per line OK)
+special_features   (text)            e.g. Wi-Fi 6, EZ Debug LED
+form_factor        (text)            ATX | Micro ATX | Mini ITX | Extended ATX
+expansion_slots    (text, multiline) PCIe / M.2 slots
+warranty           (text, required)  e.g. 3 Years
+
+When creating via API / ProductService, send specifications as:
+  { "key": "warranty", "value": "3 Years" }
+(and the same pattern for every other key).
+
+Brand slugs (must match CMS)
+----------------------------
+msi-intel | msi-amd | asrock-intel | asrock-amd | asus-intel | asus-amd |
+gigabyte-intel | gigabyte-amd | colorful-intel | colorful-amd |
+xenthra | biostar | nzxt   (import script can create missing maker brands)
+
+Suggested agent prompt
+----------------------
+"Read docs/imports/motherboard-cms-import.xlsx and
+docs/imports/MOTHERBOARD_EXCEL_AGENT_INSTRUCTIONS.txt.
+For models I mark STOCK: fill manufacturer specs, my prices, my images, and my
+descriptions. Do not scrape or paste Star Tech PDP content. Then run
+npx tsx scripts/import-motherboard-csv.ts so products save to PostgreSQL CMS
+and appear on the motherboard category page."
+
+Rebuild Excel from listing (if needed)
+--------------------------------------
+npx tsx scripts/scrape-startech-motherboard-list.ts
+npx tsx scripts/build-motherboard-import-excel.ts

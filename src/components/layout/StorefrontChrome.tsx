@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { ProductAdvisorChat } from '@/components/agent/ProductAdvisorChat';
 
 /**
  * Renders storefront Header + MegaMenu + Footer on all non-admin pages.
@@ -20,6 +21,7 @@ export function StorefrontChrome({ children }: { children: React.ReactNode }) {
       <Header />
       {children}
       <Footer />
+      <ProductAdvisorChat />
     </>
   );
 }

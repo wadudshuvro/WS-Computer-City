@@ -1,0 +1,52 @@
+---
+description: When user asks to add/fix PDP product images for a category — download locally to public/uploads and wire CMS image URLs (same plan as RAM & Motherboard).
+alwaysApply: true
+---
+
+# Product PDP Images (category image pass)
+
+When the user says **add images**, **fix PDP images**, **download product images**, or the same for a category (RAM, motherboard, GPU, etc.), follow this plan end-to-end. Do not leave broken `/uploads/...` paths or hotlink competitor CDNs as the permanent CMS URL.
+
+## Goal
+
+Every product in that category’s PDP and listing must show a **local** primary image under LogicBay BD:
+
+`/uploads/<folder>/<product-slug>.<ext>` → file on disk at `public/uploads/<folder>/`
+
+## Required steps
+
+1. **List DB products** for the category (and child slugs), including current `product_images.url`.
+2. **Resolve a source PDP URL** per product (prefer import CSV `source_list_url`, then `docs/imports/startech-*-list.json` name match). Use that page only to find the main product photo — do not paste Star Tech descriptions/prices into CMS.
+3. **Download** the main PDP image (prefer ~800px) into `public/uploads/<folder>/` named by product `slug`.
+4. **Update CMS**: set primary `product_images.url` to `/uploads/<folder>/<slug>.<ext>` (create row if missing). Prefer local path over `https://…startech…`.
+5. **Verify**: file count on disk matches products; every product has a local `/uploads/…` URL and the file exists.
+6. Tell the user to hard-refresh a PDP / category page.
+
+## Folder map
+
+| Category | Upload folder | Script (create if missing, mirror existing) |
+|----------|---------------|-----------------------------------------------|
+| Desktop RAM | `public/uploads/ram/` | `scripts/download-desktop-ram-images.ts` |
+| Motherboard | `public/uploads/motherboards/` | `scripts/download-motherboard-images.ts` |
+| New category | `public/uploads/<kebab>/` | `scripts/download-<category>-images.ts` |
+
+Re-run examples:
+
+```bash
+npx tsx scripts/download-desktop-ram-images.ts
+npx tsx scripts/download-motherboard-images.ts
+```
+
+## Do
+
+- Create `public/uploads/...` if missing (Next.js serves `/uploads` from `public/uploads`).
+- Match products by `slug`, then normalized `name`, then listing JSON.
+- Upsert primary image in PostgreSQL via Prisma / ProductService patterns already used.
+- For a new category: copy the RAM/motherboard download script pattern; wire category slugs + CSV/JSON paths.
+
+## Do not
+
+- Leave `image_url` as `/uploads/...` without writing the file
+- Rely on hotlinked `startech.com.bd/image/...` as the final CMS URL
+- Skip DB update after downloading files
+- Copy competitor PDP text/prices into product fields while doing an image pass

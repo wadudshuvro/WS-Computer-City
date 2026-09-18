@@ -1,8 +1,8 @@
 # AI/Agent Feature Roadmap — LogicBay BD
 
-> **Status:** Saved for later — not implemented yet.  
-> **Saved:** 2026-09-15  
-> **How to resume:** Tell Cursor: “Implement the Smart Product Q&A plan in `docs/ai-agent-feature-roadmap.md`.”
+> **Status:** Feature #1 (Smart Product Q&A) implemented — needs `GEMINI_API_KEY` in `.env`.  
+> **Saved:** 2026-09-15 · **Implemented:** 2026-09-18  
+> **How to resume Feature #5:** Tell Cursor: “Implement the Admin SEO helper from `docs/ai-agent-feature-roadmap.md`.”
 
 ---
 
@@ -125,7 +125,7 @@ Defer until catalog is much larger.
 | Later | #2 Compatibility → then #3 PC builder | Need key normalization + builder UI |
 | Not now | #4 Orders, #6 Image search | Missing order system / expensive infra |
 
-**Model default:** Google **Gemini 2.0 Flash** (free tier / cheap). DeepSeek as optional alternate env. No rewrite of the store.
+**Model default:** Google **Gemini 3.6 Flash** (required for new AI Studio keys; tool results sent as user JSON for compatibility). DeepSeek as optional alternate env. No rewrite of the store.
 
 ---
 
@@ -172,7 +172,7 @@ sequenceDiagram
 
 ### Files to change lightly
 
-- `.env.example` — `GEMINI_API_KEY=`, optional `AI_MODEL=gemini-2.0-flash`
+- `.env.example` — `GEMINI_API_KEY=`, optional `AI_MODEL=gemini-3.6-flash`
 - No Prisma migration; no new tables for v1
 
 ### Prompt / safety (minimal)

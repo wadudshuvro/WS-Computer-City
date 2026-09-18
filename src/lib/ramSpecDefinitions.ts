@@ -56,6 +56,7 @@ export const RAM_BRANDS = [
 
 export const RAM_SPEED_OPTIONS = [
   '1600 MHz',
+  '2400 MHz',
   '2666 MHz',
   '3200 MHz',
   '3600 MHz',

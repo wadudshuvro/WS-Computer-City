@@ -1,0 +1,202 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1680" viewBox="0 0 1400 1680" role="img" aria-labelledby="title desc">
+  <title id="title">Business owner ecommerce workflow</title>
+  <desc id="desc">Generic Startech-style owner flow: what to buy, how customers browse, how staff add PDPs in CMS, where the database lives, and when a developer must deploy code.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3563e9" />
+    </marker>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #1f2937; }
+      .title { font-size: 32px; font-weight: bold; }
+      .subtitle { font-size: 17px; fill: #475569; }
+      .section { font-size: 22px; font-weight: bold; }
+      .box-title { font-size: 18px; font-weight: bold; }
+      .box-text { font-size: 15px; fill: #334155; }
+      .small { font-size: 14px; fill: #475569; }
+      .line { stroke: #3563e9; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .soft-line { stroke: #64748b; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .note { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2; }
+      .primary { fill: #eff6ff; stroke: #93c5fd; stroke-width: 2.5; }
+      .success { fill: #ecfdf5; stroke: #86efac; stroke-width: 2.5; }
+      .warning { fill: #fffbeb; stroke: #fcd34d; stroke-width: 2.5; }
+      .muted { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2.5; }
+      .accent { fill: #eef2ff; stroke: #a5b4fc; stroke-width: 2.5; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1400" height="1680" fill="#ffffff" />
+  <text x="60" y="52" class="title">Business Owner Workflow (Startech-style shop)</text>
+  <text x="60" y="82" class="subtitle">Generic ecommerce: domain, hosting, CMS, database, physical store. Not tied to one code repo.</text>
+
+  <!-- 1. What you buy -->
+  <text x="60" y="130" class="section">1. What you buy / subscribe (once, then monthly)</text>
+
+  <rect x="60" y="155" width="200" height="118" rx="16" class="warning" />
+  <text x="80" y="188" class="box-title">Domain</text>
+  <text x="80" y="214" class="box-text">yoursite.com</text>
+  <text x="80" y="236" class="box-text">Namecheap / GoDaddy</text>
+  <text x="80" y="256" class="small">Pay yearly</text>
+
+  <rect x="285" y="155" width="200" height="118" rx="16" class="primary" />
+  <text x="305" y="188" class="box-title">DNS + shield</text>
+  <text x="305" y="214" class="box-text">Cloudflare</text>
+  <text x="305" y="236" class="box-text">Name to server + CDN</text>
+  <text x="305" y="256" class="small">Often free tier</text>
+
+  <rect x="510" y="155" width="210" height="118" rx="16" class="accent" />
+  <text x="530" y="188" class="box-title">Website hosting</text>
+  <text x="530" y="214" class="box-text">Vercel or VPS</text>
+  <text x="530" y="236" class="box-text">Runs the live site</text>
+  <text x="530" y="256" class="small">Pay monthly</text>
+
+  <rect x="745" y="155" width="220" height="118" rx="16" class="success" />
+  <text x="765" y="188" class="box-title">Database</text>
+  <text x="765" y="214" class="box-text">Managed PostgreSQL</text>
+  <text x="765" y="236" class="box-text">Neon / RDS / cPanel MySQL</text>
+  <text x="765" y="256" class="small">Products live here</text>
+
+  <rect x="990" y="155" width="200" height="118" rx="16" class="muted" />
+  <text x="1010" y="188" class="box-title">Images + email</text>
+  <text x="1010" y="214" class="box-text">R2 / S3 / Cloudinary</text>
+  <text x="1010" y="236" class="box-text">Resend / SendGrid</text>
+  <text x="1010" y="256" class="small">Pay monthly</text>
+
+  <path d="M260 214 H285" class="line" />
+  <path d="M485 214 H510" class="line" />
+  <path d="M720 214 H745" class="line" />
+  <path d="M965 214 H990" class="line" />
+
+  <!-- 2. Two people -->
+  <text x="60" y="330" class="section">2. Two different people, two different jobs</text>
+
+  <rect x="60" y="355" width="620" height="200" rx="16" class="primary" />
+  <text x="85" y="392" class="box-title">Customer (browser / phone)</text>
+  <text x="85" y="424" class="box-text">Types the domain, sees homepage, category, PDP, price, stock.</text>
+  <text x="85" y="450" class="box-text">Never opens CMS. Never touches the database.</text>
+  <text x="85" y="476" class="box-text">Flow: Domain � Cloudflare � Hosting � Website reads Database.</text>
+  <text x="85" y="510" class="small">Same idea as Star Tech / PQS visitors.</text>
+
+  <rect x="720" y="355" width="640" height="200" rx="16" class="success" />
+  <text x="745" y="392" class="box-title">Owner / staff (CMS back office)</text>
+  <text x="745" y="424" class="box-text">Logs into /admin or Shopify Admin or OpenCart panel.</text>
+  <text x="745" y="450" class="box-text">Adds PDP: name, price, stock, specs, photos. Clicks Save.</text>
+  <text x="745" y="476" class="box-text">Flow: CMS � API � Database write. No GitHub. No deploy.</text>
+  <text x="745" y="510" class="small">This is the daily job for 12 shop people.</text>
+
+  <!-- 3. Daily PDP -->
+  <text x="60" y="610" class="section">3. Daily PDP update (no website rebuild)</text>
+
+  <rect x="60" y="635" width="200" height="100" rx="16" class="success" />
+  <text x="80" y="668" class="box-title">1. Staff login</text>
+  <text x="80" y="694" class="box-text">Admin / CMS panel</text>
+  <text x="80" y="716" class="small">Password + 2FA later</text>
+
+  <rect x="300" y="635" width="210" height="100" rx="16" class="accent" />
+  <text x="320" y="668" class="box-title">2. Fill product</text>
+  <text x="320" y="694" class="box-text">Price, stock, photos</text>
+  <text x="320" y="716" class="small">Same as a paper stock list</text>
+
+  <rect x="550" y="635" width="210" height="100" rx="16" class="warning" />
+  <text x="570" y="668" class="box-title">3. Save</text>
+  <text x="570" y="694" class="box-text">Writes to database</text>
+  <text x="570" y="716" class="small">PostgreSQL or MySQL</text>
+
+  <rect x="800" y="635" width="230" height="100" rx="16" class="primary" />
+  <text x="820" y="668" class="box-title">4. Site refreshes</text>
+  <text x="820" y="694" class="box-text">Cache / page reload</text>
+  <text x="820" y="716" class="small">Customer sees new price</text>
+
+  <rect x="1070" y="635" width="250" height="100" rx="16" class="muted" />
+  <text x="1090" y="668" class="box-title">Physical store</text>
+  <text x="1090" y="694" class="box-text">Showroom still sells</text>
+  <text x="1090" y="716" class="small">Later: POS shares same DB</text>
+
+  <path d="M260 685 H300" class="line" />
+  <path d="M510 685 H550" class="line" />
+  <path d="M760 685 H800" class="line" />
+  <path d="M1030 685 H1070" class="soft-line" />
+
+  <!-- 4. Code vs data -->
+  <text x="60" y="800" class="section">4. When do you need a developer? (code vs data)</text>
+
+  <rect x="60" y="825" width="640" height="175" rx="16" class="note" />
+  <text x="85" y="860" class="box-title">Data change  staff only</text>
+  <text x="85" y="892" class="box-text">New laptop listing, price change, out of stock, new photo.</text>
+  <text x="85" y="918" class="box-text">Does NOT need Cursor, GitHub, or Vercel deploy.</text>
+  <text x="85" y="944" class="box-text">Star Tech / PQS staff do this all day in their admin panel.</text>
+  <text x="85" y="970" class="small">Rule: if it is a product field, it is a database write.</text>
+
+  <rect x="720" y="825" width="640" height="175" rx="16" class="note" />
+  <text x="745" y="860" class="box-title">Code change  developer</text>
+  <text x="745" y="892" class="box-text">New filter, new page design, payment, bug fix, speed.</text>
+  <text x="745" y="918" class="box-text">Laptop � GitHub � hosting build � live site.</text>
+  <text x="745" y="944" class="box-text">Shopify shops change theme/apps instead of a VPS upload.</text>
+  <text x="745" y="970" class="small">Rule: if the website software changes, it is a deploy.</text>
+
+  <!-- 5. Big shop architecture -->
+  <text x="60" y="1065" class="section">5. How a big BD computer shop usually runs (Star Tech pattern)</text>
+
+  <rect x="60" y="1090" width="240" height="115" rx="16" class="muted" />
+  <text x="80" y="1124" class="box-title">Branches / POS</text>
+  <text x="80" y="1152" class="box-text">Showroom sells a PC</text>
+  <text x="80" y="1174" class="box-text">Stock deducted in ERP</text>
+
+  <rect x="340" y="1090" width="250" height="115" rx="16" class="success" />
+  <text x="360" y="1124" class="box-title">Central database</text>
+  <text x="360" y="1152" class="box-text">One product master</text>
+  <text x="360" y="1174" class="box-text">Price + warehouse qty</text>
+
+  <rect x="630" y="1090" width="250" height="115" rx="16" class="accent" />
+  <text x="650" y="1124" class="box-title">Website CMS</text>
+  <text x="650" y="1152" class="box-text">Publishes same catalog</text>
+  <text x="650" y="1174" class="box-text">or syncs from ERP</text>
+
+  <rect x="920" y="1090" width="200" height="115" rx="16" class="primary" />
+  <text x="940" y="1124" class="box-title">Public website</text>
+  <text x="940" y="1152" class="box-text">Customers browse</text>
+  <text x="940" y="1174" class="box-text">Place / call order</text>
+
+  <rect x="1155" y="1090" width="205" height="115" rx="16" class="warning" />
+  <text x="1175" y="1124" class="box-title">IT / hosting</text>
+  <text x="1175" y="1152" class="box-text">Servers, backup,</text>
+  <text x="1175" y="1174" class="box-text">SSL, Cloudflare</text>
+
+  <path d="M300 1147 H340" class="line" />
+  <path d="M590 1147 H630" class="line" />
+  <path d="M880 1147 H920" class="line" />
+  <path d="M1120 1147 H1155" class="soft-line" />
+
+  <!-- 6. 2-3 people -->
+  <text x="60" y="1270" class="section">6. Easy path for 23 people (cost + security)</text>
+
+  <rect x="60" y="1295" width="420" height="155" rx="16" class="success" />
+  <text x="80" y="1328" class="box-title">Recommended starter stack</text>
+  <text x="80" y="1358" class="box-text">Cloudflare + Vercel + Neon Postgres</text>
+  <text x="80" y="1382" class="box-text">Own admin CMS for daily PDPs</text>
+  <text x="80" y="1406" class="box-text">1 tech person for bills and deploys</text>
+  <text x="80" y="1430" class="small">Best balance for a custom catalog shop</text>
+
+  <rect x="500" y="1295" width="420" height="155" rx="16" class="warning" />
+  <text x="520" y="1328" class="box-title">Shopify (easier, costlier)</text>
+  <text x="520" y="1358" class="box-text">They host app + database</text>
+  <text x="520" y="1382" class="box-text">Staff only use Shopify Admin</text>
+  <text x="520" y="1406" class="box-text">Monthly plan + extra fees</text>
+  <text x="520" y="1430" class="small">Simple ops, weaker fit for huge PC SKUs</text>
+
+  <rect x="940" y="1295" width="420" height="155" rx="16" class="muted" />
+  <text x="960" y="1328" class="box-title">Cheap old PHP VPS</text>
+  <text x="960" y="1358" class="box-text">Low monthly hosting bill</text>
+  <text x="960" y="1382" class="box-text">You patch PHP, backups, hacks</text>
+  <text x="960" y="1406" class="box-text">Hard for 23 people to secure</text>
+  <text x="960" y="1430" class="small">Looks cheap, risk is expensive</text>
+
+  <!-- 7. Summary -->
+  <rect x="60" y="1485" width="1300" height="150" rx="16" class="note" />
+  <text x="85" y="1522" class="box-title">7. Owner cheat sheet</text>
+  <text x="85" y="1554" class="box-text">1) Domain is the name. Cloudflare points it to hosting.</text>
+  <text x="700" y="1554" class="box-text">2) Hosting runs the website. Database stores products.</text>
+  <text x="85" y="1582" class="box-text">3) CMS save = database update = live PDP. No deploy.</text>
+  <text x="700" y="1582" class="box-text">4) Design/feature change = developer deploy.</text>
+  <text x="85" y="1610" class="box-text">5) Laptop PostgreSQL is only for building. Live site needs a cloud database.</text>
+  <text x="85" y="1638" class="small">Sister diagram (this repo stack): docs/ecommerce-site-architecture.svg</text>
+</svg>
