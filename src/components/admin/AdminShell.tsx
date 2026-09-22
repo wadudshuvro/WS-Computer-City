@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutGrid, Package, FolderTree, Tag, Home, LogOut, Menu } from 'lucide-react';
+import { LayoutGrid, Package, FolderTree, Tag, Home, LogOut, Menu, ShoppingBag } from 'lucide-react';
 
 interface AdminShellProps {
   children: React.ReactNode;
@@ -14,6 +14,7 @@ interface AdminShellProps {
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutGrid, exact: true },
+  { href: '/admin/orders', label: 'Orders', icon: ShoppingBag, exact: false },
   { href: '/admin/products', label: 'Products', icon: Package, exact: false },
   { href: '/admin/menus', label: 'Menus', icon: Menu, exact: false },
   { href: '/admin/categories', label: 'Categories', icon: FolderTree, exact: true },

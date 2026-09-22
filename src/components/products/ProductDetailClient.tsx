@@ -15,13 +15,27 @@ import {
   Shield,
   RotateCcw,
   Plus,
-  Minus
+  Minus,
+  Info,
 } from 'lucide-react';
 import { GPU_SPECIFICATION_GROUPS, isGpuCategory, getCategorySlugs } from '@/lib/gpuSpecDefinitions';
 import { MOTHERBOARD_SPECIFICATION_GROUPS, isMotherboardCategory } from '@/lib/motherboardSpecDefinitions';
 import { RAM_SPECIFICATION_GROUPS, isRamCategory } from '@/lib/ramSpecDefinitions';
 import { GpuProductHighlights } from '@/components/products/GpuProductHighlights';
 import { ProductDescription } from '@/components/products/ProductDescription';
+import { AddedToCartDialog } from '@/components/cart/AddedToCartDialog';
+import { useCartStore, formatVariantLabel } from '@/store/cartStore';
+
+/** Star Tech–style: Single unit costs this much more than Bundle with PC */
+const PROCESSOR_SINGLE_SURCHARGE_BDT = 500;
+
+const PROCESSOR_CATEGORY_SLUGS = new Set(['processor', 'intel', 'amd', 'amd-ryzen']);
+
+function isProcessorCategory(slugs: string[]): boolean {
+  return slugs.some((slug) => PROCESSOR_CATEGORY_SLUGS.has(slug));
+}
+
+type ProcessorPurchaseVariant = 'bundle' | 'single';
 
 interface ProductSpecification {
   specificationDefinition: {
@@ -138,10 +152,16 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [activeTab, setActiveTab] = useState<'description' | 'specification' | 'reviews'>('specification');
   const [quantity, setQuantity] = useState(1);
+  /** Processors only: CMS price = Bundle with PC; Single adds surcharge */
+  const [processorVariant, setProcessorVariant] = useState<ProcessorPurchaseVariant>('bundle');
+  const [cartDialogOpen, setCartDialogOpen] = useState(false);
+  const addItem = useCartStore((s) => s.addItem);
 
   useEffect(() => {
     if (slug) {
       setActiveTab('specification');
+      setProcessorVariant('bundle');
+      setQuantity(1);
       fetchProduct();
     }
   }, [slug]);
@@ -275,13 +295,39 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const isGpu = isGpuCategory(categorySlugs);
   const isMotherboard = isMotherboardCategory(categorySlugs);
   const isRam = isRamCategory(categorySlugs);
-  const discount = product.compareAtPrice
-    ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
+  const isProcessor = isProcessorCategory(categorySlugs);
+
+  // Stored CMS price = Bundle with PC; Single is +৳500 (all processors)
+  const bundlePrice = product.price;
+  const singlePrice = product.price + PROCESSOR_SINGLE_SURCHARGE_BDT;
+  const displayPrice = isProcessor
+    ? processorVariant === 'single'
+      ? singlePrice
+      : bundlePrice
+    : product.price;
+
+  const savings = product.compareAtPrice
+    ? Math.max(0, product.compareAtPrice - displayPrice)
     : 0;
-  const savings = product.compareAtPrice ? product.compareAtPrice - product.price : 0;
   const primaryImage = product.images.find(img => img.isPrimary) || product.images[0];
 
+  const addCurrentProductToCart = () => {
+    const variant = isProcessor ? processorVariant : undefined;
+    addItem({
+      productId: product.id,
+      slug: product.slug,
+      name: product.name,
+      imageUrl: primaryImage?.url,
+      unitPrice: displayPrice,
+      quantity,
+      variant,
+      variantLabel: formatVariantLabel(variant),
+    });
+    setCartDialogOpen(true);
+  };
+
   return (
+    <>
     <div className="min-h-screen bg-gray-50">
       {/* Breadcrumb */}
       <div className="bg-white border-b">
@@ -465,18 +511,75 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       <span className="text-sm text-gray-600">(1 Reviews)</span>
                     </div>
 
-                    {/* Price Alert */}
-                    <div className="bg-red-50 border border-red-100 rounded-lg p-3 mb-4 flex items-center gap-2 text-red-700 text-sm">
-                      <X className="w-4 h-4" />
-                      Price valid only with PC bundle.
-                    </div>
+                    {/* Processor purchase variant (Star Tech–style) */}
+                    {isProcessor && (
+                      <div className="mb-4 space-y-3">
+                        <div className="bg-red-50 border border-red-100 rounded-lg p-3 flex items-start gap-2 text-red-700 text-sm">
+                          <Info className="w-4 h-4 mt-0.5 shrink-0" />
+                          <span>
+                            {processorVariant === 'bundle' ? (
+                              <>
+                                Bundle With PC, Single Price -{' '}
+                                <span className="font-semibold">{singlePrice.toLocaleString()}</span>
+                              </>
+                            ) : (
+                              <>
+                                Single unit price. Bundle with PC -{' '}
+                                <span className="font-semibold">{bundlePrice.toLocaleString()}</span>
+                              </>
+                            )}
+                          </span>
+                        </div>
+
+                        <div>
+                          <p className="text-sm text-gray-700 mb-2">
+                            Variant:{' '}
+                            <span className="font-medium text-gray-900">
+                              {processorVariant === 'bundle' ? 'Bundle with PC' : 'Single'}
+                            </span>
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setProcessorVariant('single')}
+                              className={`min-w-[120px] px-4 py-2.5 rounded-md border text-sm font-medium transition-colors ${
+                                processorVariant === 'single'
+                                  ? 'bg-orange-500 border-orange-500 text-white'
+                                  : 'bg-white border-gray-300 text-gray-800 hover:border-orange-400'
+                              }`}
+                            >
+                              Single
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setProcessorVariant('bundle')}
+                              className={`min-w-[140px] px-4 py-2.5 rounded-md border text-sm font-medium transition-colors ${
+                                processorVariant === 'bundle'
+                                  ? 'bg-orange-500 border-orange-500 text-white'
+                                  : 'bg-white border-gray-300 text-gray-800 hover:border-orange-400'
+                              }`}
+                            >
+                              Bundle with PC
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Price alert (non-processors) */}
+                    {!isProcessor && (
+                      <div className="bg-red-50 border border-red-100 rounded-lg p-3 mb-4 flex items-center gap-2 text-red-700 text-sm">
+                        <X className="w-4 h-4" />
+                        Price valid only with PC bundle.
+                      </div>
+                    )}
 
                     {/* Price Section */}
                     <div className="grid grid-cols-2 gap-4 mb-6">
                       <div className="bg-gray-50 rounded-lg p-4">
                         <span className="text-sm text-gray-500 block mb-1">Discount Price</span>
                         <span className="text-2xl font-bold text-gray-900">
-                          ৳ {product.price.toLocaleString()}
+                          ৳ {displayPrice.toLocaleString()}
                         </span>
                         {product.compareAtPrice && (
                           <span className="text-sm text-gray-500 line-through ml-2">
@@ -490,7 +593,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       <div className="bg-gray-50 rounded-lg p-4">
                         <span className="text-sm text-gray-500 block mb-1">EMI Start From*</span>
                         <span className="text-2xl font-bold text-gray-900">
-                          ৳ {Math.round(product.price / 12).toLocaleString()}
+                          ৳ {Math.round(displayPrice / 12).toLocaleString()}
                         </span>
                         <p className="text-xs text-blue-600 mt-1 cursor-pointer hover:underline">
                           💳 View Bank EMI Plans
@@ -518,13 +621,21 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       </div>
 
                       {/* Add to Cart */}
-                      <button className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2">
+                      <button
+                        type="button"
+                        onClick={addCurrentProductToCart}
+                        className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+                      >
                         <ShoppingCart className="w-5 h-5" />
                         Add to Cart
                       </button>
 
                       {/* Buy Now */}
-                      <button className="bg-orange-500 text-white px-8 py-3 rounded-lg hover:bg-orange-600 transition-colors font-medium">
+                      <button
+                        type="button"
+                        onClick={addCurrentProductToCart}
+                        className="bg-orange-500 text-white px-8 py-3 rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                      >
                         Buy Now
                       </button>
                     </div>
@@ -682,10 +793,10 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
               </h2>
               <div className="prose prose-sm max-w-none text-gray-600">
                 <p>
-                  The {product.name} Price in BD is ৳{product.price.toLocaleString()}. 
+                  The {product.name} Price in BD is ৳{displayPrice.toLocaleString()}. 
                   This {product.brand.name} {product.category.name} Manufacturing by {product.brand.name} Comes With 
                   {getSpecValue('warranty') ? ` ${getSpecValue('warranty')} Warranty` : ' No Warranty'} & Based on {0} reviews. 
-                  WS Computer City Offers you {product.name} by ৳{product.price.toLocaleString()} 
+                  LogicBay BD Offers you {product.name} by ৳{displayPrice.toLocaleString()} 
                   {product.compareAtPrice ? ` and its regular price is ৳${product.compareAtPrice.toLocaleString()}` : ''} Which is 
                   {product.stockStatus === 'IN_STOCK' ? ' also In Stock Now' : ' currently not in stock'} at our Showroom. 
                   Follow us on Facebook For Regular updates & Offer. Subscribe Our YouTube Channel for Product Reviews.
@@ -696,5 +807,11 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
         </div>
       </div>
     </div>
+    <AddedToCartDialog
+      open={cartDialogOpen}
+      onOpenChange={setCartDialogOpen}
+      productName={product.name}
+    />
+    </>
   );
 }

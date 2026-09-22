@@ -33,6 +33,13 @@ const AMD_TYPE_FILTER_MAP: Record<string, string[]> = {
 };
 
 export function mapTypeFilterToDb(value: string, brand: ProcessorBrand = 'intel'): string[] {
+  if (brand === 'all') {
+    const merged = [
+      ...(INTEL_TYPE_FILTER_MAP[value] || []),
+      ...(AMD_TYPE_FILTER_MAP[value] || []),
+    ];
+    return merged.length > 0 ? merged : [value];
+  }
   const map = brand === 'amd' ? AMD_TYPE_FILTER_MAP : INTEL_TYPE_FILTER_MAP;
   return map[value] || [value];
 }
@@ -72,6 +79,16 @@ export function mapGenerationFilterToDb(value: string, brand: ProcessorBrand = '
     return AMD_SERIES_FILTER_MAP[value] || [value];
   }
 
+  if (brand === 'all') {
+    const intel =
+      value === 'Up to 9th Gen'
+        ? INTEL_GENERATION_FILTER_MAP['Up to 9th Gen'] ?? []
+        : INTEL_GENERATION_FILTER_MAP[value] || [];
+    const amd = AMD_SERIES_FILTER_MAP[value] || [];
+    const merged = [...intel, ...amd];
+    return merged.length > 0 ? merged : [value];
+  }
+
   if (value === 'Up to 9th Gen') {
     return INTEL_GENERATION_FILTER_MAP['Up to 9th Gen'] ?? [value];
   }
@@ -83,7 +100,7 @@ export function generationDbValueMatchesFilter(
   dbValue: string,
   brand: ProcessorBrand = 'intel'
 ): boolean {
-  if (brand === 'amd') {
+  if (brand === 'amd' || (brand === 'all' && filterValue.includes('Series'))) {
     const candidates = mapGenerationFilterToDb(filterValue, 'amd');
     return candidates.some(
       (c) =>
@@ -98,7 +115,10 @@ export function generationDbValueMatchesFilter(
       (token) => dbValue.includes(token) || dbValue.toLowerCase().includes('9th gen')
     );
   }
-  const candidates = mapGenerationFilterToDb(filterValue, 'intel');
+  const candidates = mapGenerationFilterToDb(
+    filterValue,
+    brand === 'all' ? 'intel' : brand
+  );
   return candidates.some((c) => dbValue === c || dbValue.includes(filterValue.replace(' Gen', '')));
 }
 
@@ -117,6 +137,13 @@ const AMD_SOCKET_FILTER_MAP: Record<string, string[]> = {
 };
 
 export function mapSocketFilterToDb(value: string, brand: ProcessorBrand = 'intel'): string[] {
+  if (brand === 'all') {
+    const merged = [
+      ...(INTEL_SOCKET_FILTER_MAP[value] || []),
+      ...(AMD_SOCKET_FILTER_MAP[value] || []),
+    ];
+    return merged.length > 0 ? merged : [value];
+  }
   const map = brand === 'amd' ? AMD_SOCKET_FILTER_MAP : INTEL_SOCKET_FILTER_MAP;
   return map[value] || [value];
 }

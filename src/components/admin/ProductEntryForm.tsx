@@ -15,6 +15,7 @@ import {
   filterBrandsForComponent,
   hasComponentBrandFilter,
 } from '@/lib/componentBrandConfig';
+import { AdminProductImagesEditor } from '@/components/admin/AdminProductImagesEditor';
 
 interface Category {
   id: string;
@@ -343,29 +344,6 @@ export default function ProductEntryForm({ defaultCategorySlug }: ProductEntryFo
         return { ...prev, [key]: current.filter(v => v !== value) };
       }
     });
-  };
-
-  const handleImageAdd = () => {
-    setImages(prev => [...prev, { url: '', alt: '', order: prev.length, isPrimary: prev.length === 0 }]);
-  };
-
-  const handleImageChange = (index: number, field: keyof ProductImage, value: string | boolean) => {
-    setImages(prev => {
-      const newImages = [...prev];
-      if (field === 'isPrimary' && value === true) {
-        // Only one image can be primary
-        newImages.forEach((img, i) => {
-          img.isPrimary = i === index;
-        });
-      } else {
-        newImages[index] = { ...newImages[index], [field]: value };
-      }
-      return newImages;
-    });
-  };
-
-  const handleImageRemove = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSpecChange = (key: string, value: string) => {
@@ -1087,51 +1065,11 @@ export default function ProductEntryForm({ defaultCategorySlug }: ProductEntryFo
         </div>
         
         <div className="space-y-4">
-          {images.map((image, index) => (
-            <div key={index} className="flex gap-4 items-start p-4 border border-gray-200 rounded-lg bg-gray-50">
-              <div className="flex-1 space-y-3">
-                <input
-                  type="url"
-                  value={image.url}
-                  onChange={(e) => handleImageChange(index, 'url', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                  placeholder="Image URL (https://...)"
-                />
-                <input
-                  type="text"
-                  value={image.alt || ''}
-                  onChange={(e) => handleImageChange(index, 'alt', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                  placeholder="Alt text (optional)"
-                />
-              </div>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={image.isPrimary}
-                  onChange={(e) => handleImageChange(index, 'isPrimary', e.target.checked)}
-                  className="rounded border-gray-300 text-pink-600 focus:ring-pink-500"
-                />
-                <span className="text-sm font-medium">Primary</span>
-              </label>
-              <button
-                type="button"
-                onClick={() => handleImageRemove(index)}
-                className="text-red-600 hover:text-red-800 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors"
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-          
-          <button
-            type="button"
-            onClick={handleImageAdd}
-            className="w-full border-2 border-dashed border-gray-300 text-gray-600 px-4 py-4 rounded-lg hover:border-pink-400 hover:text-pink-600 transition-colors"
-          >
-            + Add Image
-          </button>
-          {errors.images && <p className="text-red-500 text-sm mt-1">{errors.images}</p>}
+          <AdminProductImagesEditor
+            images={images}
+            onChange={setImages}
+            error={errors.images}
+          />
         </div>
       </div>
 

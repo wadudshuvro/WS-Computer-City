@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AdminShell } from '@/components/admin/AdminShell';
-import { Package, FolderTree, Tag, ArrowRight, Menu } from 'lucide-react';
+import { Package, FolderTree, Tag, ArrowRight, Menu, ShoppingBag } from 'lucide-react';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -17,6 +17,12 @@ export default function AdminPage() {
   }, [router]);
 
   const cards = [
+    {
+      title: 'Orders',
+      description: 'Customer COD checkout submissions and contact details',
+      icon: ShoppingBag,
+      links: [{ label: 'View orders', href: '/admin/orders' }],
+    },
     {
       title: 'Products',
       description: 'Browse by content type — Processor, GPU, RAM, and more',

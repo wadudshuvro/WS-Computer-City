@@ -4,6 +4,7 @@ import { SSD_BRANDS } from '@/lib/ssdSpecDefinitions';
 import { CASING_BRANDS } from '@/lib/casingSpecDefinitions';
 import { CPU_COOLER_BRANDS } from '@/lib/cpuCoolerSpecDefinitions';
 import type { MenuTreeItem } from '@/lib/menu';
+import { enrichAccessoriesBrandFlyouts } from '@/lib/accessoriesBrandMenu';
 
 type BrandRef = { slug: string; label: string };
 
@@ -119,9 +120,10 @@ export function getComponentBrandFlyout(subSlug: string): MenuTreeItem[] | null 
 /**
  * If a Component sub has no CMS children, attach the catalog brand flyout
  * (Desktop RAM, PSU, SSD, Casing, CPU Cooler, Laptop RAM).
+ * Accessories brand flyouts are applied separately without changing Component.
  */
 export function enrichMenuWithBrandFlyouts(tree: MenuTreeItem[]): MenuTreeItem[] {
-  return tree.map((top) => {
+  const withComponents = tree.map((top) => {
     if (top.slug !== 'components' && top.slug !== 'component') return top;
 
     return {
@@ -134,6 +136,8 @@ export function enrichMenuWithBrandFlyouts(tree: MenuTreeItem[]): MenuTreeItem[]
       }),
     };
   });
+
+  return enrichAccessoriesBrandFlyouts(withComponents);
 }
 
 export const COMPONENT_BRAND_PARENT_SLUGS = [

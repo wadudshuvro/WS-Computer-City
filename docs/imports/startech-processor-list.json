@@ -1,0 +1,610 @@
+[
+  {
+    "name": "AMD Athlon PRO 300GE AM4 Socket Desktop Processor with Radeon Vega 3 Graphics (Rebox)",
+    "slug": "amd-athlon-pro-300ge-processor",
+    "productUrl": "https://www.startech.com.bd/amd-athlon-pro-300ge-processor",
+    "price": 3990,
+    "compareAtPrice": 5200,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/AMD/athlon-pro-300ge/athlon-pro-300ge-228x228.jpg"
+  },
+  {
+    "name": "AMD Ryzen 5 2400G Desktop Processor with Radeon RX Vega 11 Graphics",
+    "slug": "amd-ryzen-5-2400g-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-5-2400g-processor",
+    "price": 5900,
+    "compareAtPrice": 7200,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-5-2400g/ryzen-5-2400g-001-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 5 Pro 2400GE Desktop Processor with Radeon RX Vega 11 Graphics",
+    "slug": "amd-ryzen-5-pro-2400ge-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-5-pro-2400ge-processor",
+    "price": 6200,
+    "compareAtPrice": 7200,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-5-2400g/ryzen-5-2400g-001-228x228.webp"
+  },
+  {
+    "name": "Intel Pentium Gold G6400 10th gen Coffee Lake Processor",
+    "slug": "intel-pentium-gold-g6400-processor",
+    "productUrl": "https://www.startech.com.bd/intel-pentium-gold-g6400-processor",
+    "price": 6200,
+    "compareAtPrice": 7300,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/Intel/g6400/g6400-228x228.jpg"
+  },
+  {
+    "name": "AMD Ryzen 3 3200G Processor with Radeon RX Vega 8 Graphics",
+    "slug": "amd-ryzen-3-3200g",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-3-3200g",
+    "price": 6500,
+    "compareAtPrice": 7800,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-3-3200g/ryzen-3-3200g-3-228x228.jpg"
+  },
+  {
+    "name": "AMD Ryzen 5 3400G Processor with Radeon RX Vega 11 Graphics",
+    "slug": "amd-ryzen-5-3400g-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-5-3400g-processor",
+    "price": 6900,
+    "compareAtPrice": 9500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-5-3400g/3400g-228x228.jpg"
+  },
+  {
+    "name": "AMD Ryzen 3 4100 Processor",
+    "slug": "amd-ryzen-3-4100-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-3-4100-processor",
+    "price": 8700,
+    "compareAtPrice": 10000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/AMD/ryzen-3-4100/amd-ryzen-3-4100-01-228x228.jpg"
+  },
+  {
+    "name": "Intel 10th Gen Core i3 10100 Processor",
+    "slug": "intel-core-i3-10100-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-i3-10100-processor",
+    "price": 9500,
+    "compareAtPrice": 11300,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/Intel/i3-10100/i3-10100-228x228.jpg"
+  },
+  {
+    "name": "AMD Ryzen 5 5500 Processor",
+    "slug": "amd-ryzen-5-5500-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-5-5500-processor",
+    "price": 10500,
+    "compareAtPrice": 11000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/amd-ryzen-5-5500/amd-ryzen-5-5500-01-228x228.jpg"
+  },
+  {
+    "name": "Intel Core i3 10105 10th Gen Comet Lake Processor",
+    "slug": "intel-core-i3-10105-10th-gen-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-i3-10105-10th-gen-processor",
+    "price": 10400,
+    "compareAtPrice": 12500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/core-i3-10105/core-i3-10105-001-228x228.jpg"
+  },
+  {
+    "name": "Intel Core i5-10500T 10th Gen Processor",
+    "slug": "intel-core-i5-10500t-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-i5-10500t-processor",
+    "price": 12800,
+    "compareAtPrice": null,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/core-i5-10500t/core-i5-10500t-01-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 5 8400F Processor",
+    "slug": "amd-ryzen-5-8400f-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-5-8400f-processor",
+    "price": 11200,
+    "compareAtPrice": 12300,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-5-8400f/ryzen-5-8400f-01-228x228.webp"
+  },
+  {
+    "name": "Intel 10th Gen Core i5-10500 Processor",
+    "slug": "intel-core-i5-10500-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-i5-10500-processor",
+    "price": 13900,
+    "compareAtPrice": 14800,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/Intel/i5-10400/i5-10400-1-228x228.jpg"
+  },
+  {
+    "name": "Intel 10th Gen Core i5-10505 Processor",
+    "slug": "intel-core-i5-10505-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-i5-10505-processor",
+    "price": 13900,
+    "compareAtPrice": 14800,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/Intel/core-i5-10505/core-i5-10505-01-228x228.webp"
+  },
+  {
+    "name": "Intel Core i5-11500T 11th Gen Processor",
+    "slug": "intel-core-i5-11500t-11th-gen-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-i5-11500t-11th-gen-processor",
+    "price": 15200,
+    "compareAtPrice": null,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/Intel/core-i5-11500/core-i5-11500-228x228.jpg"
+  },
+  {
+    "name": "AMD Ryzen 5 5600 Processor",
+    "slug": "amd-ryzen-5-5600-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-5-5600-processor",
+    "price": 12400,
+    "compareAtPrice": 14000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/5600x/5600x-001-228x228.jpg"
+  },
+  {
+    "name": "Intel 10th Gen Core i5-10400 Processor",
+    "slug": "intel-core-i5-10400-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-i5-10400-processor",
+    "price": 14000,
+    "compareAtPrice": 16000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/Intel/i5-10400/i5-10400-1-228x228.jpg"
+  },
+  {
+    "name": "Intel Core i3 12100T 12th Gen Alder Lake Processor",
+    "slug": "intel-core-i3-12100t-12th-gen-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-i3-12100t-12th-gen-processor",
+    "price": 15500,
+    "compareAtPrice": 16000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/i3-12100/i3-12100-228x228.jpg"
+  },
+  {
+    "name": "Intel Core i3-12100 12th Gen Alder Lake Processor",
+    "slug": "intel-core-i3-12100-12th-gen-alder-lake-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-i3-12100-12th-gen-alder-lake-processor",
+    "price": 13900,
+    "compareAtPrice": 16200,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/i3-12100/i3-12100-228x228.jpg"
+  },
+  {
+    "name": "Intel 11th Gen Core i5-11500 Rocket Lake Processor",
+    "slug": "intel-core-i5-11500-11th-gen-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-i5-11500-11th-gen-processor",
+    "price": 15500,
+    "compareAtPrice": 16900,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/Intel/core-i5-11500/core-i5-11500-228x228.jpg"
+  },
+  {
+    "name": "AMD Ryzen 5 7500F Processor",
+    "slug": "amd-ryzen-5-7500f-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-5-7500f-processor",
+    "price": 14300,
+    "compareAtPrice": 17140,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-5-7600/ryzen-5-7600-01-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 5 PRO 5650GE Processor with Radeon Graphics",
+    "slug": "amd-ryzen-5-pro-5650ge-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-5-pro-5650ge-processor",
+    "price": 16200,
+    "compareAtPrice": 17200,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/AMD/ryzen-5-pro-5650g/ryzen-5-pro-5650g-01-228x228.webp"
+  },
+  {
+    "name": "Intel 11th Gen Core i5-11400 Rocket Lake Processor",
+    "slug": "intel-core-i5-11400-11th-gen-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-i5-11400-11th-gen-processor",
+    "price": 15500,
+    "compareAtPrice": 17500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/Intel/core-i5-11400/core-i5-11400-228x228.jpg"
+  },
+  {
+    "name": "AMD Ryzen 5 8500G Processor with Radeon Graphics",
+    "slug": "amd-ryzen-5-8500g-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-5-8500g-processor",
+    "price": 16000,
+    "compareAtPrice": 17500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-5-8500g/ryzen-5-8500g-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 5 PRO 5650G Processor with Radeon Graphics",
+    "slug": "amd-ryzen-5-pro-5650g-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-5-pro-5650g-processor",
+    "price": 17200,
+    "compareAtPrice": 18500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/AMD/ryzen-5-pro-5650g/ryzen-5-pro-5650g-01-228x228.webp"
+  },
+  {
+    "name": "Intel Core i3 14100 14th Gen Raptor Lake Processor",
+    "slug": "intel-core-i3-14100-14th-gen-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-i3-14100-14th-gen-processor",
+    "price": 13900,
+    "compareAtPrice": 16500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/i3-14100f/i3-14100f-01-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 5 5500GT AM4 Processor with Radeon Graphics",
+    "slug": "amd-ryzen-5-5500gt-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-5-5500gt-processor",
+    "price": 17900,
+    "compareAtPrice": 18000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/AMD/ryzen-5-5500gt/ryzen-5-5500gt-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 5 5600GT AM4 Processor with Radeon Graphics",
+    "slug": "amd-ryzen-5-5600gt-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-5-5600gt-processor",
+    "price": 17900,
+    "compareAtPrice": 18500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-5-5600gt/ryzen-5-5600gt-01-228x228.webp"
+  },
+  {
+    "name": "Intel 12th Gen Core i5-12400F Alder Lake Processor",
+    "slug": "intel-12th-gen-core-i5-12400f-alder-lake-processor",
+    "productUrl": "https://www.startech.com.bd/intel-12th-gen-core-i5-12400f-alder-lake-processor",
+    "price": 15500,
+    "compareAtPrice": 18000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/i5-12400/i5-12400-001-228x228.jpg"
+  },
+  {
+    "name": "AMD Ryzen 7 5700X Processor",
+    "slug": "amd-ryzen-7-5700x-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-7-5700x-processor",
+    "price": 16000,
+    "compareAtPrice": 18000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/amd-ryzen-7-5700x/amd-ryzen-7-5700x-01-228x228.jpg"
+  },
+  {
+    "name": "AMD Ryzen 5 7600 Gaming Processor",
+    "slug": "amd-ryzen-5-7600-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-5-7600-processor",
+    "price": 18000,
+    "compareAtPrice": 20000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-5-7600/ryzen-5-7600-01-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 5 7600X Processor",
+    "slug": "amd-ryzen-5-7600x-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-5-7600x-processor",
+    "price": 18500,
+    "compareAtPrice": 20500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-5-7600x/ryzen-5-7600x-01-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 7 PRO 5755G Processor with Radeon Graphics",
+    "slug": "amd-ryzen-7-pro-5755g-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-7-pro-5755g-processor",
+    "price": 21500,
+    "compareAtPrice": 22500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/AMD/ryzen-7-pro-5750g/ryzen-7-pro-5750g-01-228x228.webp"
+  },
+  {
+    "name": "Intel Core i5 14400F 14th Gen Raptor Lake Processor",
+    "slug": "intel-core-i5-14400f-14th-gen-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-i5-14400f-14th-gen-processor",
+    "price": 17500,
+    "compareAtPrice": 20000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/i5-14400/i5-14400-01-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 7 5700G Processor with Radeon Graphics",
+    "slug": "amd-ryzen-7-5700g-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-7-5700g-processor",
+    "price": 21900,
+    "compareAtPrice": 24000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-7-5700ge/ryzen-7-5700g-228x228.webp"
+  },
+  {
+    "name": "Intel Core Ultra 5 225 Arrow Lake Processor",
+    "slug": "intel-core-ultra-5-225-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-ultra-5-225-processor",
+    "price": 20500,
+    "compareAtPrice": 24200,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/core-ultra-5-225/core-ultra-5-225-228x228.webp"
+  },
+  {
+    "name": "Intel 12th Gen Core i5-12400 Alder Lake Processor",
+    "slug": "intel-12th-gen-core-i5-12400-alder-lake-processor",
+    "productUrl": "https://www.startech.com.bd/intel-12th-gen-core-i5-12400-alder-lake-processor",
+    "price": 18300,
+    "compareAtPrice": 21000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/i5-12400/i5-12400-01-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 5 8600G Processor with Radeon Graphics",
+    "slug": "amd-ryzen-5-8600g-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-5-8600g-processor",
+    "price": 20500,
+    "compareAtPrice": 24500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/AMD/ryzen-5-8600g/ryzen-5-8600g-01-228x228.webp"
+  },
+  {
+    "name": "Intel Core i5 14400 14th Gen Raptor Lake Processor",
+    "slug": "intel-core-i5-14400-14th-gen-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-i5-14400-14th-gen-processor",
+    "price": 19000,
+    "compareAtPrice": 22000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/i5-14400/i5-14400-01-228x228.webp"
+  },
+  {
+    "name": "Intel 12th Gen Core i5-12500 Alder Lake Processor",
+    "slug": "intel-12th-gen-core-i5-12500-alder-lake-processor",
+    "productUrl": "https://www.startech.com.bd/intel-12th-gen-core-i5-12500-alder-lake-processor",
+    "price": 23200,
+    "compareAtPrice": 25500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/i5-12500/i5-12500-01-228x228.jpg"
+  },
+  {
+    "name": "AMD Ryzen 5 9600X AM5 Desktop Gaming Processor",
+    "slug": "amd-ryzen-5-9600x-gaming-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-5-9600x-gaming-processor",
+    "price": 21200,
+    "compareAtPrice": 26000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-5-9600x/ryzen-5-9600x-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 7 7700 Gaming Processor",
+    "slug": "amd-ryzen-7-7700-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-7-7700-processor",
+    "price": 20000,
+    "compareAtPrice": 23000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-7-7700/ryzen-7-7700-01-228x228.webp"
+  },
+  {
+    "name": "Intel 10th Gen Core i7-10700 Processor",
+    "slug": "intel-core-i7-10700-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-i7-10700-processor",
+    "price": 24300,
+    "compareAtPrice": 27000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/Intel/i7-10700/i7-10700-228x228.jpg"
+  },
+  {
+    "name": "AMD Ryzen 7 7700X Processor",
+    "slug": "amd-ryzen-7-7700x-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-7-7700x-processor",
+    "price": 25000,
+    "compareAtPrice": 27000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-7-7700x/ryzen-7-7700x-01-228x228.webp"
+  },
+  {
+    "name": "Intel Core i5 14500 14th Gen Raptor Lake Processor",
+    "slug": "intel-core-i5-14500-14th-gen-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-i5-14500-14th-gen-processor",
+    "price": 27300,
+    "compareAtPrice": 31000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/i5-14500/core-i5-14500-14th-gen-228x228.webp"
+  },
+  {
+    "name": "Intel 13th Gen Core i5 13400 Raptor Lake Processor",
+    "slug": "intel-13th-gen-core-i5-13400-processor",
+    "productUrl": "https://www.startech.com.bd/intel-13th-gen-core-i5-13400-processor",
+    "price": 19000,
+    "compareAtPrice": 23500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/Intel/core-i5-13600k/Core i5 13600K-01-228x228.webp"
+  },
+  {
+    "name": "Intel Core Ultra 5 250K Plus Arrow Lake Processor",
+    "slug": "intel-core-ultra-5-250k-plus-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-ultra-5-250k-plus-processor",
+    "price": 27500,
+    "compareAtPrice": 30500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/core-ultra-5-250k-plus/core-ultra-5-250k-plus-228x228.webp"
+  },
+  {
+    "name": "Intel Core Ultra 5 245K Arrow Lake Processor",
+    "slug": "intel-core-ultra-5-245k-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-ultra-5-245k-processor",
+    "price": 22200,
+    "compareAtPrice": 25500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/core-ultra-5-245k/intel-core-ultra-5-245k-processor-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 7 8700G Processor with Radeon Graphics",
+    "slug": "amd-ryzen-7-8700g-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-7-8700g-processor",
+    "price": 30500,
+    "compareAtPrice": 33000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/AMD/ryzen-7-8700g/ryzen-7-8700g-01-228x228.webp"
+  },
+  {
+    "name": "Intel Core i5 14600K 14th Gen Raptor Lake Processor",
+    "slug": "intel-14th-gen-core-i5-14600k-processor",
+    "productUrl": "https://www.startech.com.bd/intel-14th-gen-core-i5-14600k-processor",
+    "price": 29500,
+    "compareAtPrice": 33500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/Intel/core-i5-14600k/core-i5-14600k-01-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 7 9700X AM5 Desktop Gaming Processor",
+    "slug": "amd-ryzen-7-9700x-gaming-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-7-9700x-gaming-processor",
+    "price": 28000,
+    "compareAtPrice": 33500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-7-9700x/ryzen-7-9700x-228x228.webp"
+  },
+  {
+    "name": "Intel Core Ultra 7 265K Arrow Lake Processor",
+    "slug": "intel-core-ultra-7-265k-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-ultra-7-265k-processor",
+    "price": 33300,
+    "compareAtPrice": 38000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/core-ultra-7-265k/intel-core-ultra-7-265k-processor-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 9 5900X Processor",
+    "slug": "amd-ryzen-9-5900x-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-9-5900x-processor",
+    "price": 35999,
+    "compareAtPrice": 38000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-9-5900x/ryzen-9-5900x-001-228x228.jpg"
+  },
+  {
+    "name": "Intel 12th Gen Core i7-12700 Alder Lake Processor",
+    "slug": "intel-12th-gen-core-i7-12700-alder-lake-processor",
+    "productUrl": "https://www.startech.com.bd/intel-12th-gen-core-i7-12700-alder-lake-processor",
+    "price": 33000,
+    "compareAtPrice": 37500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/i7-12700/i7-12700-01-228x228.jpg"
+  },
+  {
+    "name": "Intel 13th Gen Core i7 13700KF Raptor Lake Processor",
+    "slug": "intel-13th-gen-core-i7-13700kf-processor",
+    "productUrl": "https://www.startech.com.bd/intel-13th-gen-core-i7-13700kf-processor",
+    "price": 39500,
+    "compareAtPrice": 42900,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/Intel/core-i7-13700kf/core-i7-13700kf-01-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 9 7900X Processor",
+    "slug": "amd-ryzen-9-7900x-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-9-7900x-processor",
+    "price": 39800,
+    "compareAtPrice": 43500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-9-7950x/ryzen-9-7950x-01-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 7 7800X3D Processor",
+    "slug": "amd-ryzen-7-7800x3d-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-7-7800x3d-processor",
+    "price": 34000,
+    "compareAtPrice": 44000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-7-7800x3d/ryzen-7-7800x3d-01-228x228.webp"
+  },
+  {
+    "name": "Intel 12th Gen Core i7-12700K Alder Lake Processor",
+    "slug": "intel-12th-gen-core-i7-12700k-alder-lake-processor",
+    "productUrl": "https://www.startech.com.bd/intel-12th-gen-core-i7-12700k-alder-lake-processor",
+    "price": 34000,
+    "compareAtPrice": 38500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/i7-12700k/i7-12700k-01-228x228.jpg"
+  },
+  {
+    "name": "Intel Core Ultra 7 270K Plus Arrow Lake Processor",
+    "slug": "intel-core-ultra-7-270k-plus-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-ultra-7-270k-plus-processor",
+    "price": 38500,
+    "compareAtPrice": 44000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/core-ultra-7-270k-plus/core-ultra-7-270k-plus-228x228.webp"
+  },
+  {
+    "name": "Intel 13th Gen Core i7 13700 Raptor Lake Processor",
+    "slug": "intel-13th-gen-core-i7-13700-processor",
+    "productUrl": "https://www.startech.com.bd/intel-13th-gen-core-i7-13700-processor",
+    "price": 39000,
+    "compareAtPrice": 44500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/Intel/core-i7-13700k/core-i7-13700k-01-228x228.webp"
+  },
+  {
+    "name": "Intel Core i7 14700KF 14th Gen Raptor Lake Processor",
+    "slug": "intel-14th-gen-core-i7-14700kf-processor",
+    "productUrl": "https://www.startech.com.bd/intel-14th-gen-core-i7-14700kf-processor",
+    "price": 44500,
+    "compareAtPrice": 47000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/Intel/core-i7-14700k/core-i7-14700k-01-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 9 9900X Gaming Processor",
+    "slug": "amd-ryzen-9-9900x-gaming-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-9-9900x-gaming-processor",
+    "price": 42900,
+    "compareAtPrice": 47990,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-9-9900x/ryzen-9-9950x-228x228.webp"
+  },
+  {
+    "name": "Intel 13th Gen Core i7 13700K Raptor Lake Processor",
+    "slug": "intel-13th-gen-core-i7-13700k-processor",
+    "productUrl": "https://www.startech.com.bd/intel-13th-gen-core-i7-13700k-processor",
+    "price": 43500,
+    "compareAtPrice": 48500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/Intel/core-i7-13700k/core-i7-13700k-01-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 9 5950X Processor",
+    "slug": "amd-ryzen-9-5950x-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-9-5950x-processor",
+    "price": 45000,
+    "compareAtPrice": 49000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-9-5950x/ryzen-9-5950x-1-228x228.jpg"
+  },
+  {
+    "name": "Intel Core i7 14700 14th Gen Raptor Lake Processor",
+    "slug": "intel-core-i7-14700-14th-gen-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-i7-14700-14th-gen-processor",
+    "price": 39500,
+    "compareAtPrice": 45000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/i7-14700/i7-14700-02-228x228.webp"
+  },
+  {
+    "name": "Intel Core i7 14700K 14th Gen Raptor Lake Processor",
+    "slug": "intel-14th-gen-core-i7-14700k-processor",
+    "productUrl": "https://www.startech.com.bd/intel-14th-gen-core-i7-14700k-processor",
+    "price": 47500,
+    "compareAtPrice": 53000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/Intel/core-i7-14700k/core-i7-14700k-01-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 9 7950X3D Gaming Processor",
+    "slug": "amd-ryzen-9-7950x3d-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-9-7950x3d-processor",
+    "price": 49500,
+    "compareAtPrice": 55000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-9-7950x3d/ryzen-9-7950x3d-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 9 9950X Gaming Processor",
+    "slug": "amd-ryzen-9-9950x-gaming-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-9-9950x-gaming-processor",
+    "price": 53500,
+    "compareAtPrice": 55000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-9-9950x/ryzen-9-9950x-01-228x228.webp"
+  },
+  {
+    "name": "Intel Core i9 14900KF 14th Gen Raptor Lake Processor",
+    "slug": "intel-14th-gen-core-i9-14900kf-processor",
+    "productUrl": "https://www.startech.com.bd/intel-14th-gen-core-i9-14900kf-processor",
+    "price": 52000,
+    "compareAtPrice": 58000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/core-i9-14900k/core-i9-14900k-01-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 9 7950X Processor",
+    "slug": "amd-ryzen-9-7950x-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-9-7950x-processor",
+    "price": 45000,
+    "compareAtPrice": 59000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-9-7950x/ryzen-9-7950x-01-228x228.webp"
+  },
+  {
+    "name": "Intel Core i9 14900K 14th Gen Raptor Lake Processor",
+    "slug": "intel-14th-gen-core-i9-14900k-processor",
+    "productUrl": "https://www.startech.com.bd/intel-14th-gen-core-i9-14900k-processor",
+    "price": 56800,
+    "compareAtPrice": 62500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/core-i9-14900k/core-i9-14900k-01-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 7 9800X3D Gaming Processor",
+    "slug": "amd-ryzen-7-9800x3d-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-7-9800x3d-processor",
+    "price": 50500,
+    "compareAtPrice": 61500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-7-9800x3d/ryzen-7-9800x3d-228x228.webp"
+  },
+  {
+    "name": "AMD RYZEN 7 9850X3D Gaming Processor",
+    "slug": "amd-ryzen-7-9850x3d-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-7-9850x3d-processor",
+    "price": 58500,
+    "compareAtPrice": 63000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-7-9850x3d/ryzen-7-9850x3d-01-228x228.webp"
+  },
+  {
+    "name": "Intel Core Ultra 9 285K Arrow Lake Processor",
+    "slug": "intel-core-ultra-9-285k-processor",
+    "productUrl": "https://www.startech.com.bd/intel-core-ultra-9-285k-processor",
+    "price": 58000,
+    "compareAtPrice": 64500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/intel/core-ultra-9-285k/core-ultra-9-001-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 9 9900X3D Gaming Processor",
+    "slug": "amd-ryzen-9-9900x3d-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-9-9900x3d-processor",
+    "price": 61800,
+    "compareAtPrice": 69500,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-9-9900x3d/ryzen-9-9900x3d-228x228.webp"
+  },
+  {
+    "name": "AMD Ryzen 9 9950X3D Gaming Processor",
+    "slug": "amd-ryzen-9-9950x3d-processor",
+    "productUrl": "https://www.startech.com.bd/amd-ryzen-9-9950x3d-processor",
+    "price": 77500,
+    "compareAtPrice": 85000,
+    "thumbUrl": "https://www.startech.com.bd/image/cache/catalog/processor/amd/ryzen-9-9950x3d/ryzen-9-9950x3d-01-228x228.webp"
+  }
+]

@@ -421,6 +421,24 @@ function ProcessorPageContent() {
                             </h3>
                           </Link>
 
+                          {(() => {
+                            const lines = (product.shortDescription || '')
+                              .split(/\r?\n|•/)
+                              .map((l) => l.replace(/^[-*]\s*/, '').trim())
+                              .filter(Boolean)
+                              .slice(0, 4);
+                            if (lines.length === 0) return null;
+                            return (
+                              <ul className="mb-3 list-disc space-y-0.5 pl-4 text-xs text-gray-700">
+                                {lines.map((line) => (
+                                  <li key={line} className="leading-snug">
+                                    {line}
+                                  </li>
+                                ))}
+                              </ul>
+                            );
+                          })()}
+
                           {/* Price */}
                           <div className="flex items-baseline gap-2 mb-3">
                             <span className="text-xl font-bold text-blue-600">
@@ -487,11 +505,23 @@ function ProcessorPageContent() {
                                 {product.name}
                               </h3>
                             </Link>
-                            {product.shortDescription && (
-                              <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                                {product.shortDescription}
-                              </p>
-                            )}
+                            {(() => {
+                              const lines = (product.shortDescription || '')
+                                .split(/\r?\n|•/)
+                                .map((l) => l.replace(/^[-*]\s*/, '').trim())
+                                .filter(Boolean)
+                                .slice(0, 4);
+                              if (lines.length > 0) {
+                                return (
+                                  <ul className="mb-2 list-disc space-y-0.5 pl-4 text-sm text-gray-600">
+                                    {lines.map((line) => (
+                                      <li key={line}>{line}</li>
+                                    ))}
+                                  </ul>
+                                );
+                              }
+                              return null;
+                            })()}
                             <span className={`${stockBadge.className} text-white text-xs px-2 py-1 rounded`}>
                               {stockBadge.text}
                             </span>

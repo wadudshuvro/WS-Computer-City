@@ -16,6 +16,8 @@ import {
   filterBrandsForComponent,
   hasComponentBrandFilter,
 } from '@/lib/componentBrandConfig';
+import { AdminProductImagesEditor } from '@/components/admin/AdminProductImagesEditor';
+import { resolveAdminListSlug } from '@/lib/adminCategoryConfig';
 
 interface Category {
   id: string;
@@ -339,28 +341,6 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
     });
   };
 
-  const handleImageAdd = () => {
-    setImages(prev => [...prev, { url: '', alt: '', order: prev.length, isPrimary: prev.length === 0 }]);
-  };
-
-  const handleImageChange = (index: number, field: keyof ProductImage, value: string | boolean) => {
-    setImages(prev => {
-      const newImages = [...prev];
-      if (field === 'isPrimary' && value === true) {
-        newImages.forEach((img, i) => {
-          img.isPrimary = i === index;
-        });
-      } else {
-        newImages[index] = { ...newImages[index], [field]: value };
-      }
-      return newImages;
-    });
-  };
-
-  const handleImageRemove = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
-  };
-
   const handleSpecChange = (key: string, value: string) => {
     setSpecifications(prev => ({ ...prev, [key]: value }));
   };
@@ -479,8 +459,11 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
       }
 
       alert('Product updated successfully! Changes are saved and will show on the website.');
-      const categorySlug = saved.category?.slug || product.category.slug;
-      router.push(`/admin/products/category/${categorySlug}`);
+      const dbSlug = saved.category?.slug || product.category.slug;
+      const parentSlug =
+        saved.category?.parent?.slug || product.category.parent?.slug || null;
+      const listSlug = resolveAdminListSlug(dbSlug, parentSlug);
+      router.push(`/admin/products/category/${listSlug}`);
       router.refresh();
     } catch (error: any) {
       console.error('Error updating product:', error);
@@ -951,55 +934,10 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
         </div>
         
         <div className="space-y-4">
-          {images.map((image, index) => (
-            <div key={index} className="flex gap-4 items-start p-4 border border-gray-200 rounded-lg bg-gray-50">
-              <div className="flex-1 space-y-3">
-                <input
-                  type="url"
-                  value={image.url}
-                  onChange={(e) => handleImageChange(index, 'url', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                  placeholder="Image URL"
-                />
-                <input
-                  type="text"
-                  value={image.alt || ''}
-                  onChange={(e) => handleImageChange(index, 'alt', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                  placeholder="Alt text"
-                />
-              </div>
-              {image.url && (
-                <div className="w-20 h-20 bg-white rounded border overflow-hidden">
-                  <img src={image.url} alt={image.alt || ''} className="w-full h-full object-contain" />
-                </div>
-              )}
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={image.isPrimary}
-                  onChange={(e) => handleImageChange(index, 'isPrimary', e.target.checked)}
-                  className="rounded border-gray-300 text-pink-600 focus:ring-pink-500"
-                />
-                <span className="text-sm font-medium">Primary</span>
-              </label>
-              <button
-                type="button"
-                onClick={() => handleImageRemove(index)}
-                className="text-red-600 hover:text-red-800 px-3 py-2 rounded-lg"
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-          
-          <button
-            type="button"
-            onClick={handleImageAdd}
-            className="w-full border-2 border-dashed border-gray-300 text-gray-600 px-4 py-4 rounded-lg hover:border-pink-400 hover:text-pink-600"
-          >
-            + Add Image
-          </button>
+          <AdminProductImagesEditor
+            images={images}
+            onChange={setImages}
+          />
         </div>
       </div>
 

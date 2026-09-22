@@ -1,0 +1,761 @@
+[
+  {
+    "slug": "amd-athlon-pro-300ge-processor",
+    "name": "AMD Athlon PRO 300GE AM4 Socket Desktop Processor with Radeon Vega 3 Graphics (Rebox)",
+    "features": [
+      "Base Clock Speed 3.4GHz",
+      "Package AM4",
+      "PCI Express PCIe 3.0"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-5-2400g-processor",
+    "name": "AMD Ryzen 5 2400G Desktop Processor with Radeon RX Vega 11 Graphics",
+    "features": [
+      "Speed: 3.6GHz Up To 3.9GHz",
+      "Cache: L1 384KB L2 2MB L3 4MB",
+      "Cores-4 & Threads-8",
+      "Powerful Radeon Vega graphics"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-5-pro-2400ge-processor",
+    "name": "AMD Ryzen 5 Pro 2400GE Desktop Processor with Radeon RX Vega 11 Graphics",
+    "features": [
+      "Speed: 3.2GHz Up To 3.8GHz",
+      "Cache: L1 384KB L2 2MB L3 4MB",
+      "Cores-4 & Threads-8",
+      "Powerful Radeon Vega graphics"
+    ]
+  },
+  {
+    "slug": "intel-pentium-gold-g6400-processor",
+    "name": "Intel Pentium Gold G6400 10th gen Coffee Lake Processor",
+    "features": [
+      "Socket Supported FCLGA1200",
+      "Speed 4.00 GHz",
+      "Cores- 2 & Threads- 4",
+      "4M Intel Smart Cache"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-3-3200g",
+    "name": "AMD Ryzen 3 3200G Processor with Radeon RX Vega 8 Graphics",
+    "features": [
+      "Speed: 3.6 GHz up to 4.0 GHz",
+      "Cores-4 & Threads-4",
+      "Memory Speed: Up to 2933MHz",
+      "Radeon Vega 8 Graphics"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-5-3400g-processor",
+    "name": "AMD Ryzen 5 3400G Processor with Radeon RX Vega 11 Graphics",
+    "features": [
+      "Speed: 3.7GHz up to 4.2GHz",
+      "Cache: L2: 2MB, L3: 4MB",
+      "Cores-4 & Threads-8",
+      "Memory Speed: Up to 2933MHz"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-3-4100-processor",
+    "name": "AMD Ryzen 3 4100 Processor",
+    "features": [
+      "Clock Speed: 3.8GHz; Up to 4.0GHz",
+      "L1 Cache: 256KB; L2 Cache: 2MB; L3 Cache: 4MB",
+      "4 Cores & 8 Threads",
+      "CPU Socket: AM4"
+    ]
+  },
+  {
+    "slug": "intel-core-i3-10100-processor",
+    "name": "Intel 10th Gen Core i3 10100 Processor",
+    "features": [
+      "Socket Supported FCLGA1200",
+      "Speed 3.60 up to 4.30 GHz",
+      "Cores- 4 & Threads- 8",
+      "6M Cache"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-5-5500-processor",
+    "name": "AMD Ryzen 5 5500 Processor",
+    "features": [
+      "Speed: 3.6GHz; Up to 4.2GHz",
+      "L2 Cache: 3MB, L3 Cache: 16MB",
+      "Cores: 6, Threads: 12",
+      "Up to 3200MHz DDR4"
+    ]
+  },
+  {
+    "slug": "intel-core-i3-10105-10th-gen-processor",
+    "name": "Intel Core i3 10105 10th Gen Comet Lake Processor",
+    "features": [
+      "Socket Supported FCLGA1200",
+      "Speed 3.70 GHz up to 4.40 GHz",
+      "Cores- 4 & Threads- 8, 6M Cache",
+      "Intel UHD Graphics 630"
+    ]
+  },
+  {
+    "slug": "intel-core-i5-10500t-processor",
+    "name": "Intel Core i5-10500T 10th Gen Processor",
+    "features": [
+      "Clock Speed: 2.3 GHz up to 3.8 GHz",
+      "Cache: 12 MB Intel Smart Cache",
+      "CPU Cores: 6, CPU Threads: 12",
+      "Socket: LGA1200"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-5-8400f-processor",
+    "name": "AMD Ryzen 5 8400F Processor",
+    "features": [
+      "Clock Speed: 4.2GHz up to 4.7 GHz",
+      "Cores: 6, Threads: 12",
+      "L2 Cache: 6MB, L3 Cache: 16MB",
+      "Socket: AM5"
+    ]
+  },
+  {
+    "slug": "intel-core-i5-10500-processor",
+    "name": "Intel 10th Gen Core i5-10500 Processor",
+    "features": [
+      "Clock Speed: 3.10 GHz up to 4.50 GHz",
+      "Cores-6 & Threads-12",
+      "12 MB SmartCache, Socket: FCLGA1200",
+      "Intel UHD Graphics 630"
+    ]
+  },
+  {
+    "slug": "intel-core-i5-10505-processor",
+    "name": "Intel 10th Gen Core i5-10505 Processor",
+    "features": [
+      "Clock Speed: 3.20 GHz up to 4.60 GHz",
+      "Cores: 6, Threads: 12",
+      "Cache: 12 MB Intel Smart Cache",
+      "Sockets Supported: FCLGA1200"
+    ]
+  },
+  {
+    "slug": "intel-core-i5-11500t-11th-gen-processor",
+    "name": "Intel Core i5-11500T 11th Gen Processor",
+    "features": [
+      "Clock Speed: 1.50 GHz Up to 3.90 GHz",
+      "Cache: 12 MB, Socket: LGA1200",
+      "CPU Cores: 6, CPU Threads: 12",
+      "GPU name: Intel UHD Graphics 750"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-5-5600-processor",
+    "name": "AMD Ryzen 5 5600 Processor",
+    "features": [
+      "Speed: 3.5GHz up to 4.4GHz",
+      "Cache: L2: 3MB, L3: 32MB; Cores-6 & Threads-12",
+      "Memory Speed: DDR4 Up to 3200MHz",
+      "AMD ZEN 3 Architecture"
+    ]
+  },
+  {
+    "slug": "intel-core-i5-10400-processor",
+    "name": "Intel 10th Gen Core i5-10400 Processor",
+    "features": [
+      "Clock Speed:2.90 GHz up to 4.30 GHz",
+      "Cores-6 & Threads-12",
+      "12 MB SmartCache",
+      "Intel UHD Graphics 630"
+    ]
+  },
+  {
+    "slug": "intel-core-i3-12100t-12th-gen-processor",
+    "name": "Intel Core i3 12100T 12th Gen Alder Lake Processor",
+    "features": [
+      "Clock Speed: 2.20 GHz Up to 4.10 GHz",
+      "Cache: 12MB, Socket: LGA 1700",
+      "CPU Cores: 4, CPU Threads: 8",
+      "Graphic: Intel UHD Graphics 730"
+    ]
+  },
+  {
+    "slug": "intel-core-i3-12100-12th-gen-alder-lake-processor",
+    "name": "Intel Core i3-12100 12th Gen Alder Lake Processor",
+    "features": [
+      "Clock Speed: 3.30 GHz Up to 4.30 GHz",
+      "Cache: 12MB, Socket: LGA 1700",
+      "CPU Cores: 4, CPU Threads: 8",
+      "Graphic: Intel UHD Graphics 730"
+    ]
+  },
+  {
+    "slug": "intel-core-i5-11500-11th-gen-processor",
+    "name": "Intel 11th Gen Core i5-11500 Rocket Lake Processor",
+    "features": [
+      "Clock Speed: 2.70 GHz Up to 4.60 GHz",
+      "Cache: 12 MB, Socket: LGA1200",
+      "CPU Cores: 6, CPU Threads: 12",
+      "GPU name: Intel UHD Graphics 750"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-5-7500f-processor",
+    "name": "AMD Ryzen 5 7500F Processor",
+    "features": [
+      "Clock Speed: 3.7GHz up to 5.0GHz",
+      "Cores: 6, Threads: 12",
+      "L2 Cache: 6MB, L3 Cache: 32MB",
+      "Socket: AM5"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-5-pro-5650ge-processor",
+    "name": "AMD Ryzen 5 PRO 5650GE Processor with Radeon Graphics",
+    "features": [
+      "Speed: 3.4GHz up to 4.4GHz",
+      "Cache: L2: 3MB, L3: 16MB",
+      "Cores-6 & Threads-12",
+      "CPU Socket: AM4"
+    ]
+  },
+  {
+    "slug": "intel-core-i5-11400-11th-gen-processor",
+    "name": "Intel 11th Gen Core i5-11400 Rocket Lake Processor",
+    "features": [
+      "Clock Speed: 2.60 GHz Up to 4.40 GHz",
+      "Cache: 12 MB, Socket: LGA1200",
+      "CPU Cores: 6, CPU Threads: 12",
+      "GPU name: Intel UHD Graphics 730"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-5-8500g-processor",
+    "name": "AMD Ryzen 5 8500G Processor with Radeon Graphics",
+    "features": [
+      "Clock Speed: 3.5GHz up to 5.0GHz",
+      "Cores: 6, Threads: 12",
+      "L2 Cache: 6MB, L3 Cache: 16MB",
+      "Socket: AM5"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-5-pro-5650g-processor",
+    "name": "AMD Ryzen 5 PRO 5650G Processor with Radeon Graphics",
+    "features": [
+      "Speed: 3.9GHz up to 4.4GHz",
+      "Cache: L2: 3MB, L3: 16MB",
+      "Cores-6 & Threads-12",
+      "CPU Socket: AM4"
+    ]
+  },
+  {
+    "slug": "intel-core-i3-14100-14th-gen-processor",
+    "name": "Intel Core i3 14100 14th Gen Raptor Lake Processor",
+    "features": [
+      "Clock Speed: 3.5 GHz up to 4.7 GHz",
+      "Cache: 12 MB, Socket: LGA1700",
+      "CPU Cores: 4; CPU Threads: 8",
+      "Intel UHD Graphics 730"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-5-5500gt-processor",
+    "name": "AMD Ryzen 5 5500GT AM4 Processor with Radeon Graphics",
+    "features": [
+      "Clock Speed: 3.6GHz; Up to 4.4GHz",
+      "L2 Cache: 3MB; L3 Cache: 16MB",
+      "6 Cores & 12 Threads",
+      "CPU Socket: AM4, Zen 3 Architecture"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-5-5600gt-processor",
+    "name": "AMD Ryzen 5 5600GT AM4 Processor with Radeon Graphics",
+    "features": [
+      "Clock Speed: 3.6GHz; Up to 4.6GHz",
+      "L2 Cache: 3MB; L3 Cache: 16MB",
+      "6 Cores & 12 Threads",
+      "CPU Socket: AM4"
+    ]
+  },
+  {
+    "slug": "intel-12th-gen-core-i5-12400f-alder-lake-processor",
+    "name": "Intel 12th Gen Core i5-12400F Alder Lake Processor",
+    "features": [
+      "Base Clock Speed: 2.50 GHz Up to 4.40 GHz",
+      "Cache: 18 MB Intel Smart Cache",
+      "CPU Cores: 6, CPU Threads: 12",
+      "Supported Socket: LGA1700"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-7-5700x-processor",
+    "name": "AMD Ryzen 7 5700X Processor",
+    "features": [
+      "Speed: 3.4GHz Up to 4.6GHz",
+      "L2 Cache: 4MB, L3 Cache: 32MB",
+      "Cores: 8, Threads: 16",
+      "Up to 3200MHz DDR4"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-5-7600-processor",
+    "name": "AMD Ryzen 5 7600 Gaming Processor",
+    "features": [
+      "Clock Speed: 3.8GHz Up to 5.1GHz",
+      "Cores: 6, Threads: 12",
+      "L2 Cache: 6MB, L3 Cache: 32MB",
+      "Socket: AM5"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-5-7600x-processor",
+    "name": "AMD Ryzen 5 7600X Processor",
+    "features": [
+      "Clock Speed: 4.7GHz Up to 5.3GHz",
+      "Cores: 6, Threads: 12",
+      "L2 Cache: 6MB, L3 Cache: 32MB",
+      "Socket: AM5"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-7-pro-5755g-processor",
+    "name": "AMD Ryzen 7 PRO 5755G Processor with Radeon Graphics",
+    "features": [
+      "Clock Speed: Base: 3.8GHz Boost: up to 4.6GHz",
+      "Cache: L2: 4MB, L3: 16MB; TDP: 65W",
+      "CPU Cores-8 ; Threads-16",
+      "CPU Socket: AM4"
+    ]
+  },
+  {
+    "slug": "intel-core-i5-14400f-14th-gen-processor",
+    "name": "Intel Core i5 14400F 14th Gen Raptor Lake Processor",
+    "features": [
+      "Clock Speed: 3.5 GHz up to 4.7 GHz",
+      "Cache: 20 MB Intel Smart Cache",
+      "CPU Cores: 10, CPU Threads: 16",
+      "Socket: LGA1700"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-7-5700g-processor",
+    "name": "AMD Ryzen 7 5700G Processor with Radeon Graphics",
+    "features": [
+      "Speed: 3.8GHz up to 4.6GHz",
+      "Cache: L2: 4MB, L3: 16MB",
+      "Cores-8 & Threads-16",
+      "Memory Speed: Up to 3200MHz"
+    ]
+  },
+  {
+    "slug": "intel-core-ultra-5-225-processor",
+    "name": "Intel Core Ultra 5 225 Arrow Lake Processor",
+    "features": [
+      "Clock Speed: 3.3 GHz up to 4.9 GHz",
+      "Cache: 20 MB, Socket: LGA1851",
+      "CPU Cores: 10, CPU Threads: 10",
+      "NPU: Intel AI Boost"
+    ]
+  },
+  {
+    "slug": "intel-12th-gen-core-i5-12400-alder-lake-processor",
+    "name": "Intel 12th Gen Core i5-12400 Alder Lake Processor",
+    "features": [
+      "Clock Speed: 2.50 GHz Up to 4.40 GHz",
+      "Cache: 18MB, Socket: LGA1700",
+      "CPU Cores: 6, CPU Threads: 12",
+      "Graphic: Intel UHD Graphics 730"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-5-8600g-processor",
+    "name": "AMD Ryzen 5 8600G Processor with Radeon Graphics",
+    "features": [
+      "Clock Speed: 4.3GHz up to 5.0GHz",
+      "Cores: 6, Threads: 12",
+      "L2 Cache: 6MB, L3 Cache: 16MB",
+      "Socket: AM5"
+    ]
+  },
+  {
+    "slug": "intel-core-i5-14400-14th-gen-processor",
+    "name": "Intel Core i5 14400 14th Gen Raptor Lake Processor",
+    "features": [
+      "Clock Speed: 3.5 GHz up to 4.7 GHz",
+      "Cache: 20 MB, Socket: LGA1700",
+      "CPU Cores: 10, CPU Threads: 16",
+      "Graphics: Intel UHD Graphics 730"
+    ]
+  },
+  {
+    "slug": "intel-12th-gen-core-i5-12500-alder-lake-processor",
+    "name": "Intel 12th Gen Core i5-12500 Alder Lake Processor",
+    "features": [
+      "Clock Speed: 3.00 GHz Up to 4.60 GHz",
+      "Cache: 18 MB, Socket: LGA1700",
+      "CPU Cores: 6, CPU Threads: 12",
+      "Graphics: Intel UHD Graphics 770"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-5-9600x-gaming-processor",
+    "name": "AMD Ryzen 5 9600X AM5 Desktop Gaming Processor",
+    "features": [
+      "Clock Speed: 3.9 GHz Up to 5.4 GHz",
+      "Cores: 6, Threads: 12",
+      "L2 Cache: 6MB, L3 Cache: 32MB",
+      "CPU Socket: AM5"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-7-7700-processor",
+    "name": "AMD Ryzen 7 7700 Gaming Processor",
+    "features": [
+      "Clock Speed: 3.8GHz Up to 5.3GHz",
+      "Cores: 8, Threads: 16",
+      "L2 Cache: 8MB, L3 Cache: 32MB",
+      "Socket: AM5"
+    ]
+  },
+  {
+    "slug": "intel-core-i7-10700-processor",
+    "name": "Intel 10th Gen Core i7-10700 Processor",
+    "features": [
+      "Frequency: 2.90 GHz up to 4.8GHz",
+      "Cache: 16M Cache, Socket: FCLGA1200",
+      "8 Core 16 Threads",
+      "Intel UHD Graphics 630"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-7-7700x-processor",
+    "name": "AMD Ryzen 7 7700X Processor",
+    "features": [
+      "Clock Speed: 4.5GHz Up to 5.4GHz",
+      "Cores: 8, Threads: 16",
+      "L2 Cache: 8MB, L3 Cache: 32MB",
+      "Socket: AM5"
+    ]
+  },
+  {
+    "slug": "intel-core-i5-14500-14th-gen-processor",
+    "name": "Intel Core i5 14500 14th Gen Raptor Lake Processor",
+    "features": [
+      "Clock Speed: 3.7 GHz up to 5.0 GHz",
+      "Cache: 24 MB, Socket: LGA1700",
+      "CPU Cores: 14, CPU Threads: 20",
+      "Graphics: Intel UHD Graphics 770"
+    ]
+  },
+  {
+    "slug": "intel-13th-gen-core-i5-13400-processor",
+    "name": "Intel 13th Gen Core i5 13400 Raptor Lake Processor",
+    "features": [
+      "Clock Speed: 2.50 GHz up to 4.60 GHz",
+      "Cache: 20 MB, Socket: LGA1700",
+      "CPU Cores: 10, CPU Threads: 16",
+      "Graphics: Intel UHD Graphics 730"
+    ]
+  },
+  {
+    "slug": "intel-core-ultra-5-250k-plus-processor",
+    "name": "Intel Core Ultra 5 250K Plus Arrow Lake Processor",
+    "features": [
+      "Clock Speed: 3.3 GHz up to 5.3 GHz",
+      "Cache: 30 MB, Socket: LGA1851",
+      "CPU Cores: 18, CPU Threads: 18",
+      "NPU: Intel AI Boost"
+    ]
+  },
+  {
+    "slug": "intel-core-ultra-5-245k-processor",
+    "name": "Intel Core Ultra 5 245K Arrow Lake Processor",
+    "features": [
+      "Clock Speed: 3.6 GHz up to 5.2GHz",
+      "Cache: 24 MB, Socket: LGA1851",
+      "CPU Cores: 14, CPU Threads: 14",
+      "NPU: Intel AI Boost"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-7-8700g-processor",
+    "name": "AMD Ryzen 7 8700G Processor with Radeon Graphics",
+    "features": [
+      "Clock Speed: 4.2GHz Up to 5.1GHz",
+      "Cores: 8, Threads: 16",
+      "L2 Cache: 8MB, L3 Cache: 16MB",
+      "Socket: AM5"
+    ]
+  },
+  {
+    "slug": "intel-14th-gen-core-i5-14600k-processor",
+    "name": "Intel Core i5 14600K 14th Gen Raptor Lake Processor",
+    "features": [
+      "Clock Speed: 3.5 GHz up to 5.3 GHz",
+      "Cache: 24 MB, Socket: LGA1700",
+      "CPU Cores: 14, CPU Threads: 20",
+      "Graphics: Intel UHD Graphics 770"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-7-9700x-gaming-processor",
+    "name": "AMD Ryzen 7 9700X AM5 Desktop Gaming Processor",
+    "features": [
+      "Clock Speed: 3.8 GHz Up to 5.5 GHz",
+      "Cores: 8, Threads: 16",
+      "L2 Cache: 8MB, L3 Cache: 32MB",
+      "CPU Socket: AM5"
+    ]
+  },
+  {
+    "slug": "intel-core-ultra-7-265k-processor",
+    "name": "Intel Core Ultra 7 265K Arrow Lake Processor",
+    "features": [
+      "Clock Speed: 3.3GHz up to 5.5GHz",
+      "Cache: 30 MB, Socket: LGA1851",
+      "CPU Cores: 20, CPU Threads: 20",
+      "NPU: Intel AI Boost"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-9-5900x-processor",
+    "name": "AMD Ryzen 9 5900X Processor",
+    "features": [
+      "Speed: 3.7GHz Up to 4.8GHz",
+      "L2 Cache: 6MB, L3 Cache: 64MB",
+      "Cores: 12, Threads: 24",
+      "Up to 3200MHz DDR4"
+    ]
+  },
+  {
+    "slug": "intel-12th-gen-core-i7-12700-alder-lake-processor",
+    "name": "Intel 12th Gen Core i7-12700 Alder Lake Processor",
+    "features": [
+      "Clock Speed: 2.10 GHz Up to 4.80 GHz",
+      "Cache: 25MB, Socket: LGA1700",
+      "CPU Cores: 12, CPU Threads: 20",
+      "GPU: Intel UHD Graphics 770"
+    ]
+  },
+  {
+    "slug": "intel-13th-gen-core-i7-13700kf-processor",
+    "name": "Intel 13th Gen Core i7 13700KF Raptor Lake Processor",
+    "features": [
+      "Clock Speed: 3.40 GHz up to 5.40 GHz",
+      "Cache: 30 MB Intel Smart Cache",
+      "CPU Cores: 16, CPU Threads: 24",
+      "Socket: LGA1700"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-9-7900x-processor",
+    "name": "AMD Ryzen 9 7900X Processor",
+    "features": [
+      "Clock Speed: 4.7GHz Up to 5.6GHz",
+      "Cores: 12, Threads: 24",
+      "L2 Cache: 12MB, L3 Cache: 64MB",
+      "Socket: AM5"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-7-7800x3d-processor",
+    "name": "AMD Ryzen 7 7800X3D Processor",
+    "features": [
+      "Clock Speed: 4.2GHz Up to 5.0GHz",
+      "Cores: 8, Threads: 16",
+      "L1 Cache: 512KB, L2 Cache: 8MB, L3 Cache: 96MB",
+      "Socket: AM5"
+    ]
+  },
+  {
+    "slug": "intel-12th-gen-core-i7-12700k-alder-lake-processor",
+    "name": "Intel 12th Gen Core i7-12700K Alder Lake Processor",
+    "features": [
+      "Clock Speed: 3.60 GHz Up to 5.0 GHz",
+      "Cores: 12, Threads: 20",
+      "Cache: 25 MB Intel Smart Cache",
+      "Socket: LGA1700"
+    ]
+  },
+  {
+    "slug": "intel-core-ultra-7-270k-plus-processor",
+    "name": "Intel Core Ultra 7 270K Plus Arrow Lake Processor",
+    "features": [
+      "Clock Speed: 4.7 GHz up to 5.5 GHz",
+      "Cache: 36 MB, Socket: LGA1851",
+      "CPU Cores: 24, CPU Threads: 24",
+      "NPU: Intel AI Boost"
+    ]
+  },
+  {
+    "slug": "intel-13th-gen-core-i7-13700-processor",
+    "name": "Intel 13th Gen Core i7 13700 Raptor Lake Processor",
+    "features": [
+      "Clock Speed: 2.10 GHz GHz up to 5.20 GHz",
+      "Cache: 30 MB, Socket: LGA1700",
+      "CPU Cores: 16, CPU Threads: 24",
+      "Graphics: Intel UHD Graphics 770"
+    ]
+  },
+  {
+    "slug": "intel-14th-gen-core-i7-14700kf-processor",
+    "name": "Intel Core i7 14700KF 14th Gen Raptor Lake Processor",
+    "features": [
+      "Clock Speed: 3.4 GHz up to 5.6 GHz",
+      "Cache: 33 MB Intel Smart Cache",
+      "CPU Cores: 20, CPU Threads: 28",
+      "Socket: LGA1700"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-9-9900x-gaming-processor",
+    "name": "AMD Ryzen 9 9900X Gaming Processor",
+    "features": [
+      "Clock Speed: 4.4GHz Up to 5.6GHz",
+      "Cores: 12, Threads: 24",
+      "L1 Cache: 960KB, L2 Cache: 12MB, L3 Cache: 64MB",
+      "CPU Socket: AM5"
+    ]
+  },
+  {
+    "slug": "intel-13th-gen-core-i7-13700k-processor",
+    "name": "Intel 13th Gen Core i7 13700K Raptor Lake Processor",
+    "features": [
+      "Clock Speed: 3.40 GHz up to 5.40 GHz",
+      "Cache: 30 MB, Socket: LGA1700",
+      "CPU Cores: 16, CPU Threads: 24",
+      "Graphics: Intel UHD Graphics 770"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-9-5950x-processor",
+    "name": "AMD Ryzen 9 5950X Processor",
+    "features": [
+      "Speed: 3.4GHz Up to 4.9GHz",
+      "L2 Cache: 8MB, L3 Cache: 64MB",
+      "Cores: 16, Threads: 32",
+      "Up to 3200MHz DDR4 Memory"
+    ]
+  },
+  {
+    "slug": "intel-core-i7-14700-14th-gen-processor",
+    "name": "Intel Core i7 14700 14th Gen Raptor Lake Processor",
+    "features": [
+      "Clock Speed: 4.2 GHz up to 5.4 GHz",
+      "Cache: 33 MB, Socket: LGA1700",
+      "CPU Cores: 20, CPU Threads: 28",
+      "Graphics: Intel UHD Graphics 770"
+    ]
+  },
+  {
+    "slug": "intel-14th-gen-core-i7-14700k-processor",
+    "name": "Intel Core i7 14700K 14th Gen Raptor Lake Processor",
+    "features": [
+      "Clock Speed: 3.4 GHz up to 5.6 GHz",
+      "Cache: 33 MB, Socket: LGA1700",
+      "CPU Cores: 20, CPU Threads: 28",
+      "Graphics: Intel UHD Graphics 770"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-9-7950x3d-processor",
+    "name": "AMD Ryzen 9 7950X3D Gaming Processor",
+    "features": [
+      "Clock Speed: 4.2GHz Up to 5.7GHz",
+      "Cores: 16, Threads: 32",
+      "L3 Cache: 128MB",
+      "CPU Socket: AM5"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-9-9950x-gaming-processor",
+    "name": "AMD Ryzen 9 9950X Gaming Processor",
+    "features": [
+      "Clock Speed: 4.3GHz Up to 5.7GHz",
+      "Cores: 16, Threads: 32",
+      "L1 Cache: 1280KB, L2 Cache: 16MB, L3 Cache: 64MB",
+      "CPU Socket: AM5"
+    ]
+  },
+  {
+    "slug": "intel-14th-gen-core-i9-14900kf-processor",
+    "name": "Intel Core i9 14900KF 14th Gen Raptor Lake Processor",
+    "features": [
+      "Clock Speed: 3.20 GHz up to 6.00 GHz",
+      "Cache: 36 MB Intel Smart Cache",
+      "CPU Cores: 24, CPU Threads: 32",
+      "Socket: LGA1700"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-9-7950x-processor",
+    "name": "AMD Ryzen 9 7950X Processor",
+    "features": [
+      "Clock Speed: 4.5GHz Up to 5.7GHz",
+      "Cores: 16, Threads: 32",
+      "L2 Cache: 16MB, L3 Cache: 64MB",
+      "Socket: AM5"
+    ]
+  },
+  {
+    "slug": "intel-14th-gen-core-i9-14900k-processor",
+    "name": "Intel Core i9 14900K 14th Gen Raptor Lake Processor",
+    "features": [
+      "Clock Speed: 3.20 GHz up to 6.00 GHz",
+      "Cache: 36 MB Intel Smart Cache, Socket: LGA1700",
+      "CPU Cores: 24, CPU Threads: 32",
+      "Intel UHD Graphics 770"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-7-9800x3d-processor",
+    "name": "AMD Ryzen 7 9800X3D Gaming Processor",
+    "features": [
+      "Clock Speed: 4.7GHz Up to 5.2GHz",
+      "Cores: 8, Threads: 16",
+      "L1 Cache: 640 KB, L2 Cache: 8 MB, L3 Cache: 96 MB",
+      "CPU Socket: AM5"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-7-9850x3d-processor",
+    "name": "AMD RYZEN 7 9850X3D Gaming Processor",
+    "features": [
+      "Clock Speed: 4.7GHz Up to 5.6GHz",
+      "Cores: 8, Threads: 16",
+      "L1 Cache: 640 KB, L2 Cache: 8 MB, L3 Cache: 96 MB",
+      "CPU Socket: AM5"
+    ]
+  },
+  {
+    "slug": "intel-core-ultra-9-285k-processor",
+    "name": "Intel Core Ultra 9 285K Arrow Lake Processor",
+    "features": [
+      "Clock Speed: 3.2GHz up to 5.7GHz",
+      "Cache: 36 MB, Socket: LGA1851",
+      "CPU Cores: 24, CPU Threads: 24",
+      "NPU: Intel AI Boost"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-9-9900x3d-processor",
+    "name": "AMD Ryzen 9 9900X3D Gaming Processor",
+    "features": [
+      "Clock Speed: 4.4GHz Up to 5.5GHz",
+      "Cores: 12; Threads: 24",
+      "Cache: L1: 960KB; L2: 12MB; L3: 128MB",
+      "CPU Socket: AM5"
+    ]
+  },
+  {
+    "slug": "amd-ryzen-9-9950x3d-processor",
+    "name": "AMD Ryzen 9 9950X3D Gaming Processor",
+    "features": [
+      "Clock Speed: 4.3GHz Up to 5.7GHz",
+      "Cores: 16; Threads: 32",
+      "Cache: L1 : 1280KB; L2 : 16MB; L3 : 128MB",
+      "CPU Socket: AM5"
+    ]
+  }
+]

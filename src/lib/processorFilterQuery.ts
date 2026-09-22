@@ -67,7 +67,7 @@ export function buildProcessorSpecCondition(
               ...values.map((filterValue) => ({
                 value: {
                   contains:
-                    brand === 'amd'
+                    brand === 'amd' || filterValue.includes('Series')
                       ? filterValue.replace(' Series', '')
                       : filterValue.replace(' Gen', ''),
                   mode: 'insensitive' as const,

@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AdminShell } from '@/components/admin/AdminShell';
 import ProductEditForm from '@/components/admin/ProductEditForm';
+import { resolveAdminListSlug } from '@/lib/adminCategoryConfig';
 
 interface Product {
   id: string;
@@ -124,9 +125,11 @@ export default function EditProductPage() {
 
   if (!product) return null;
 
-  const categoryBackHref = product.category?.slug
-    ? `/admin/products/category/${product.category.slug}`
-    : '/admin/products';
+  const listSlug = resolveAdminListSlug(
+    product.category.slug,
+    product.category.parent?.slug
+  );
+  const categoryBackHref = `/admin/products/category/${listSlug}`;
 
   return (
     <AdminShell

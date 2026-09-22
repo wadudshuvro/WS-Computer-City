@@ -327,9 +327,76 @@ const cacheFilter: FilterDefinition = {
   ],
 };
 
+function mergeFilterOptions(
+  ...lists: Array<Array<{ value: string; label: string }> | undefined>
+): Array<{ value: string; label: string }> {
+  const seen = new Set<string>();
+  const merged: Array<{ value: string; label: string }> = [];
+  for (const list of lists) {
+    for (const option of list || []) {
+      if (seen.has(option.value)) continue;
+      seen.add(option.value);
+      merged.push(option);
+    }
+  }
+  return merged;
+}
+
 export function getProcessorFilters(brand: ProcessorBrand): FilterDefinition[] {
+  // Parent Processor page (no Intel/AMD pill) — full Star Tech–style sidebar,
+  // with Intel + AMD options merged so filters are never stripped down.
   if (brand === 'all') {
-    return [priceRangeFilter, stockStatusFilter, processorBrandFilter];
+    return [
+      priceRangeFilter,
+      stockStatusFilter,
+      processorBrandFilter,
+      {
+        key: 'generation',
+        name: 'Generation / Series',
+        type: 'checkbox',
+        defaultExpanded: false,
+        options: mergeFilterOptions(
+          intelGenerationFilter.options,
+          amdSeriesFilter.options
+        ),
+      },
+      {
+        key: 'processor_model',
+        name: 'Type',
+        type: 'checkbox',
+        defaultExpanded: false,
+        options: mergeFilterOptions(intelTypeFilter.options, amdTypeFilter.options),
+      },
+      {
+        key: 'socket_type',
+        name: 'Socket',
+        type: 'checkbox',
+        defaultExpanded: false,
+        options: mergeFilterOptions(
+          intelSocketFilter.options,
+          amdSocketFilter.options
+        ),
+      },
+      {
+        key: 'number_of_cores',
+        name: 'Number of Core',
+        type: 'checkbox',
+        defaultExpanded: false,
+        options: mergeFilterOptions(intelCoreFilter.options, amdCoreFilter.options),
+      },
+      {
+        key: 'number_of_threads',
+        name: 'Number of Thread',
+        type: 'checkbox',
+        defaultExpanded: false,
+        options: mergeFilterOptions(
+          intelThreadFilter.options,
+          amdThreadFilter.options
+        ),
+      },
+      clockSpeedFilter,
+      cacheFilter,
+    ];
   }
 
   const isAmd = brand === 'amd';

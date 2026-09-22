@@ -167,6 +167,7 @@ model Product {
   
   images           ProductImage[]
   specifications   ProductSpecification[]
+  orderItems       OrderItem[]
 
   @@index([slug])
   @@index([sku])
@@ -272,6 +273,81 @@ model FilterableSpecification {
   @@index([key])
   @@index([categoryId])
   @@map("filterable_specifications")
+}
+
+// ============================================
+// ORDERS (COD checkout)
+// ============================================
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum DeliveryMethod {
+  HOME_DELIVERY
+  STORE_PICKUP
+  EXPRESS
+}
+
+enum PaymentMethod {
+  CASH_ON_DELIVERY
+}
+
+model Order {
+  id              String         @id @default(cuid())
+  orderNumber     String         @unique
+  status          OrderStatus    @default(PENDING)
+
+  // Shipping & billing
+  firstName       String
+  lastName        String?
+  address         String
+  upazila         String?
+  district        String
+  mobile          String
+  email           String?
+  comment         String?        @db.Text
+
+  paymentMethod   PaymentMethod  @default(CASH_ON_DELIVERY)
+  deliveryMethod  DeliveryMethod @default(HOME_DELIVERY)
+  deliveryFee     Decimal        @db.Decimal(10, 2)
+  subtotal        Decimal        @db.Decimal(10, 2)
+  total           Decimal        @db.Decimal(10, 2)
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  items           OrderItem[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([mobile])
+  @@map("orders")
+}
+
+model OrderItem {
+  id            String   @id @default(cuid())
+  orderId       String
+  productId     String?
+  productName   String
+  productSlug   String?
+  productSku    String?
+  imageUrl      String?
+  variantLabel  String?  // e.g. "Bundle with PC" / "Single"
+  unitPrice     Decimal  @db.Decimal(10, 2)
+  quantity      Int
+  lineTotal     Decimal  @db.Decimal(10, 2)
+  createdAt     DateTime @default(now())
+
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
 }
 
 // ============================================

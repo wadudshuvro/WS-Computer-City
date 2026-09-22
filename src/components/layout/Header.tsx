@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { Heart, Scale, Search, ShoppingCart, User } from 'lucide-react';
+import { Heart, Scale, Search, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MegaMenu } from './MegaMenu';
+import { HeaderCartButton } from './HeaderCartButton';
 
 export function Header() {
   return (
@@ -77,18 +78,7 @@ export function Header() {
           </div>
 
           <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="relative h-9 w-9 text-sidebar-foreground hover:bg-sidebar-muted hover:text-white"
-              aria-label="Cart"
-            >
-              <ShoppingCart className="h-4 w-4" />
-              <span className="absolute right-1 top-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-destructive px-0.5 text-[10px] font-medium text-destructive-foreground">
-                0
-              </span>
-            </Button>
+            <HeaderCartButton />
             <Button
               type="button"
               variant="ghost"

@@ -1189,6 +1189,11 @@ function ProductsPageContent() {
                       'cache_size',
                       'generation',
                     ];
+                    const featuredFromShort = (product.shortDescription || '')
+                      .split(/\r?\n|•/)
+                      .map((l) => l.replace(/^[-*]\s*/, '').trim())
+                      .filter(Boolean)
+                      .slice(0, 4);
                     const processorCardSpecs = isProcessorCategory
                       ? (product.specifications || [])
                           .filter((s) =>
@@ -1196,6 +1201,13 @@ function ProductsPageContent() {
                           )
                           .slice(0, 4)
                       : [];
+                    const processorFeatureLines =
+                      isProcessorCategory && featuredFromShort.length > 0
+                        ? featuredFromShort
+                        : processorCardSpecs.map(
+                            (s) =>
+                              `${s.specificationDefinition.name}: ${s.value}`
+                          );
 
                     return viewMode === 'grid' ? (
                       // Grid View Card
@@ -1245,14 +1257,11 @@ function ProductsPageContent() {
                             </h3>
                           </Link>
 
-                          {processorCardSpecs.length > 0 && (
-                            <ul className="mb-3 space-y-0.5 text-xs">
-                              {processorCardSpecs.map((spec) => (
-                                <li key={spec.specificationDefinition.key} className="flex gap-1">
-                                  <span className="text-gray-500">
-                                    {spec.specificationDefinition.name}:
-                                  </span>
-                                  <span className="text-gray-900">{spec.value}</span>
+                          {processorFeatureLines.length > 0 && (
+                            <ul className="mb-3 list-disc space-y-0.5 pl-4 text-xs text-gray-700">
+                              {processorFeatureLines.map((line) => (
+                                <li key={line} className="leading-snug">
+                                  {line}
                                 </li>
                               ))}
                             </ul>
@@ -1324,11 +1333,17 @@ function ProductsPageContent() {
                                 {product.name}
                               </h3>
                             </Link>
-                            {product.shortDescription && (
+                            {processorFeatureLines.length > 0 ? (
+                              <ul className="mb-2 list-disc space-y-0.5 pl-4 text-sm text-gray-600">
+                                {processorFeatureLines.map((line) => (
+                                  <li key={line}>{line}</li>
+                                ))}
+                              </ul>
+                            ) : product.shortDescription ? (
                               <p className="text-sm text-gray-600 mb-2 line-clamp-2">
                                 {product.shortDescription}
                               </p>
-                            )}
+                            ) : null}
                             <span className={`${stockBadge.className} text-white text-xs px-2 py-1 rounded`}>
                               {stockBadge.text}
                             </span>

@@ -206,7 +206,11 @@ export function MegaMenu() {
                 {showDropdown && (
                   <div
                     className={`absolute left-0 top-full z-[300] overflow-visible border border-gray-200 border-t-[3px] border-t-nav bg-white text-gray-800 shadow-md ${
-                      category.slug === 'monitor' ? 'min-w-[440px]' : 'min-w-[210px]'
+                      category.slug === 'monitor'
+                        ? 'min-w-[440px]'
+                        : category.slug === 'accessories'
+                          ? 'min-w-[240px]'
+                          : 'min-w-[210px]'
                     }`}
                     onMouseEnter={() => {
                       clearTimer(categoryCloseTimer);
@@ -269,14 +273,26 @@ export function MegaMenu() {
 
                             {hasChildren && isSubActive && (
                               <div
-                                className="absolute left-full top-0 z-[310] -ml-px max-h-[70vh] min-w-[170px] overflow-y-auto border border-gray-200 bg-white text-gray-800 shadow-md"
+                                className={`absolute left-full top-0 z-[310] -ml-px max-h-[70vh] overflow-y-auto border border-gray-200 bg-white text-gray-800 shadow-md ${
+                                  category.slug === 'accessories' &&
+                                  subCat.children.length > 12
+                                    ? 'min-w-[340px]'
+                                    : 'min-w-[170px]'
+                                }`}
                                 onMouseEnter={() => {
                                   clearTimer(subCategoryCloseTimer);
                                   openSubCategory(subCat.id);
                                 }}
                                 onMouseLeave={scheduleCloseSubCategory}
                               >
-                                <ul className="py-0.5">
+                                <ul
+                                  className={
+                                    category.slug === 'accessories' &&
+                                    subCat.children.length > 12
+                                      ? 'grid grid-cols-2 gap-x-0 py-0.5'
+                                      : 'py-0.5'
+                                  }
+                                >
                                   {subCat.children.map((child) => {
                                     const childLink = resolveMenuHref(
                                       child,

@@ -3,6 +3,8 @@
  * Each item maps to a database category slug for product filtering.
  */
 
+import { resolveCategoryFromDbSlug } from '@/lib/categoryConfig';
+
 export interface AdminContentType {
   name: string;
   slug: string;
@@ -58,11 +60,29 @@ export const adminContentGroups: AdminContentGroup[] = [
     name: 'Accessories',
     description: 'Peripherals and add-ons',
     items: [
+      { name: 'Watch', slug: 'watch', description: 'Smartwatches & wearables' },
       { name: 'Keyboard', slug: 'keyboard', description: 'Mechanical & membrane keyboards' },
       { name: 'Mouse', slug: 'mouse', description: 'Gaming & office mice' },
       { name: 'Headphone', slug: 'headphone', description: 'Headsets & headphones' },
+      { name: 'Bluetooth Headphone', slug: 'bluetooth-headphone', description: 'Wireless headphones' },
+      { name: 'Mouse Pad', slug: 'mouse-pad', description: 'Mouse pads' },
+      { name: 'Wrist Rest', slug: 'wrist-rest', description: 'Keyboard & mouse wrist rests' },
+      { name: 'Headphone Stand', slug: 'headphone-stand', description: 'Headphone stands' },
+      { name: 'Speaker & Home Theater', slug: 'speaker-home-theater', description: 'Speakers & home theater' },
+      { name: 'Bluetooth Speakers', slug: 'bluetooth-speakers', description: 'Portable Bluetooth speakers' },
+      { name: 'Soundbar', slug: 'soundbar', description: 'Soundbars' },
       { name: 'Webcam', slug: 'webcam', description: 'Web cameras' },
-      { name: 'Speaker', slug: 'speaker', description: 'Audio speakers' },
+      { name: 'Cable', slug: 'cable', description: 'Cables' },
+      { name: 'Converter', slug: 'converter', description: 'Converters & adapters' },
+      { name: 'Card Reader', slug: 'card-reader', description: 'Card readers' },
+      { name: 'Hubs & Docks', slug: 'hubs-docks', description: 'USB hubs & docks' },
+      { name: 'Microphone', slug: 'microphone', description: 'Microphones' },
+      { name: 'Digital Voice Recorder', slug: 'digital-voice-recorder', description: 'Voice recorders' },
+      { name: 'Presenter', slug: 'presenter', description: 'Presentation remotes' },
+      { name: 'Memory Card', slug: 'memory-card', description: 'SD & microSD cards' },
+      { name: 'Capture Card', slug: 'capture-card', description: 'Video capture cards' },
+      { name: 'Pen Drive', slug: 'pen-drive', description: 'USB flash drives' },
+      { name: 'Thermal Paste', slug: 'thermal-paste', description: 'CPU thermal paste' },
     ],
   },
   {
@@ -97,4 +117,41 @@ export function getContentTypeBySlug(slug: string): AdminContentType | undefined
 
 export function getContentGroupForSlug(slug: string): AdminContentGroup | undefined {
   return adminContentGroups.find((g) => g.items.some((item) => item.slug === slug));
+}
+
+/**
+ * Map a product's DB category slug (e.g. intel-motherboard) to the CMS
+ * content-type list slug (e.g. motherboard) used by /admin/products/category/[slug].
+ */
+export function resolveAdminListSlug(
+  categorySlug: string,
+  parentSlug?: string | null
+): string {
+  if (getContentTypeBySlug(categorySlug)) return categorySlug;
+
+  if (parentSlug && getContentTypeBySlug(parentSlug)) return parentSlug;
+
+  const { mainCategory } = resolveCategoryFromDbSlug(categorySlug, parentSlug);
+
+  if (mainCategory) {
+    const byForm = getAllContentTypes().find((t) => t.formMainCategory === mainCategory);
+    if (byForm) return byForm.slug;
+  }
+
+  // Common DB parent aliases → CMS list slug
+  const aliases: Record<string, string> = {
+    'graphics-card': 'graphics-card',
+    motherboard: 'motherboard',
+    processor: 'processor',
+    ram: 'desktop-ram',
+    'desktop-ram': 'desktop-ram',
+    'power-supply': 'power-supply',
+    ssd: 'ssd',
+    'computer-case': 'computer-case',
+    'cpu-cooler': 'cpu-cooler',
+  };
+  if (aliases[categorySlug]) return aliases[categorySlug];
+  if (parentSlug && aliases[parentSlug]) return aliases[parentSlug];
+
+  return parentSlug || categorySlug;
 }

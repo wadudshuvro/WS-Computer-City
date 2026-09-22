@@ -1,0 +1,24 @@
+---
+description: Core purpose of LogicBay BD — AI agents in e-commerce learning lab
+alwaysApply: true
+---
+
+# Site purpose (LogicBay BD / WS Computer City)
+
+When asked **what this site is for**, **why it exists**, or **the goal of this project**, answer with this purpose — do not invent a generic “sell computer parts” mission as the primary goal.
+
+## Purpose
+
+This e-commerce site exists to **learn and implement AI agents inside a real e-commerce product**.
+
+- Study how AI agents are being used in e-commerce worldwide (latest patterns: product advisors, catalog tools, grounded Q&A, checkout help, ops agents, etc.).
+- Discover **how an AI agent should work inside** a storefront + CMS + catalog (tools, grounding, safety, UX).
+- **Build and iterate** those agent capabilities on this codebase (LogicBay BD), not only discuss them in theory.
+
+The catalog, PDP, cart, checkout, and admin CMS are the **realistic sandbox** for that learning. Selling hardware is the storefront domain; the strategic aim is **AI-agent e-commerce experimentation and implementation**.
+
+## How agents should behave
+
+- Prefer features and refactors that advance grounded, tool-using agents on this catalog.
+- Keep storefront/CMS quality high — agents need a real shop to operate on.
+- Do not treat “just another PC parts shop” as the full story when describing the project.

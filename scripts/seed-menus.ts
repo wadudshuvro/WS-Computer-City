@@ -8,6 +8,7 @@ import { PrismaClient } from '@prisma/client';
 import { loadEnvValue } from './load-env';
 import { getComponentBrandFlyout } from '../src/lib/componentBrandMenu';
 import { MONITOR_MENU_ITEMS } from '../src/lib/monitorMenuBrands';
+import { ACCESSORIES_MENU_ITEMS } from '../src/lib/accessoriesMenuItems';
 
 process.env.DATABASE_URL = loadEnvValue('DATABASE_URL');
 
@@ -146,7 +147,31 @@ async function main() {
     }))
   );
 
-  console.log(`✅ Seeded menu: ${component.name}, ${monitor.name} (+ brands)`);
+  const accessories = await prisma.menuItem.create({
+    data: {
+      name: 'Accessories',
+      slug: 'accessories',
+      parentId: null,
+      level: 0,
+      sortOrder: 2,
+      isVisible: true,
+    },
+  });
+
+  await createChildren(
+    accessories.id,
+    0,
+    ACCESSORIES_MENU_ITEMS.map((item) => ({
+      name: item.name,
+      slug: item.slug,
+      href: item.href,
+      hideArrow: item.hideArrow ?? true,
+    }))
+  );
+
+  console.log(
+    `✅ Seeded menu: ${component.name}, ${monitor.name}, ${accessories.name} (+ brands)`
+  );
 }
 
 main()
