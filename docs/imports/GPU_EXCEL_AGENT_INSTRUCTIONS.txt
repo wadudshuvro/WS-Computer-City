@@ -1,0 +1,22 @@
+Graphics Card CMS import (LogicBay BD)
+======================================
+
+Source listing (titles, URLs, listing prices, card bullets only):
+https://www.startech.com.bd/component/graphics-card?filter_status=7&limit=90
+
+Files:
+  docs/imports/startech-gpu-list.json
+  docs/imports/gpu-cms-import.csv
+  docs/imports/gpu-cms-import.xlsx
+
+Workflow:
+  1. npx tsx scripts/scrape-startech-gpu-list.ts
+  2. npx tsx scripts/build-gpu-import-excel.ts
+  3. npx tsx scripts/import-gpu-csv.ts
+  4. npx tsx scripts/download-gpu-images.ts
+
+Required listing-card specs: memory_size, memory_type, engine_clock, resolution, port_types
+Required PDP: warranty (default 3 Years), gpu_chipset, chipset_series
+Images: public/uploads/gpus/<slug>.<ext> → CMS /uploads/gpus/...
+
+Do not copy Star Tech PDP body text. Prices come from listing cards.

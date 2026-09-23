@@ -22,12 +22,14 @@ import { GPU_SPECIFICATION_GROUPS, isGpuCategory, getCategorySlugs } from '@/lib
 import { MOTHERBOARD_SPECIFICATION_GROUPS, isMotherboardCategory } from '@/lib/motherboardSpecDefinitions';
 import { RAM_SPECIFICATION_GROUPS, isRamCategory } from '@/lib/ramSpecDefinitions';
 import { GpuProductHighlights } from '@/components/products/GpuProductHighlights';
+import { ProductDetailSkeleton } from '@/components/products/ProductDetailSkeleton';
 import { ProductDescription } from '@/components/products/ProductDescription';
 import { AddedToCartDialog } from '@/components/cart/AddedToCartDialog';
 import { useCartStore, formatVariantLabel } from '@/store/cartStore';
 
 /** Star Tech–style: Single unit costs this much more than Bundle with PC */
 const PROCESSOR_SINGLE_SURCHARGE_BDT = 500;
+const GPU_SINGLE_SURCHARGE_BDT = 1000;
 
 const PROCESSOR_CATEGORY_SLUGS = new Set(['processor', 'intel', 'amd', 'amd-ryzen']);
 
@@ -152,15 +154,15 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [activeTab, setActiveTab] = useState<'description' | 'specification' | 'reviews'>('specification');
   const [quantity, setQuantity] = useState(1);
-  /** Processors only: CMS price = Bundle with PC; Single adds surcharge */
-  const [processorVariant, setProcessorVariant] = useState<ProcessorPurchaseVariant>('bundle');
+  /** Processors + GPUs: CMS price = Bundle with PC; Single adds surcharge */
+  const [purchaseVariant, setPurchaseVariant] = useState<ProcessorPurchaseVariant>('bundle');
   const [cartDialogOpen, setCartDialogOpen] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
 
   useEffect(() => {
     if (slug) {
       setActiveTab('specification');
-      setProcessorVariant('bundle');
+      setPurchaseVariant('bundle');
       setQuantity(1);
       fetchProduct();
     }
@@ -263,14 +265,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading product details...</p>
-        </div>
-      </div>
-    );
+    return <ProductDetailSkeleton />;
   }
 
   if (error || !product) {
@@ -296,12 +291,16 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const isMotherboard = isMotherboardCategory(categorySlugs);
   const isRam = isRamCategory(categorySlugs);
   const isProcessor = isProcessorCategory(categorySlugs);
+  const hasPcBundleVariant = isProcessor || isGpu;
+  const singleSurcharge = isGpu
+    ? GPU_SINGLE_SURCHARGE_BDT
+    : PROCESSOR_SINGLE_SURCHARGE_BDT;
 
-  // Stored CMS price = Bundle with PC; Single is +৳500 (all processors)
+  // Stored CMS price = Bundle with PC; Single is +৳500 (processor) or +৳1000 (GPU)
   const bundlePrice = product.price;
-  const singlePrice = product.price + PROCESSOR_SINGLE_SURCHARGE_BDT;
-  const displayPrice = isProcessor
-    ? processorVariant === 'single'
+  const singlePrice = product.price + singleSurcharge;
+  const displayPrice = hasPcBundleVariant
+    ? purchaseVariant === 'single'
       ? singlePrice
       : bundlePrice
     : product.price;
@@ -312,7 +311,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const primaryImage = product.images.find(img => img.isPrimary) || product.images[0];
 
   const addCurrentProductToCart = () => {
-    const variant = isProcessor ? processorVariant : undefined;
+    const variant = hasPcBundleVariant ? purchaseVariant : undefined;
     addItem({
       productId: product.id,
       slug: product.slug,
@@ -459,7 +458,6 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                     {/* GPU: boxed feature points + short description */}
                     {isGpu ? (
                       <GpuProductHighlights
-                        sku={product.sku}
                         stockStatus={product.stockStatus}
                         stockLabel={stockStatus.text}
                         brand={product.brand}
@@ -511,15 +509,15 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       <span className="text-sm text-gray-600">(1 Reviews)</span>
                     </div>
 
-                    {/* Processor purchase variant (Star Tech–style) */}
-                    {isProcessor && (
+                    {/* Bundle with PC vs Single (processors + GPUs) */}
+                    {hasPcBundleVariant && (
                       <div className="mb-4 space-y-3">
                         <div className="bg-red-50 border border-red-100 rounded-lg p-3 flex items-start gap-2 text-red-700 text-sm">
                           <Info className="w-4 h-4 mt-0.5 shrink-0" />
                           <span>
-                            {processorVariant === 'bundle' ? (
+                            {purchaseVariant === 'bundle' ? (
                               <>
-                                Bundle With PC, Single Price -{' '}
+                                Bundle With PC , Single Price -{' '}
                                 <span className="font-semibold">{singlePrice.toLocaleString()}</span>
                               </>
                             ) : (
@@ -535,15 +533,15 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                           <p className="text-sm text-gray-700 mb-2">
                             Variant:{' '}
                             <span className="font-medium text-gray-900">
-                              {processorVariant === 'bundle' ? 'Bundle with PC' : 'Single'}
+                              {purchaseVariant === 'bundle' ? 'Bundle with PC' : 'Single'}
                             </span>
                           </p>
                           <div className="flex flex-wrap gap-2">
                             <button
                               type="button"
-                              onClick={() => setProcessorVariant('single')}
+                              onClick={() => setPurchaseVariant('single')}
                               className={`min-w-[120px] px-4 py-2.5 rounded-md border text-sm font-medium transition-colors ${
-                                processorVariant === 'single'
+                                purchaseVariant === 'single'
                                   ? 'bg-orange-500 border-orange-500 text-white'
                                   : 'bg-white border-gray-300 text-gray-800 hover:border-orange-400'
                               }`}
@@ -552,9 +550,9 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                             </button>
                             <button
                               type="button"
-                              onClick={() => setProcessorVariant('bundle')}
+                              onClick={() => setPurchaseVariant('bundle')}
                               className={`min-w-[140px] px-4 py-2.5 rounded-md border text-sm font-medium transition-colors ${
-                                processorVariant === 'bundle'
+                                purchaseVariant === 'bundle'
                                   ? 'bg-orange-500 border-orange-500 text-white'
                                   : 'bg-white border-gray-300 text-gray-800 hover:border-orange-400'
                               }`}
@@ -566,8 +564,8 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       </div>
                     )}
 
-                    {/* Price alert (non-processors) */}
-                    {!isProcessor && (
+                    {/* Price alert (categories without bundle/single pricing) */}
+                    {!hasPcBundleVariant && (
                       <div className="bg-red-50 border border-red-100 rounded-lg p-3 mb-4 flex items-center gap-2 text-red-700 text-sm">
                         <X className="w-4 h-4" />
                         Price valid only with PC bundle.

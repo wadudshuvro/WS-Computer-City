@@ -13,6 +13,7 @@ import {
   parseCacheMb,
   parseClockGhz,
   PROCESSOR_SPEC_FILTER_KEYS,
+  amdSeriesNameContainsTokens,
 } from '@/lib/processorFilterMappings';
 
 export function buildProcessorSpecCondition(
@@ -58,24 +59,35 @@ export function buildProcessorSpecCondition(
 
     case 'generation': {
       const dbValues = values.flatMap((v) => mapGenerationFilterToDb(v, brand));
+      const nameTokens =
+        brand === 'amd' ? values.flatMap((v) => amdSeriesNameContainsTokens(v)) : [];
       return {
-        specifications: {
-          some: {
-            specificationDefinition: { key },
-            OR: [
-              { value: { in: dbValues } },
-              ...values.map((filterValue) => ({
-                value: {
-                  contains:
-                    brand === 'amd' || filterValue.includes('Series')
-                      ? filterValue.replace(' Series', '')
-                      : filterValue.replace(' Gen', ''),
-                  mode: 'insensitive' as const,
-                },
-              })),
-            ],
+        OR: [
+          {
+            specifications: {
+              some: {
+                specificationDefinition: { key },
+                OR: [
+                  { value: { in: dbValues } },
+                  ...values.map((filterValue) => ({
+                    value: {
+                      contains:
+                        brand === 'amd' || filterValue.includes('Series')
+                          ? filterValue.replace(' Series', '')
+                          : filterValue.replace(' Gen', ''),
+                      mode: 'insensitive' as const,
+                    },
+                  })),
+                ],
+              },
+            },
           },
-        },
+          ...(nameTokens.length > 0
+            ? nameTokens.map((token) => ({
+                name: { contains: token, mode: 'insensitive' as const },
+              }))
+            : []),
+        ],
       };
     }
 

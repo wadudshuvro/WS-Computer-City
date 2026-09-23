@@ -1,6 +1,7 @@
 'use client';
 
 import { ProcessorFilters } from '@/components/products/ProcessorFilters';
+import { ProductGridSkeleton } from '@/components/products/ProductCardSkeleton';
 import { categorySortOptions } from '@/lib/filterConfig';
 import { PROCESSOR_SPEC_FILTER_KEYS } from '@/lib/processorFilterMappings';
 import { ChevronRight, Eye, Grid, Heart, List, ShoppingCart, SlidersHorizontal, X } from 'lucide-react';
@@ -326,13 +327,7 @@ function ProcessorPageContent() {
               </div>
             </div>
 
-            {/* Loading State */}
-            {loading && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-                <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading processors...</p>
-              </div>
-            )}
+            {loading && <ProductGridSkeleton viewMode={viewMode} count={8} />}
 
             {/* Error State */}
             {error && !loading && (
@@ -376,7 +371,7 @@ function ProcessorPageContent() {
                       // Grid View Card
                       <div
                         key={product.id}
-                        className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow group"
+                        className="group relative flex h-full flex-col rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
                       >
                         {/* Discount Badge */}
                         {discount > 0 && (
@@ -413,7 +408,7 @@ function ProcessorPageContent() {
                         </div>
 
                         {/* Product Info */}
-                        <div className="p-4">
+                        <div className="flex flex-1 flex-col p-4">
                           {/* Product Name */}
                           <Link href={`/products/${product.slug}`}>
                             <h3 className="font-medium text-gray-900 mb-2 line-clamp-2 min-h-[2.5rem] hover:text-blue-600 transition-colors">
@@ -439,33 +434,35 @@ function ProcessorPageContent() {
                             );
                           })()}
 
-                          {/* Price */}
-                          <div className="flex items-baseline gap-2 mb-3">
-                            <span className="text-xl font-bold text-blue-600">
-                              ৳ {product.price.toLocaleString()}
-                            </span>
-                            {product.compareAtPrice && (
-                              <span className="text-sm text-gray-500 line-through">
-                                ৳ {product.compareAtPrice.toLocaleString()}
+                          <div className="mt-auto">
+                            {/* Price */}
+                            <div className="mb-3 flex items-baseline gap-2">
+                              <span className="text-xl font-bold text-blue-600">
+                                ৳ {product.price.toLocaleString()}
                               </span>
-                            )}
-                          </div>
+                              {product.compareAtPrice && (
+                                <span className="text-sm text-gray-500 line-through">
+                                  ৳ {product.compareAtPrice.toLocaleString()}
+                                </span>
+                              )}
+                            </div>
 
-                          {/* Stock Status */}
-                          <div className="mb-3">
-                            <span className={`${stockBadge.className} text-white text-xs px-2 py-1 rounded`}>
-                              {stockBadge.text}
-                            </span>
-                          </div>
+                            {/* Stock Status */}
+                            <div className="mb-3">
+                              <span className={`${stockBadge.className} text-white text-xs px-2 py-1 rounded`}>
+                                {stockBadge.text}
+                              </span>
+                            </div>
 
-                          {/* Action Buttons */}
-                          <div className="flex gap-2">
-                            <button className="flex-1 bg-orange-500 text-white py-2 rounded hover:bg-orange-600 transition-colors text-sm font-medium">
-                              <ShoppingCart className="w-4 h-4 inline mr-1" />
-                            </button>
-                            <button className="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors text-sm font-medium">
-                              Buy Now
-                            </button>
+                            {/* Action Buttons */}
+                            <div className="flex gap-2">
+                              <button className="flex-1 bg-orange-500 text-white py-2 rounded hover:bg-orange-600 transition-colors text-sm font-medium">
+                                <ShoppingCart className="w-4 h-4 inline mr-1" />
+                              </button>
+                              <button className="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors text-sm font-medium">
+                                Buy Now
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -643,8 +640,10 @@ function ProcessorPageContent() {
 export default function ProcessorPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div>
+      <div className="min-h-screen bg-gray-50">
+        <div className="mx-auto max-w-[1400px] px-4 py-6">
+          <ProductGridSkeleton viewMode="grid" count={8} />
+        </div>
       </div>
     }>
       <ProcessorPageContent />

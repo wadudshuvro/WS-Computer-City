@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { X } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
@@ -33,7 +32,6 @@ export function ProductSidebarFilters({
   contextKey = 'default',
   priceRange,
   filterCounts = {},
-  preserveParamKeys = ['category', 'sub', 'brand', 'type'],
 }: ProductSidebarFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -104,6 +102,33 @@ export function ProductSidebarFilters({
     });
   }, [contextKey, filters]);
 
+  /** Drop generation/socket values that don't belong to the current brand. */
+  useEffect(() => {
+    if (!mounted) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+    let changed = false;
+
+    filters.forEach((filter) => {
+      if (filter.key === 'priceRange' || !filter.options?.length) return;
+      const raw = params.get(filter.key);
+      if (!raw) return;
+      const allowed = new Set(filter.options.map((o) => o.value));
+      const next = raw.split(',').filter((value) => allowed.has(value));
+      if (next.length === raw.split(',').filter(Boolean).length) return;
+      changed = true;
+      if (next.length > 0) {
+        params.set(filter.key, next.join(','));
+      } else {
+        params.delete(filter.key);
+      }
+    });
+
+    if (!changed) return;
+    params.set('page', '1');
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [contextKey, filters, mounted, pathname, router, searchParams]);
+
   const pushFiltersToUrl = useCallback(
     (
       nextFilters: Record<string, string[]>,
@@ -160,14 +185,15 @@ export function ProductSidebarFilters({
       delete nextFilters[filterKey];
     }
 
+    // Brand drives Generation/Series + Socket — clear the other family's leftovers.
+    if (filterKey === 'brand') {
+      delete nextFilters.generation;
+      delete nextFilters.socket_type;
+    }
+
     setSelectedFilters(nextFilters);
     pushFiltersToUrl(nextFilters);
   };
-
-  const hasActiveFilters =
-    Object.values(selectedFilters).some((values) => values.length > 0) ||
-    currentPriceRange[0] !== priceRange.min ||
-    currentPriceRange[1] !== priceRange.max;
 
   const getCount = (filterKey: string, value: string): number => {
     return filterCounts[filterKey]?.[value] || 0;
@@ -240,29 +266,6 @@ export function ProductSidebarFilters({
     }
   };
 
-  const clearAllFilters = () => {
-    setSelectedFilters({});
-    setCurrentPriceRange([priceRange.min, priceRange.max]);
-    setPriceInputMin(priceRange.min.toString());
-    setPriceInputMax(priceRange.max.toString());
-
-    const params = new URLSearchParams();
-    preserveParamKeys.forEach((key) => {
-      const value = searchParams.get(key);
-      if (value) params.set(key, value);
-    });
-
-    const queryString = params.toString();
-    router.push(queryString ? `${pathname}?${queryString}` : pathname);
-  };
-
-  const clearFilter = (filterKey: string) => {
-    const nextFilters = { ...selectedFilters };
-    delete nextFilters[filterKey];
-    setSelectedFilters(nextFilters);
-    pushFiltersToUrl(nextFilters);
-  };
-
   const sliderLow = Math.min(Math.max(currentPriceRange[0], sliderMin), sliderMax);
   const sliderHigh = Math.max(
     Math.min(Math.max(currentPriceRange[1], sliderMin), sliderMax),
@@ -271,47 +274,42 @@ export function ProductSidebarFilters({
   const sliderValue: [number, number] = [sliderLow, sliderHigh];
   if (!mounted) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <p className="text-sm text-gray-500">Loading filters...</p>
+      <div className="space-y-3">
+        {Array.from({ length: 4 }, (_, i) => (
+          <div key={i} className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+            <p className="text-sm text-gray-400">Loading filters...</p>
+          </div>
+        ))}
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-      {hasActiveFilters && (
-        <div className="flex items-center justify-end p-4 border-b border-gray-200">
-          <button
-            onClick={clearAllFilters}
-            className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+    <Accordion
+      key={contextKey}
+      type="multiple"
+      defaultValue={defaultExpandedItems}
+      className="w-full space-y-3"
+    >
+      {filters.map((filter, index) => {
+        const accordionId = `${filter.key}-${index}`;
+        return (
+          <AccordionItem
+            key={accordionId}
+            value={accordionId}
+            className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"
           >
-            Clear All
-          </button>
-        </div>
-      )}
-
-      <div className="p-4">
-        <Accordion
-          key={contextKey}
-          type="multiple"
-          defaultValue={defaultExpandedItems}
-          className="w-full space-y-0"
-        >
-          {filters.map((filter, index) => {
-            const accordionId = `${filter.key}-${index}`;
-            return (
-            <AccordionItem key={accordionId} value={accordionId} className="border-b-0">
-              <AccordionTrigger className="py-3 text-sm font-medium text-gray-700 hover:text-gray-900">
-                <div className="flex items-center gap-2">
-                  {filter.name}
-                  {(selectedFilters[filter.key]?.length ?? 0) > 0 && (
-                    <span className="bg-blue-100 text-blue-600 text-xs px-2 py-0.5 rounded-full">
-                      {selectedFilters[filter.key]?.length ?? 0}
-                    </span>
-                  )}
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="pb-4">
+            <AccordionTrigger className="px-3 py-2.5 text-sm font-semibold text-slate-800 hover:no-underline hover:text-slate-900 bg-slate-50">
+              <div className="flex items-center gap-2">
+                {filter.name}
+                {(selectedFilters[filter.key]?.length ?? 0) > 0 && (
+                  <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-600">
+                    {selectedFilters[filter.key]?.length ?? 0}
+                  </span>
+                )}
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-3 pb-3">
                 {filter.key === 'priceRange' ? (
                   <div className="space-y-3">
                     <Slider
@@ -368,16 +366,7 @@ export function ProductSidebarFilters({
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
-                    {filter.showClearButton && (selectedFilters[filter.key]?.length ?? 0) > 0 && (
-                      <button
-                        onClick={() => clearFilter(filter.key)}
-                        className="text-xs text-blue-600 hover:text-blue-800 mb-2 flex items-center gap-1"
-                      >
-                        <X className="w-3 h-3" />
-                        Clear All
-                      </button>
-                    )}
+                  <div className="max-h-64 space-y-2 overflow-y-auto pr-2">
                     {filter.options?.map((option) => {
                       const count = getCount(filter.key, option.value);
                       const isChecked =
@@ -409,12 +398,10 @@ export function ProductSidebarFilters({
                     })}
                   </div>
                 )}
-              </AccordionContent>
-            </AccordionItem>
-            );
-          })}
-        </Accordion>
-      </div>
-    </div>
+            </AccordionContent>
+          </AccordionItem>
+        );
+      })}
+    </Accordion>
   );
 }

@@ -74,6 +74,46 @@ const AMD_SERIES_FILTER_MAP: Record<string, string[]> = {
   '9000 Series': ['Ryzen 9000 Series', '9000 Series'],
 };
 
+/** e.g. 3200G / 3400G → "3200","3400" so names still match if generation spec is missing. */
+export function amdSeriesNameContainsTokens(filterValue: string): string[] {
+  const m = /^(\d)000 Series$/i.exec(filterValue.trim());
+  if (!m) return [];
+  const digit = m[1];
+  const tokens: string[] = [];
+  for (let i = 0; i < 10; i++) {
+    tokens.push(`${digit}${i}00`);
+    tokens.push(`${digit}${i}50`);
+  }
+  return tokens;
+}
+
+/**
+ * Infer AMD series + type from a product name.
+ * Ryzen 3 3200G → Ryzen 3000 Series / Ryzen 3
+ */
+export function inferAmdSeriesFromName(name: string): {
+  generation: string;
+  processorModel: string | null;
+} | null {
+  if (!/\b(ryzen|athlon|threadripper)\b/i.test(name)) return null;
+
+  let processorModel: string | null = null;
+  const ryzen = name.match(/\bRyzen\s*(3|5|7|9)\b/i);
+  if (ryzen) processorModel = `Ryzen ${ryzen[1]}`;
+  else if (/\bThreadripper\b/i.test(name)) processorModel = 'Threadripper';
+  else if (/\bAthlon\b/i.test(name)) processorModel = 'Athlon';
+
+  const fourDigit = name.match(/\b([1-9]\d{3})(?=[A-Z]|\b)/i);
+  const threeDigit = fourDigit ? null : name.match(/\b([1-9]\d{2})(?:GE|G)\b/i);
+  const modelNum = fourDigit?.[1] || threeDigit?.[1];
+  if (!modelNum) return processorModel ? { generation: '', processorModel } : null;
+
+  return {
+    generation: `Ryzen ${modelNum[0]}000 Series`,
+    processorModel,
+  };
+}
+
 export function mapGenerationFilterToDb(value: string, brand: ProcessorBrand = 'intel'): string[] {
   if (brand === 'amd') {
     return AMD_SERIES_FILTER_MAP[value] || [value];

@@ -6,7 +6,6 @@ import {
 } from '@/lib/gpuSpecDefinitions';
 
 interface GpuProductHighlightsProps {
-  sku: string;
   stockStatus: string;
   stockLabel: string;
   brand: { name: string; slug: string };
@@ -34,7 +33,6 @@ function FeatureBox({
 }
 
 export function GpuProductHighlights({
-  sku,
   stockStatus,
   stockLabel,
   brand,
@@ -54,10 +52,6 @@ export function GpuProductHighlights({
           <span className={isInStock ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
             {stockLabel}
           </span>
-        </FeatureBox>
-
-        <FeatureBox label="PID">
-          <span className="text-gray-900 font-medium">{sku}</span>
         </FeatureBox>
 
         <FeatureBox label="Brand">

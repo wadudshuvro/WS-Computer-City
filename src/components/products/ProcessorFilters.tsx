@@ -15,6 +15,7 @@ export function ProcessorFilters({ brand, priceRange, filterCounts = {} }: Proce
 
   return (
     <ProductSidebarFilters
+      key={brand}
       filters={filters}
       contextKey={brand}
       priceRange={priceRange}

@@ -14,6 +14,7 @@ import http from 'http';
 import { PrismaClient, StockStatus } from '@prisma/client';
 import { ProductService } from '../src/services/product.service';
 import { loadEnvValue } from './load-env';
+import { inferAmdSeriesFromName } from '../src/lib/processorFilterMappings';
 
 process.env.DATABASE_URL = loadEnvValue('DATABASE_URL');
 const prisma = new PrismaClient();
@@ -528,7 +529,17 @@ async function main() {
               isPrimary: true,
             },
           ],
-          specifications: [{ key: 'warranty', value: '03 Years' }],
+          specifications: (() => {
+            const specs: { key: string; value: string }[] = [{ key: 'warranty', value: '03 Years' }];
+            if (brand === 'amd') {
+              const inferred = inferAmdSeriesFromName(item.name);
+              if (inferred?.generation) specs.push({ key: 'generation', value: inferred.generation });
+              if (inferred?.processorModel) {
+                specs.push({ key: 'processor_model', value: inferred.processorModel });
+              }
+            }
+            return specs;
+          })(),
         } as any);
 
         product = {

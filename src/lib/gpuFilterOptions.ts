@@ -22,6 +22,7 @@ export const GPU_MANUFACTURER_BRANDS = [
   { value: 'ocpc', label: 'OCPC' },
   { value: 'maxsun', label: 'MAXSUN' },
   { value: 'unika', label: 'Unika' },
+  { value: 'abit', label: 'ABIT' },
 ] as const;
 
 export const GPU_CHIPSET_OPTIONS = [

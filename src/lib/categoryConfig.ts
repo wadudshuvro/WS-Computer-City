@@ -161,6 +161,8 @@ export const processorSpecOptions = {
     'Ryzen 5000 Series',
     'Ryzen 4000 Series',
     'Ryzen 3000 Series',
+    'Ryzen 2000 Series',
+    'Ryzen 1000 Series',
   ],
   
   // Cache Memory Sizes

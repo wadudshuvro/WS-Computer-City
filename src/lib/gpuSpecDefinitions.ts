@@ -69,12 +69,23 @@ export const GPU_SPEC_DEFINITIONS: GpuSpecDefinitionSeed[] = [
     ],
   },
   {
+    key: 'engine_clock',
+    name: 'Engine Clock',
+    section: 'Memory',
+    dataType: 'TEXT',
+    unit: 'MHz',
+    isRequired: true,
+    order: 4,
+    placeholder: 'e.g., 550 MHz',
+    helpText: 'Shown on listing cards (Star Tech-style Engine Clock line)',
+  },
+  {
     key: 'memory_clock',
     name: 'Memory Clock',
     section: 'Memory',
     dataType: 'TEXT',
     unit: 'MHz',
-    order: 4,
+    order: 5,
     placeholder: 'e.g., 2595 MHz',
   },
   {
@@ -83,7 +94,7 @@ export const GPU_SPEC_DEFINITIONS: GpuSpecDefinitionSeed[] = [
     section: 'Memory',
     dataType: 'SELECT',
     formType: 'select',
-    order: 5,
+    order: 6,
     options: ['64 bit', '96 bit', '128 bit', '192 bit', '256 bit', '320 bit', '384 bit', '512 bit'],
   },
   // Display
@@ -93,7 +104,8 @@ export const GPU_SPEC_DEFINITIONS: GpuSpecDefinitionSeed[] = [
     section: 'Display',
     dataType: 'TEXT',
     isFilterable: true,
-    order: 6,
+    isRequired: true,
+    order: 7,
     placeholder: 'e.g., 7680x4320',
   },
   {
@@ -263,6 +275,7 @@ export const GPU_SPEC_DEFINITIONS: GpuSpecDefinitionSeed[] = [
     name: 'Warranty',
     section: 'Warranty Information',
     dataType: 'TEXT',
+    isRequired: true,
     order: 22,
     placeholder: 'e.g., 3 Years',
   },
@@ -271,7 +284,7 @@ export const GPU_SPEC_DEFINITIONS: GpuSpecDefinitionSeed[] = [
 export const GPU_SPECIFICATION_GROUPS: Record<string, { title: string; keys: string[] }> = {
   memory: {
     title: 'Memory',
-    keys: ['memory_size', 'bus_type', 'memory_type', 'memory_clock', 'memory_bus'],
+    keys: ['memory_size', 'bus_type', 'memory_type', 'engine_clock', 'memory_clock', 'memory_bus'],
   },
   display: {
     title: 'Display',
@@ -316,12 +329,21 @@ export function getCategorySlugs(category: {
   return [category.slug, ...(category.breadcrumb?.map((c) => c.slug) ?? [])];
 }
 
-/** Key highlight lines shown under the title on GPU product pages (TechLand style) */
+/** Key highlight lines shown under the title on GPU PDPs */
 export const GPU_SHORT_DESCRIPTION_FIELDS: { label: string; keys: string[] }[] = [
-  { label: 'Memory Clock', keys: ['bus_type', 'memory_clock'] },
-  { label: 'Memory Size', keys: ['memory_size'] },
-  { label: 'Memory Type', keys: ['memory_type'] },
-  { label: 'Card Bus', keys: ['pci_express'] },
+  { label: 'Video Memory', keys: ['memory_size'] },
+  { label: 'Engine Clock', keys: ['engine_clock'] },
+  { label: 'Memory Clock', keys: ['memory_clock'] },
+  { label: 'Resolution', keys: ['resolution'] },
+  { label: 'Interface', keys: ['port_types', 'display_port'] },
+];
+
+/** Listing-card bullets (Star Tech order). Always try to show these four. */
+export const GPU_LISTING_CARD_FIELDS: { label: string; keys: string[] }[] = [
+  { label: 'Video Memory', keys: ['memory_size'] },
+  { label: 'Engine Clock', keys: ['engine_clock'] },
+  { label: 'Resolution', keys: ['resolution'] },
+  { label: 'Interface', keys: ['port_types', 'display_port'] },
 ];
 
 export function getGpuShortDescriptionLines(
@@ -331,6 +353,30 @@ export function getGpuShortDescriptionLines(
     const value = keys.map((k) => getSpecValue(k)).find(Boolean);
     return value ? { label, value } : null;
   }).filter(Boolean) as { label: string; value: string }[];
+}
+
+/** Four Star Tech-style bullets for category listing cards. */
+export function getGpuListingCardLines(
+  getSpecValue: (key: string) => string | null
+): string[] {
+  const size = getSpecValue('memory_size');
+  const type = getSpecValue('memory_type');
+  const videoMemory = [size, type].filter(Boolean).join(' ');
+  const engine = getSpecValue('engine_clock');
+  const memClock = getSpecValue('memory_clock');
+  const clock =
+    engine && memClock
+      ? `${engine}, Memory Clock: ${memClock}`
+      : engine || (memClock ? `Memory Clock: ${memClock}` : '');
+  const resolution = getSpecValue('resolution');
+  const iface = getSpecValue('port_types') || getSpecValue('display_port');
+
+  const lines: string[] = [];
+  if (videoMemory) lines.push(`Video Memory: ${videoMemory}`);
+  if (clock) lines.push(`Engine Clock: ${clock}`);
+  if (resolution) lines.push(`Resolution: ${resolution}`);
+  if (iface) lines.push(`Interface: ${iface}`);
+  return lines.slice(0, 4);
 }
 
 /** Model name for feature box — chipset or shortened product name */

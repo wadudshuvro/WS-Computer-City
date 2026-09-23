@@ -1,0 +1,54 @@
+---
+description: Graphics Card listing cards and PDPs must show required GPU specs (Star Tech-style bullets + warranty).
+globs: src/app/products/**/*.{tsx,ts},src/components/products/**/*.{tsx,ts},src/lib/gpuSpecDefinitions.ts,src/lib/categoryConfig.ts
+alwaysApply: true
+---
+
+# Graphics Card listing + PDP required info
+
+Every Graphics Card (category slugs `graphics-card`, `nvidia`, `amd-gpu`) must expose structured specs and show them on the **listing card** and **PDP**. Do not ship a GPU card that is only a title + price.
+
+## Required structured specs
+
+Store these as `productSpecification` keys (not only HTML in `description`):
+
+| Key | Listing card | PDP |
+|-----|--------------|-----|
+| `memory_size` | Video Memory | yes |
+| `memory_type` | Video Memory (append) | yes |
+| `engine_clock` | Engine Clock | yes |
+| `memory_clock` | with Engine Clock when present | yes |
+| `resolution` | Resolution | yes |
+| `port_types` (or `display_port`) | Interface | yes |
+| `gpu_chipset` | — | yes |
+| `chipset_series` | — | filters + PDP |
+| `warranty` | — | Warranty Information block (required) |
+
+Use `getGpuListingCardLines()` for category cards and `getGpuShortDescriptionLines()` / `GpuProductHighlights` on the PDP.
+
+## Listing card (Star Tech order)
+
+Under the product name, show up to four bullets:
+
+1. **Video Memory:** `{memory_size} {memory_type}` (e.g. `8GB GDDR5`)
+2. **Engine Clock:** `{engine_clock}` and Memory Clock when available
+3. **Resolution:** `{resolution}`
+4. **Interface:** `{port_types}`
+
+Prefer `shortDescription` lines when they already follow this pattern. If missing, build from specs. Never hide the list when specs exist.
+
+## PDP
+
+Keep `GpuProductHighlights` (Stock, Brand, Model, Warranty) plus the short spec lines. Do not show PID/SKU on the GPU PDP. Warranty Information section still uses key `warranty` (fallback **No Warranty**).
+
+## Import / CMS
+
+- Category slugs: NVIDIA → `nvidia`, AMD → `amd-gpu`, Intel Arc → `graphics-card`
+- Local images: `/uploads/gpus/<slug>.<ext>`
+- Scripts: `scrape-startech-gpu-list.ts`, `build-gpu-import-excel.ts`, `import-gpu-csv.ts`, `download-gpu-images.ts`
+
+## Do not
+
+- Drop `engine_clock`, `memory_size`, `warranty` from GPU spec definitions
+- Show GPU listing cards without the four highlight bullets when data exists
+- Hotlink Star Tech images as the permanent CMS URL

@@ -208,8 +208,6 @@ const intelSocketFilter: FilterDefinition = {
   type: 'checkbox',
   defaultExpanded: false,
   options: [
-    { value: 'LGA2011', label: 'LGA2011' },
-    { value: 'LGA1155', label: 'LGA1155' },
     { value: 'LGA1200', label: 'LGA1200' },
     { value: 'LGA1700', label: 'LGA1700' },
     { value: 'LGA1851', label: 'LGA1851' },
@@ -343,72 +341,83 @@ function mergeFilterOptions(
 }
 
 export function getProcessorFilters(brand: ProcessorBrand): FilterDefinition[] {
-  // Parent Processor page (no Intel/AMD pill) — full Star Tech–style sidebar,
-  // with Intel + AMD options merged so filters are never stripped down.
-  if (brand === 'all') {
-    return [
-      priceRangeFilter,
-      stockStatusFilter,
-      processorBrandFilter,
-      {
-        key: 'generation',
-        name: 'Generation / Series',
-        type: 'checkbox',
-        defaultExpanded: false,
-        options: mergeFilterOptions(
-          intelGenerationFilter.options,
-          amdSeriesFilter.options
-        ),
-      },
-      {
-        key: 'processor_model',
-        name: 'Type',
-        type: 'checkbox',
-        defaultExpanded: false,
-        options: mergeFilterOptions(intelTypeFilter.options, amdTypeFilter.options),
-      },
-      {
-        key: 'socket_type',
-        name: 'Socket',
-        type: 'checkbox',
-        defaultExpanded: false,
-        options: mergeFilterOptions(
-          intelSocketFilter.options,
-          amdSocketFilter.options
-        ),
-      },
-      {
-        key: 'number_of_cores',
-        name: 'Number of Core',
-        type: 'checkbox',
-        defaultExpanded: false,
-        options: mergeFilterOptions(intelCoreFilter.options, amdCoreFilter.options),
-      },
-      {
-        key: 'number_of_threads',
-        name: 'Number of Thread',
-        type: 'checkbox',
-        defaultExpanded: false,
-        options: mergeFilterOptions(
-          intelThreadFilter.options,
-          amdThreadFilter.options
-        ),
-      },
-      clockSpeedFilter,
-      cacheFilter,
-    ];
-  }
+  const generationFilter =
+    brand === 'amd'
+      ? amdSeriesFilter
+      : brand === 'intel'
+        ? intelGenerationFilter
+        : {
+            key: 'generation',
+            name: 'Generation / Series',
+            type: 'checkbox' as const,
+            defaultExpanded: false,
+            options: mergeFilterOptions(
+              intelGenerationFilter.options,
+              amdSeriesFilter.options
+            ),
+          };
 
-  const isAmd = brand === 'amd';
+  const typeFilter =
+    brand === 'amd'
+      ? amdTypeFilter
+      : brand === 'intel'
+        ? intelTypeFilter
+        : {
+            key: 'processor_model',
+            name: 'Type',
+            type: 'checkbox' as const,
+            defaultExpanded: false,
+            options: mergeFilterOptions(intelTypeFilter.options, amdTypeFilter.options),
+          };
+
+  const socketFilter =
+    brand === 'amd'
+      ? amdSocketFilter
+      : brand === 'intel'
+        ? intelSocketFilter
+        : {
+            key: 'socket_type',
+            name: 'Socket',
+            type: 'checkbox' as const,
+            defaultExpanded: false,
+            options: mergeFilterOptions(intelSocketFilter.options, amdSocketFilter.options),
+          };
+
+  const coreFilter =
+    brand === 'amd'
+      ? amdCoreFilter
+      : brand === 'intel'
+        ? intelCoreFilter
+        : {
+            key: 'number_of_cores',
+            name: 'Number of Core',
+            type: 'checkbox' as const,
+            defaultExpanded: false,
+            options: mergeFilterOptions(intelCoreFilter.options, amdCoreFilter.options),
+          };
+
+  const threadFilter =
+    brand === 'amd'
+      ? amdThreadFilter
+      : brand === 'intel'
+        ? intelThreadFilter
+        : {
+            key: 'number_of_threads',
+            name: 'Number of Thread',
+            type: 'checkbox' as const,
+            defaultExpanded: false,
+            options: mergeFilterOptions(intelThreadFilter.options, amdThreadFilter.options),
+          };
 
   return [
     priceRangeFilter,
     stockStatusFilter,
-    isAmd ? amdSeriesFilter : intelGenerationFilter,
-    isAmd ? amdTypeFilter : intelTypeFilter,
-    isAmd ? amdSocketFilter : intelSocketFilter,
-    isAmd ? amdCoreFilter : intelCoreFilter,
-    isAmd ? amdThreadFilter : intelThreadFilter,
+    processorBrandFilter,
+    generationFilter,
+    typeFilter,
+    socketFilter,
+    coreFilter,
+    threadFilter,
     clockSpeedFilter,
     cacheFilter,
   ];

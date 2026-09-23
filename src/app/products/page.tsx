@@ -1,6 +1,7 @@
 'use client';
 
 import { ProcessorFilters } from '@/components/products/ProcessorFilters';
+import { ProductGridSkeleton } from '@/components/products/ProductCardSkeleton';
 import { GpuFilters } from '@/components/products/GpuFilters';
 import { RamFilters } from '@/components/products/RamFilters';
 import { MotherboardFilters } from '@/components/products/MotherboardFilters';
@@ -16,6 +17,7 @@ import {
 import { categorySortOptions, GPU_MANUFACTURER_BRANDS } from '@/lib/filterConfig';
 import { PROCESSOR_SPEC_FILTER_KEYS } from '@/lib/processorFilterMappings';
 import { GPU_SPEC_FILTER_KEYS } from '@/lib/gpuFilterMappings';
+import { getGpuListingCardLines } from '@/lib/gpuSpecDefinitions';
 import { RAM_SPEC_FILTER_KEYS } from '@/lib/ramFilterMappings';
 import { RAM_BRANDS } from '@/lib/ramSpecDefinitions';
 import { PSU_BRANDS } from '@/lib/psuSpecDefinitions';
@@ -1135,13 +1137,7 @@ function ProductsPageContent() {
               </div>
             </div>
 
-            {/* Loading State */}
-            {loading && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-                <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading products...</p>
-              </div>
-            )}
+            {loading && <ProductGridSkeleton viewMode={viewMode} count={8} />}
 
             {/* Error State */}
             {error && !loading && (
@@ -1208,12 +1204,28 @@ function ProductsPageContent() {
                             (s) =>
                               `${s.specificationDefinition.name}: ${s.value}`
                           );
+                    const gpuSpecMap = new Map(
+                      (product.specifications || []).map((s) => [
+                        s.specificationDefinition.key,
+                        s.value,
+                      ])
+                    );
+                    const gpuFeatureLines = isGpuCategory
+                      ? featuredFromShort.length > 0
+                        ? featuredFromShort
+                        : getGpuListingCardLines((key) => gpuSpecMap.get(key) || null)
+                      : [];
+                    const cardFeatureLines = isProcessorCategory
+                      ? processorFeatureLines
+                      : isGpuCategory
+                        ? gpuFeatureLines
+                        : featuredFromShort;
 
                     return viewMode === 'grid' ? (
                       // Grid View Card
                       <div
                         key={product.id}
-                        className="bg-white border border-gray-200 hover:shadow-md transition-shadow group relative"
+                        className="group relative flex h-full flex-col border border-gray-200 bg-white transition-shadow hover:shadow-md"
                       >
                         {/* Discount Badge — Star Tech style ribbon */}
                         {discount > 0 && (
@@ -1250,16 +1262,16 @@ function ProductsPageContent() {
                         </div>
 
                         {/* Product Info */}
-                        <div className="p-3">
+                        <div className="flex flex-1 flex-col p-3">
                           <Link href={`/products/${product.slug}`}>
                             <h3 className="mb-2 min-h-[2.5rem] text-sm font-semibold text-gray-900 line-clamp-2 transition-colors hover:text-blue-600">
                               {product.name}
                             </h3>
                           </Link>
 
-                          {processorFeatureLines.length > 0 && (
+                          {cardFeatureLines.length > 0 && (
                             <ul className="mb-3 list-disc space-y-0.5 pl-4 text-xs text-gray-700">
-                              {processorFeatureLines.map((line) => (
+                              {cardFeatureLines.map((line) => (
                                 <li key={line} className="leading-snug">
                                   {line}
                                 </li>
@@ -1267,33 +1279,35 @@ function ProductsPageContent() {
                             </ul>
                           )}
 
-                          {/* Price */}
-                          <div className="mb-2 flex items-baseline gap-2">
-                            <span className="text-lg font-bold text-gray-900">
-                              {product.price.toLocaleString()}৳
-                            </span>
-                            {product.compareAtPrice && (
-                              <span className="text-sm text-gray-500 line-through">
-                                {product.compareAtPrice.toLocaleString()}৳
+                          <div className="mt-auto">
+                            {/* Price */}
+                            <div className="mb-2 flex items-baseline gap-2">
+                              <span className="text-lg font-bold text-gray-900">
+                                {product.price.toLocaleString()}৳
                               </span>
-                            )}
-                          </div>
+                              {product.compareAtPrice && (
+                                <span className="text-sm text-gray-500 line-through">
+                                  {product.compareAtPrice.toLocaleString()}৳
+                                </span>
+                              )}
+                            </div>
 
-                          {/* Stock Status */}
-                          <div className="mb-3">
-                            <span className={`${stockBadge.className} rounded px-2 py-0.5 text-xs text-white`}>
-                              {stockBadge.text}
-                            </span>
-                          </div>
+                            {/* Stock Status */}
+                            <div className="mb-3">
+                              <span className={`${stockBadge.className} rounded px-2 py-0.5 text-xs text-white`}>
+                                {stockBadge.text}
+                              </span>
+                            </div>
 
-                          {/* Action Buttons */}
-                          <div className="flex gap-2">
-                            <button className="flex-1 rounded bg-orange-500 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600">
-                              <ShoppingCart className="mr-1 inline w-4 h-4" />
-                            </button>
-                            <button className="flex-1 rounded bg-blue-600 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
-                              Buy Now
-                            </button>
+                            {/* Action Buttons */}
+                            <div className="flex gap-2">
+                              <button className="flex-1 rounded bg-orange-500 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600">
+                                <ShoppingCart className="mr-1 inline w-4 h-4" />
+                              </button>
+                              <button className="flex-1 rounded bg-blue-600 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+                                Buy Now
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -1333,9 +1347,9 @@ function ProductsPageContent() {
                                 {product.name}
                               </h3>
                             </Link>
-                            {processorFeatureLines.length > 0 ? (
+                            {cardFeatureLines.length > 0 ? (
                               <ul className="mb-2 list-disc space-y-0.5 pl-4 text-sm text-gray-600">
-                                {processorFeatureLines.map((line) => (
+                                {cardFeatureLines.map((line) => (
                                   <li key={line}>{line}</li>
                                 ))}
                               </ul>
@@ -1553,8 +1567,10 @@ function ProductsPageContent() {
 export default function ProductsPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div>
+      <div className="min-h-screen bg-gray-50">
+        <div className="mx-auto max-w-[1400px] px-4 py-6">
+          <ProductGridSkeleton viewMode="grid" count={8} />
+        </div>
       </div>
     }>
       <ProductsPageContent />
