@@ -19,9 +19,14 @@ import {
   Info,
 } from 'lucide-react';
 import { GPU_SPECIFICATION_GROUPS, isGpuCategory, getCategorySlugs } from '@/lib/gpuSpecDefinitions';
+import {
+  CPU_COOLER_SPECIFICATION_GROUPS,
+  isCpuCoolerCategorySlug,
+} from '@/lib/cpuCoolerSpecDefinitions';
 import { MOTHERBOARD_SPECIFICATION_GROUPS, isMotherboardCategory } from '@/lib/motherboardSpecDefinitions';
 import { RAM_SPECIFICATION_GROUPS, isRamCategory } from '@/lib/ramSpecDefinitions';
 import { GpuProductHighlights } from '@/components/products/GpuProductHighlights';
+import { CpuCoolerProductHighlights } from '@/components/products/CpuCoolerProductHighlights';
 import { ProductDetailSkeleton } from '@/components/products/ProductDetailSkeleton';
 import { ProductDescription } from '@/components/products/ProductDescription';
 import { AddedToCartDialog } from '@/components/cart/AddedToCartDialog';
@@ -224,7 +229,9 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
         ? MOTHERBOARD_SPECIFICATION_GROUPS
         : isRamCategory(categorySlugs)
           ? RAM_SPECIFICATION_GROUPS
-          : specificationGroups;
+          : isCpuCoolerCategorySlug(categorySlugs)
+            ? CPU_COOLER_SPECIFICATION_GROUPS
+            : specificationGroups;
 
     const groups: { title: string; specs: { name: string; value: string }[] }[] = [];
 
@@ -288,6 +295,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const stockStatus = getStockStatus(product.stockStatus);
   const categorySlugs = getCategorySlugs(product.category);
   const isGpu = isGpuCategory(categorySlugs);
+  const isCpuCooler = isCpuCoolerCategorySlug(categorySlugs);
   const isMotherboard = isMotherboardCategory(categorySlugs);
   const isRam = isRamCategory(categorySlugs);
   const isProcessor = isProcessorCategory(categorySlugs);
@@ -455,9 +463,17 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       {product.name}
                     </h1>
 
-                    {/* GPU: boxed feature points + short description */}
+                    {/* GPU / CPU Cooler: boxed feature points + short description */}
                     {isGpu ? (
                       <GpuProductHighlights
+                        stockStatus={product.stockStatus}
+                        stockLabel={stockStatus.text}
+                        brand={product.brand}
+                        productName={product.name}
+                        getSpecValue={getSpecValue}
+                      />
+                    ) : isCpuCooler ? (
+                      <CpuCoolerProductHighlights
                         stockStatus={product.stockStatus}
                         stockLabel={stockStatus.text}
                         brand={product.brand}
@@ -732,9 +748,11 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       <div key={groupIndex}>
                         <h3
                           className={`text-sm font-semibold px-4 py-2 rounded-t ${
-                            isMotherboard || isRam
-                              ? 'bg-gray-100 text-gray-900 border border-gray-200'
-                              : 'text-white bg-[#1e3a5f]'
+                            isCpuCooler
+                              ? 'bg-[#eef2ff] text-[#1d4ed8] border border-gray-200'
+                              : isMotherboard || isRam
+                                ? 'bg-gray-100 text-gray-900 border border-gray-200'
+                                : 'text-white bg-[#1e3a5f]'
                           }`}
                         >
                           {group.title}

@@ -1,0 +1,44 @@
+---
+description: CPU Cooler listing cards and PDPs must show Star Tech-style specs plus warranty.
+globs: src/app/products/**/*.{tsx,ts},src/components/products/**/*.{tsx,ts},src/lib/cpuCoolerSpecDefinitions.ts
+alwaysApply: true
+---
+
+# CPU Cooler listing + PDP required info
+
+Every CPU Cooler (category slug `cpu-cooler`) must expose structured specs and show them on the **listing card** and **PDP**. Do not ship a cooler card that is only a title + price.
+
+## Required structured specs
+
+| Key | Listing card | PDP section |
+|-----|--------------|-------------|
+| `cooler_type` | Type fallback | Key Features (Type) |
+| `fan_speed_detail` | Fan Speed | Key Features |
+| `airflow` | Fan Airflow | Key Features |
+| `noise_level` | Noise | Key Features |
+| `air_pressure` | — | Key Features |
+| `connector` | — | Key Features |
+| `others` | — | Key Features |
+| `dimension` | — | Physical Specification |
+| `weight` | — | Physical Specification |
+| `intel_sockets` | compatibility line | Supported Sockets (Intel) |
+| `amd_sockets` | compatibility line | Supported Sockets (AMD) |
+| `warranty` | — | Warranty Information (required) |
+
+Use `getCpuCoolerListingCardLines()` for category cards. Prefer `shortDescription` listing bullets when present.
+
+## PDP
+
+Star Tech order: **Key Features** → **Physical Specification** → **Supported Sockets** → **Warranty Information**. Warranty key `warranty` (fallback **No Warranty**). Show up to **3 local gallery images**.
+
+## Import / CMS
+
+- Category slug: `cpu-cooler`
+- Local images: `/uploads/cpu-coolers/<slug>.<ext>`, `<slug>-2`, `<slug>-3`
+- Scripts: `scrape-startech-cpu-cooler-list.ts`, `import-cpu-cooler-json.ts`, `download-cpu-cooler-images.ts`
+
+## Do not
+
+- Drop `warranty`, `fan_speed_detail`, or socket fields
+- Show cooler listing cards without highlight bullets when data exists
+- Hotlink Star Tech images as the permanent CMS URL

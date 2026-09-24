@@ -38,33 +38,47 @@ export const CPU_COOLER_BRANDS = [
 export const CPU_COOLER_PROCESSOR_TYPE_OPTIONS = ['Intel', 'AMD'] as const;
 
 export const CPU_COOLER_SOCKET_OPTIONS = [
-  'LGA1151',
+  'LGA775',
+  'LGA1366',
   'LGA1150',
+  'LGA1151',
   'LGA1155',
   'LGA1156',
+  'LGA1200',
   'LGA2011',
   'LGA2066',
-  'LGA1200',
   'LGA1700',
+  'LGA1851',
+  'FM1',
+  'FM2',
+  'FM2+',
+  'AM2',
+  'AM2+',
+  'AM3',
+  'AM3+',
   'AM4',
+  'TR4',
+  'TRX4',
   'AM5',
 ] as const;
 
 export const CPU_COOLER_TYPE_OPTIONS = [
   'Air Cooler',
   'Liquid Cooler',
-  'Hydro-Electric Cooler',
+  'Hybrid Liquid Cooler',
 ] as const;
 
 export const CPU_COOLER_FAN_SIZE_OPTIONS = [
   '80mm',
   '92mm',
+  '100mm',
   '120mm',
   '140mm',
   '200mm',
   '240mm',
   '280mm',
   '360mm',
+  '420mm',
 ] as const;
 
 export const CPU_COOLER_FAN_SPEED_OPTIONS = [
@@ -127,8 +141,8 @@ export const CPU_COOLER_SPEC_DEFINITIONS: CpuCoolerSpecDefinitionSeed[] = [
   },
   {
     key: 'cooler_type',
-    name: 'Cooler Type',
-    section: 'Physical Specification',
+    name: 'Type',
+    section: 'Key Features',
     dataType: 'SELECT',
     formType: 'select',
     isFilterable: true,
@@ -168,61 +182,182 @@ export const CPU_COOLER_SPEC_DEFINITIONS: CpuCoolerSpecDefinitionSeed[] = [
     options: [...CPU_COOLER_SPECIAL_FEATURE_OPTIONS],
   },
   {
-    key: 'airflow',
-    name: 'Airflow',
-    section: 'Performance',
+    key: 'fan_speed_detail',
+    name: 'Fan Speed',
+    section: 'Key Features',
     dataType: 'TEXT',
     order: 7,
-    placeholder: 'e.g., 75.89 CFM',
+    placeholder: 'e.g., 2000±10% RPM(max)',
+  },
+  {
+    key: 'airflow',
+    name: 'Fan Airflow',
+    section: 'Key Features',
+    dataType: 'TEXT',
+    order: 8,
+    placeholder: 'e.g., 57.76 CFM',
   },
   {
     key: 'noise_level',
-    name: 'Noise Level',
-    section: 'Performance',
-    dataType: 'TEXT',
-    order: 8,
-    placeholder: 'e.g., 31.6 dB(A)',
-  },
-  {
-    key: 'fan_speed_detail',
-    name: 'Fan Speed Detail',
-    section: 'Performance',
+    name: 'Noise',
+    section: 'Key Features',
     dataType: 'TEXT',
     order: 9,
-    placeholder: 'e.g., 500~2000 RPM±10%',
+    placeholder: 'e.g., ≤28.87 dB(A)',
+  },
+  {
+    key: 'air_pressure',
+    name: 'Air Pressure',
+    section: 'Key Features',
+    dataType: 'TEXT',
+    order: 10,
+    placeholder: 'e.g., 2.78 mmAq',
+  },
+  {
+    key: 'connector',
+    name: 'Connector',
+    section: 'Key Features',
+    dataType: 'TEXT',
+    order: 11,
+    placeholder: 'e.g., 4-pin PWM',
+  },
+  {
+    key: 'others',
+    name: 'Others',
+    section: 'Key Features',
+    dataType: 'TEXT',
+    order: 12,
+    placeholder: 'e.g., Bearing Type: Hydro Bearing',
+  },
+  {
+    key: 'dimension',
+    name: 'Dimension',
+    section: 'Physical Specification',
+    dataType: 'TEXT',
+    order: 13,
+    placeholder: 'e.g., 127×144×159 mm (L×W×H)',
+  },
+  {
+    key: 'weight',
+    name: 'Weight',
+    section: 'Physical Specification',
+    dataType: 'TEXT',
+    order: 14,
+    placeholder: 'e.g., 1386 g',
+  },
+  {
+    key: 'intel_sockets',
+    name: 'Intel',
+    section: 'Supported Sockets',
+    dataType: 'TEXT',
+    order: 15,
+    placeholder: 'e.g., LGA1851 / 1700 / 1200 / 115X',
+  },
+  {
+    key: 'amd_sockets',
+    name: 'AMD',
+    section: 'Supported Sockets',
+    dataType: 'TEXT',
+    order: 16,
+    placeholder: 'e.g., AM5 / AM4',
   },
   {
     key: 'warranty',
     name: 'Warranty',
     section: 'Warranty Information',
     dataType: 'TEXT',
-    order: 10,
-    placeholder: 'e.g., 2 Years',
+    isRequired: true,
+    order: 17,
+    placeholder: 'e.g., 3 Years',
   },
 ];
 
+/** Star Tech PDP order: Key Features → Physical → Supported Sockets → Warranty */
 export const CPU_COOLER_SPECIFICATION_GROUPS: Record<string, { title: string; keys: string[] }> = {
-  compatibility: {
-    title: 'Compatibility',
-    keys: ['processor_type', 'socket'],
+  key_features: {
+    title: 'Key Features',
+    keys: [
+      'cooler_type',
+      'fan_speed_detail',
+      'airflow',
+      'noise_level',
+      'air_pressure',
+      'connector',
+      'others',
+    ],
   },
   physical: {
     title: 'Physical Specification',
-    keys: ['cooler_type', 'fan_size'],
+    keys: ['dimension', 'weight', 'fan_size'],
   },
-  performance: {
-    title: 'Performance',
-    keys: ['fan_speed', 'fan_speed_detail', 'airflow', 'noise_level'],
-  },
-  features: {
-    title: 'Features',
-    keys: ['special_features'],
+  sockets: {
+    title: 'Supported Sockets',
+    keys: ['intel_sockets', 'amd_sockets'],
   },
   warranty: {
     title: 'Warranty Information',
     keys: ['warranty'],
   },
 };
+
+export function getCpuCoolerShortDescriptionLines(
+  getSpecValue: (key: string) => string | null
+): { label: string; value: string }[] {
+  const fields: { label: string; key: string }[] = [
+    { label: 'Type', key: 'cooler_type' },
+    { label: 'Fan Speed', key: 'fan_speed_detail' },
+    { label: 'Fan Airflow', key: 'airflow' },
+    { label: 'Noise', key: 'noise_level' },
+  ];
+  return fields
+    .map(({ label, key }) => {
+      const value = getSpecValue(key);
+      return value ? { label, value } : null;
+    })
+    .filter(Boolean) as { label: string; value: string }[];
+}
+
+export function getCpuCoolerModelName(productName: string): string {
+  const brands = CPU_COOLER_BRANDS.map((b) => b.label).sort((a, b) => b.length - a.length);
+  for (const brand of brands) {
+    const stripped = productName.replace(new RegExp(`^${brand}\\s+`, 'i'), '').trim();
+    if (stripped && stripped !== productName) return stripped;
+  }
+  return productName;
+}
+
+export function formatCpuCoolerWarranty(getSpecValue: (key: string) => string | null): string {
+  const warranty = getSpecValue('warranty');
+  if (!warranty) return 'No Warranty';
+  if (/year/i.test(warranty)) return warranty;
+  if (/^\d+$/.test(warranty.trim())) return `${warranty} Years`;
+  return warranty;
+}
+
+export function getCpuCoolerListingCardLines(
+  getSpecValue: (key: string) => string | null
+): string[] {
+  const speed = getSpecValue('fan_speed_detail');
+  const airflow = getSpecValue('airflow');
+  const noise = getSpecValue('noise_level');
+  const intel = getSpecValue('intel_sockets');
+  const amd = getSpecValue('amd_sockets');
+  const compat = [intel ? `Intel ${intel}` : null, amd ? `AMD ${amd}` : null]
+    .filter(Boolean)
+    .join(', ');
+  const lines: string[] = [];
+  if (speed) lines.push(`Fan Speed: ${speed}`);
+  if (airflow) lines.push(`Fan Airflow: ${airflow}`);
+  if (noise) lines.push(`Noise: ${noise}`);
+  if (compat) lines.push(compat);
+  if (lines.length < 4) {
+    const type = getSpecValue('cooler_type');
+    const size = getSpecValue('fan_size');
+    if (type) lines.push(`Type: ${type}`);
+    if (size && lines.length < 4) lines.push(`Fan Size: ${size}`);
+  }
+  return lines.slice(0, 4);
+}
 
 const CPU_COOLER_CATEGORY_SLUGS = new Set(['cpu-cooler', 'cpu-coolers', 'cooler']);
 

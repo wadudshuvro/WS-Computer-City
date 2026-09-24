@@ -49,12 +49,14 @@ export function buildCpuCoolerSpecCondition(
   switch (key) {
     case 'cooler_type':
       return {
-        specifications: {
-          some: {
-            specificationDefinition: { key },
-            value: { in: values },
+        OR: values.map((v) => ({
+          specifications: {
+            some: {
+              specificationDefinition: { key: 'cooler_type' },
+              value: { contains: v.replace(/ cooler$/i, ''), mode: 'insensitive' as const },
+            },
           },
-        },
+        })),
       };
 
     case 'processor_type':
@@ -150,8 +152,11 @@ export function buildCpuCoolerFilterCounts(
     counts.cooler_type = {};
     const dbCounts = specValuesByKey.cooler_type || [];
     for (const option of coolerTypeFilter.options) {
-      const match = dbCounts.find((d) => d.value.toLowerCase() === option.value.toLowerCase());
-      if (match) counts.cooler_type[option.value] = match.count;
+      counts.cooler_type[option.value] = dbCounts
+        .filter((d) =>
+          d.value.toLowerCase().includes(option.value.toLowerCase().replace(/ cooler$/, ''))
+        )
+        .reduce((sum, d) => sum + d.count, 0);
     }
   }
 

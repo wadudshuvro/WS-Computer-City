@@ -29,6 +29,7 @@ Every product in that category’s PDP and listing must show a **local** primary
 | Desktop RAM | `public/uploads/ram/` | `scripts/download-desktop-ram-images.ts` |
 | Motherboard | `public/uploads/motherboards/` | `scripts/download-motherboard-images.ts` |
 | Graphics Card | `public/uploads/gpus/` | `scripts/download-gpu-images.ts` |
+| CPU Cooler | `public/uploads/cpu-coolers/` | `scripts/download-cpu-cooler-images.ts` |
 | New category | `public/uploads/<kebab>/` | `scripts/download-<category>-images.ts` |
 
 Re-run examples:

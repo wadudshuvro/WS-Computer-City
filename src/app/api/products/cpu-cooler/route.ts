@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 
     const page = Number(searchParams.get('page')) || 1;
     const limit = Number(searchParams.get('limit')) || 30;
-    const sort = searchParams.get('sort') || 'default';
+    const sort = searchParams.get('sort') || 'price_asc';
     const search = searchParams.get('search') || undefined;
 
     const sub = searchParams.get('sub');
@@ -94,20 +94,19 @@ export async function GET(req: NextRequest) {
 
     let orderBy: Prisma.ProductOrderByWithRelationInput;
     switch (sort) {
-      case 'price_asc':
-        orderBy = { price: 'asc' };
-        break;
       case 'price_desc':
         orderBy = { price: 'desc' };
         break;
       case 'name':
         orderBy = { name: 'asc' };
         break;
+      case 'default':
       case 'newest':
         orderBy = { createdAt: 'desc' };
         break;
+      case 'price_asc':
       default:
-        orderBy = { createdAt: 'desc' };
+        orderBy = { price: 'asc' };
     }
 
     const [products, total, priceAggregation, filterCounts] = await Promise.all([

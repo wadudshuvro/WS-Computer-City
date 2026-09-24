@@ -23,7 +23,7 @@ import { RAM_BRANDS } from '@/lib/ramSpecDefinitions';
 import { PSU_BRANDS } from '@/lib/psuSpecDefinitions';
 import { SSD_BRANDS } from '@/lib/ssdSpecDefinitions';
 import { CASING_BRANDS } from '@/lib/casingSpecDefinitions';
-import { CPU_COOLER_BRANDS } from '@/lib/cpuCoolerSpecDefinitions';
+import { CPU_COOLER_BRANDS, getCpuCoolerListingCardLines } from '@/lib/cpuCoolerSpecDefinitions';
 import { MOTHERBOARD_BRANDS } from '@/lib/componentBrandConfig';
 import { ChevronRight, Eye, Grid, Heart, List, ShoppingCart, SlidersHorizontal, X } from 'lucide-react';
 import Link from 'next/link';
@@ -79,7 +79,7 @@ function ProductsPageContent() {
 
   // Get current page, sort, category, and brand tab from URL
   const currentPage = Number(searchParams.get('page')) || 1;
-  const currentSort = searchParams.get('sort') || 'default';
+  const sortParam = searchParams.get('sort');
   const categoryParam = searchParams.get('category');
   const subCategory = searchParams.get('sub');
   const typeParam = searchParams.get('type');
@@ -136,6 +136,8 @@ function ProductsPageContent() {
     subCategory === 'cooler' ||
     categoryParam === 'cpu-cooler';
 
+  const currentSort = sortParam || (isCpuCoolerCategory ? 'price_asc' : 'default');
+
   // Desktop RAM category (including DDR4/DDR5 menu shortcuts)
   const isRamCategory =
     subCategory === 'desktop-ram' ||
@@ -191,6 +193,10 @@ function ProductsPageContent() {
 
       if (!params.has('limit')) {
         params.set('limit', itemsPerPage.toString());
+      }
+
+      if (isCpuCoolerCategory && !params.has('sort')) {
+        params.set('sort', 'price_asc');
       }
 
       // Mega-menu leaf (intel / amd-ryzen) still scopes brand; parent Processor shows all
@@ -263,7 +269,12 @@ function ProductsPageContent() {
   const handleSortChange = (sort: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (sort === 'default') {
-      params.delete('sort');
+      // Cooler landing page treats a missing sort as price_asc — keep Default explicit.
+      if (isCpuCoolerCategory) {
+        params.set('sort', 'default');
+      } else {
+        params.delete('sort');
+      }
     } else {
       params.set('sort', sort);
     }
@@ -1215,11 +1226,21 @@ function ProductsPageContent() {
                         ? featuredFromShort
                         : getGpuListingCardLines((key) => gpuSpecMap.get(key) || null)
                       : [];
+                    const coolerFeatureLines = isCpuCoolerCategory
+                      ? (() => {
+                          const fromSpecs = getCpuCoolerListingCardLines(
+                            (key) => gpuSpecMap.get(key) || null
+                          );
+                          return fromSpecs.length > 0 ? fromSpecs : featuredFromShort;
+                        })()
+                      : [];
                     const cardFeatureLines = isProcessorCategory
                       ? processorFeatureLines
                       : isGpuCategory
                         ? gpuFeatureLines
-                        : featuredFromShort;
+                        : isCpuCoolerCategory
+                          ? coolerFeatureLines
+                          : featuredFromShort;
 
                     return viewMode === 'grid' ? (
                       // Grid View Card
