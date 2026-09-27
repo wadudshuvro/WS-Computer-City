@@ -20,6 +20,10 @@ import {
 } from 'lucide-react';
 import { GPU_SPECIFICATION_GROUPS, isGpuCategory, getCategorySlugs } from '@/lib/gpuSpecDefinitions';
 import {
+  PROCESSOR_SPECIFICATION_GROUPS,
+  PROCESSOR_SPEC_PDP_LABELS,
+} from '@/lib/categoryConfig';
+import {
   CPU_COOLER_SPECIFICATION_GROUPS,
   isCpuCoolerCategorySlug,
 } from '@/lib/cpuCoolerSpecDefinitions';
@@ -27,6 +31,13 @@ import { MOTHERBOARD_SPECIFICATION_GROUPS, isMotherboardCategory } from '@/lib/m
 import { RAM_SPECIFICATION_GROUPS, isRamCategory } from '@/lib/ramSpecDefinitions';
 import { GpuProductHighlights } from '@/components/products/GpuProductHighlights';
 import { CpuCoolerProductHighlights } from '@/components/products/CpuCoolerProductHighlights';
+import { ProcessorProductHighlights } from '@/components/products/ProcessorProductHighlights';
+import { MotherboardProductHighlights } from '@/components/products/MotherboardProductHighlights';
+import { MotherboardSpecificationTable } from '@/components/products/MotherboardSpecificationTable';
+import {
+  resolveMotherboardBrandCrumb,
+  resolveStorefrontCategoryHref,
+} from '@/lib/storefrontCategoryHref';
 import { ProductDetailSkeleton } from '@/components/products/ProductDetailSkeleton';
 import { ProductDescription } from '@/components/products/ProductDescription';
 import { AddedToCartDialog } from '@/components/cart/AddedToCartDialog';
@@ -40,6 +51,24 @@ const PROCESSOR_CATEGORY_SLUGS = new Set(['processor', 'intel', 'amd', 'amd-ryze
 
 function isProcessorCategory(slugs: string[]): boolean {
   return slugs.some((slug) => PROCESSOR_CATEGORY_SLUGS.has(slug));
+}
+
+function formatProcessorSpecValue(
+  key: string,
+  value: string,
+  isProcessor: boolean,
+  isIntel: boolean
+): string {
+  if (!isProcessor) return value;
+  if ((key === 'base_clock' || key === 'boost_clock') && !/ghz/i.test(value)) {
+    return `${value} GHz`;
+  }
+  if (key === 'number_of_cores') return value.replace(/\s*Core$/i, '');
+  if (key === 'number_of_threads') return value.replace(/\s*Threads$/i, '');
+  if (key === 'cache_size' && isIntel && !/smart cache/i.test(value)) {
+    return `${value} Intel Smart Cache`;
+  }
+  return value;
 }
 
 type ProcessorPurchaseVariant = 'bundle' | 'single';
@@ -223,15 +252,17 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
     if (!product) return [];
 
     const categorySlugs = getCategorySlugs(product.category);
-    const groupsConfig = isGpuCategory(categorySlugs)
-      ? GPU_SPECIFICATION_GROUPS
-      : isMotherboardCategory(categorySlugs)
-        ? MOTHERBOARD_SPECIFICATION_GROUPS
-        : isRamCategory(categorySlugs)
-          ? RAM_SPECIFICATION_GROUPS
-          : isCpuCoolerCategorySlug(categorySlugs)
-            ? CPU_COOLER_SPECIFICATION_GROUPS
-            : specificationGroups;
+    const groupsConfig = isProcessorCategory(categorySlugs)
+      ? PROCESSOR_SPECIFICATION_GROUPS
+      : isGpuCategory(categorySlugs)
+        ? GPU_SPECIFICATION_GROUPS
+        : isMotherboardCategory(categorySlugs)
+          ? MOTHERBOARD_SPECIFICATION_GROUPS
+          : isRamCategory(categorySlugs)
+            ? RAM_SPECIFICATION_GROUPS
+            : isCpuCoolerCategorySlug(categorySlugs)
+              ? CPU_COOLER_SPECIFICATION_GROUPS
+              : specificationGroups;
 
     const groups: { title: string; specs: { name: string; value: string }[] }[] = [];
 
@@ -239,11 +270,19 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
       const isWarrantyGroup = group.keys.includes('warranty');
       const specs = group.keys
         .map((key) => {
-          const value = getSpecValue(key);
-          if (value) {
+          const raw = getSpecValue(key);
+          if (raw) {
             return {
-              name: key === 'warranty' ? 'Manufacturing Warranty' : getSpecName(key),
-              value,
+              name:
+                PROCESSOR_SPEC_PDP_LABELS[key] ||
+                (key === 'warranty' ? 'Manufacturing Warranty' : getSpecName(key)),
+              value: formatProcessorSpecValue(
+                key,
+                raw,
+                isProcessorCategory(categorySlugs),
+                categorySlugs.includes('intel') ||
+                  product.brand.slug === 'intel'
+              ),
             };
           }
           if (isWarrantyGroup && key === 'warranty') {
@@ -258,17 +297,37 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
       }
     });
 
-    // Add any remaining specifications that weren't in predefined groups
-    const allGroupKeys = Object.values(groupsConfig).flatMap(g => g.keys);
+    // Extra specs sit above warranty so Warranty Information is always last
+    const allGroupKeys = Object.values(groupsConfig).flatMap((g) => g.keys);
     const remainingSpecs = product.specifications
-      .filter(s => !allGroupKeys.includes(s.specificationDefinition.key))
-      .map(s => ({ name: s.specificationDefinition.name, value: s.value }));
+      .filter(
+        (s) =>
+          s.specificationDefinition.key !== 'warranty' &&
+          !allGroupKeys.includes(s.specificationDefinition.key)
+      )
+      .map((s) => ({ name: s.specificationDefinition.name, value: s.value }));
 
     if (remainingSpecs.length > 0) {
       groups.push({ title: 'Additional Specifications', specs: remainingSpecs });
     }
 
-    return groups;
+    const otherGroups = groups.filter(
+      (g) => !/warranty/i.test(g.title)
+    );
+    const warrantyGroups = groups.filter((g) => /warranty/i.test(g.title));
+    if (warrantyGroups.length === 0) {
+      warrantyGroups.push({
+        title: 'Warranty Information',
+        specs: [
+          {
+            name: 'Manufacturing Warranty',
+            value: getSpecValue('warranty') || 'No Warranty',
+          },
+        ],
+      });
+    }
+
+    return [...otherGroups, ...warrantyGroups];
   };
 
   if (loading) {
@@ -343,21 +402,28 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
             <Link href="/" className="text-gray-500 hover:text-blue-600">
               Home
             </Link>
-            <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
-            <Link href="/products" className="text-gray-500 hover:text-blue-600">
-              Components
-            </Link>
-            {product.category.breadcrumb?.map((cat, index) => (
+            {product.category.breadcrumb?.map((cat) => {
+              const isMotherboardPlatform =
+                cat.slug === 'intel-motherboard' || cat.slug === 'amd-motherboard';
+              const crumb = isMotherboardPlatform
+                ? resolveMotherboardBrandCrumb(product.brand.slug, cat.slug)
+                : {
+                    href: resolveStorefrontCategoryHref(cat.slug),
+                    label: cat.name,
+                  };
+
+              return (
               <span key={cat.id} className="flex items-center gap-2">
                 <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
                 <Link
-                  href={`/products?category=${cat.slug}`}
+                  href={crumb.href}
                   className="text-gray-500 hover:text-blue-600"
                 >
-                  {cat.name}
+                  {crumb.label}
                 </Link>
               </span>
-            ))}
+              );
+            })}
             <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
             <span className="text-gray-900 font-medium truncate">{product.name}</span>
           </nav>
@@ -480,9 +546,27 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                         productName={product.name}
                         getSpecValue={getSpecValue}
                       />
+                    ) : isProcessor ? (
+                      <ProcessorProductHighlights
+                        stockStatus={product.stockStatus}
+                        stockLabel={stockStatus.text}
+                        brand={product.brand}
+                        sku={product.sku}
+                        shortDescription={product.shortDescription}
+                        getSpecValue={getSpecValue}
+                      />
+                    ) : isMotherboard ? (
+                      <MotherboardProductHighlights
+                        stockStatus={product.stockStatus}
+                        stockLabel={stockStatus.text}
+                        brand={product.brand}
+                        productName={product.name}
+                        sku={product.sku}
+                        getSpecValue={getSpecValue}
+                      />
                     ) : (
                       <>
-                        {/* Quick Info ΓÇö other categories */}
+                        {/* Quick Info — other categories */}
                         <div className="flex flex-wrap items-center gap-4 text-sm mb-4">
                           <span className={`px-3 py-1 rounded-full text-xs font-medium ${stockStatus.bgColor} ${stockStatus.color}`}>
                             {stockStatus.text}
@@ -498,7 +582,6 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                           </span>
                         </div>
 
-                        {/* Key Specs Preview ΓÇö processors etc. */}
                         <div className="bg-gray-50 rounded-lg p-3 mb-4 text-sm text-gray-600">
                           {getSpecValue('base_clock') && (
                             <p>Clock Speed: {getSpecValue('base_clock')} GHz up to {getSpecValue('boost_clock') || 'N/A'} GHz</p>
@@ -743,12 +826,15 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
                 {/* Specification Tab */}
                 {activeTab === 'specification' && (
+                  isMotherboard ? (
+                    <MotherboardSpecificationTable getSpecValue={getSpecValue} />
+                  ) : (
                   <div className="space-y-6">
                     {groupedSpecifications().map((group, groupIndex) => (
                       <div key={groupIndex}>
                         <h3
                           className={`text-sm font-semibold px-4 py-2 rounded-t ${
-                            isCpuCooler
+                            isCpuCooler || isProcessor
                               ? 'bg-[#eef2ff] text-[#1d4ed8] border border-gray-200'
                               : isMotherboard || isRam
                                 ? 'bg-gray-100 text-gray-900 border border-gray-200'
@@ -785,6 +871,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       </p>
                     )}
                   </div>
+                  )
                 )}
 
                 {/* Reviews Tab */}

@@ -126,11 +126,15 @@ export const MOTHERBOARD_SPEC_DEFINITIONS: MotherboardSpecDefinitionSeed[] = [
 export const MOTHERBOARD_SPECIFICATION_GROUPS: Record<string, { title: string; keys: string[] }> = {
   processor: {
     title: 'Processor',
-    keys: ['supported_cpu', 'chipset'],
+    keys: ['supported_cpu'],
+  },
+  mainboard: {
+    title: 'Mainboard',
+    keys: ['chipset'],
   },
   memory: {
     title: 'Memory',
-    keys: ['memory_size', 'memory_type'],
+    keys: ['memory_type', 'memory_size'],
   },
   storage: {
     title: 'Storage',

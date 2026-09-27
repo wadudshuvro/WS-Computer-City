@@ -18,6 +18,7 @@ import { categorySortOptions, GPU_MANUFACTURER_BRANDS } from '@/lib/filterConfig
 import { PROCESSOR_SPEC_FILTER_KEYS } from '@/lib/processorFilterMappings';
 import { GPU_SPEC_FILTER_KEYS } from '@/lib/gpuFilterMappings';
 import { getGpuListingCardLines } from '@/lib/gpuSpecDefinitions';
+import { getMotherboardListingCardLines } from '@/lib/motherboardPdpDisplay';
 import { RAM_SPEC_FILTER_KEYS } from '@/lib/ramFilterMappings';
 import { RAM_BRANDS } from '@/lib/ramSpecDefinitions';
 import { PSU_BRANDS } from '@/lib/psuSpecDefinitions';
@@ -91,7 +92,9 @@ function ProductsPageContent() {
   // Processor pages: parent slug or Intel/AMD child slugs from mega menu
   const isProcessorCategory =
     (subCategory !== null && PROCESSOR_SUB_SLUGS.includes(subCategory as (typeof PROCESSOR_SUB_SLUGS)[number])) ||
-    categoryParam === 'processor';
+    categoryParam === 'processor' ||
+    categoryParam === 'amd' ||
+    categoryParam === 'intel';
 
   const brandSlugs = brandParam ? brandParam.split(',').filter(Boolean) : [];
 
@@ -101,9 +104,11 @@ function ProductsPageContent() {
       ? 'amd'
       : brandSlugs.length === 1 && brandSlugs[0] === 'intel'
         ? 'intel'
-        : subCategory === 'amd' || subCategory === 'amd-ryzen'
+        : subCategory === 'amd' ||
+            subCategory === 'amd-ryzen' ||
+            categoryParam === 'amd'
           ? 'amd'
-          : subCategory === 'intel'
+          : subCategory === 'intel' || categoryParam === 'intel'
             ? 'intel'
             : null;
 
@@ -204,9 +209,13 @@ function ProductsPageContent() {
         if (!params.has('category')) {
           params.set('category', 'components');
         }
-        if (subCategory === 'intel') {
+        if (subCategory === 'intel' || categoryParam === 'intel') {
           params.set('brand', 'intel');
-        } else if (subCategory === 'amd' || subCategory === 'amd-ryzen') {
+        } else if (
+          subCategory === 'amd' ||
+          subCategory === 'amd-ryzen' ||
+          categoryParam === 'amd'
+        ) {
           params.set('brand', 'amd');
         }
         // sub=processor (or missing) → no brand → all Intel + AMD
@@ -1234,13 +1243,21 @@ function ProductsPageContent() {
                           return fromSpecs.length > 0 ? fromSpecs : featuredFromShort;
                         })()
                       : [];
+                    const motherboardFeatureLines = isMotherboardCategory
+                      ? getMotherboardListingCardLines(
+                          (key) => gpuSpecMap.get(key) || null,
+                          product.shortDescription
+                        )
+                      : [];
                     const cardFeatureLines = isProcessorCategory
                       ? processorFeatureLines
                       : isGpuCategory
                         ? gpuFeatureLines
                         : isCpuCoolerCategory
                           ? coolerFeatureLines
-                          : featuredFromShort;
+                          : isMotherboardCategory
+                            ? motherboardFeatureLines
+                            : featuredFromShort;
 
                     return viewMode === 'grid' ? (
                       // Grid View Card
@@ -1411,9 +1428,10 @@ function ProductsPageContent() {
                   })}
                 </div>
 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="mt-8 flex justify-center">
+                {/* Pagination + Star Tech–style listing count */}
+                {totalProducts > 0 && (
+                  <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+                    {totalPages > 1 ? (
                     <nav className="flex items-center gap-1">
                       <button
                         onClick={() => handlePageChange(currentPage - 1)}
@@ -1451,6 +1469,14 @@ function ProductsPageContent() {
                         &gt;
                       </button>
                     </nav>
+                    ) : (
+                      <span />
+                    )}
+                    <p className="ml-auto text-sm text-gray-600">
+                      Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+                      {Math.min(currentPage * itemsPerPage, totalProducts)} of {totalProducts}{' '}
+                      ({totalPages} {totalPages === 1 ? 'page' : 'pages'})
+                    </p>
                   </div>
                 )}
               </>

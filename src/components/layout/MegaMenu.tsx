@@ -175,7 +175,7 @@ export function MegaMenu() {
   }, [router]);
 
   return (
-    <nav className="relative z-[200] overflow-visible border-b border-gray-200 bg-white">
+    <nav className="sticky top-0 z-[200] overflow-visible border-b border-gray-200 bg-white">
       <div className="container mx-auto overflow-visible">
         {/* Compact Star Tech density — never overflow-x-auto (clips flyouts). */}
         <ul className="relative z-[200] flex flex-nowrap items-center justify-start gap-0 overflow-visible whitespace-nowrap">
@@ -194,7 +194,7 @@ export function MegaMenu() {
                 <Link
                   href={categoryHref}
                   {...navigateTo(categoryHref)}
-                  className={`block px-2.5 py-[7px] text-[14px] font-normal leading-none transition-colors ${
+                  className={`block px-3 py-3.5 text-[14px] font-normal leading-none transition-colors ${
                     isActive
                       ? 'text-nav'
                       : 'text-gray-800 hover:text-nav'

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { SHOW_LIVE_LOGO, TEST_LOGO_TEXT } from '@/lib/brandDisplay';
 
 export function Footer() {
   return (
@@ -7,7 +8,17 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* About */}
           <div>
-            <h3 className="text-white font-bold text-lg mb-4">LogicBay BD</h3>
+            {SHOW_LIVE_LOGO ? (
+              <img
+                src="/logo-white.png"
+                alt="LogicBay BD"
+                className="mb-4 h-10 w-auto"
+              />
+            ) : (
+              <span className="mb-4 block whitespace-nowrap text-base font-medium text-white">
+                {TEST_LOGO_TEXT}
+              </span>
+            )}
             <p className="text-sm mb-4">
               Your trusted destination for computer hardware and technology products in Bangladesh.
             </p>

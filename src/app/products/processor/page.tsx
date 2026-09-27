@@ -551,9 +551,10 @@ function ProcessorPageContent() {
                   })}
                 </div>
 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="mt-8 flex justify-center">
+                {/* Pagination + Star Tech–style listing count */}
+                {totalProducts > 0 && (
+                  <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+                    {totalPages > 1 ? (
                     <nav className="flex items-center gap-1">
                       <button
                         onClick={() => handlePageChange(currentPage - 1)}
@@ -591,6 +592,14 @@ function ProcessorPageContent() {
                         &gt;
                       </button>
                     </nav>
+                    ) : (
+                      <span />
+                    )}
+                    <p className="ml-auto text-sm text-gray-600">
+                      Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+                      {Math.min(currentPage * itemsPerPage, totalProducts)} of {totalProducts}{' '}
+                      ({totalPages} {totalPages === 1 ? 'page' : 'pages'})
+                    </p>
                   </div>
                 )}
               </>
