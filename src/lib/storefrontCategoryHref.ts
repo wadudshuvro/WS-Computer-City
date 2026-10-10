@@ -1,10 +1,12 @@
 import { MOTHERBOARD_BRANDS } from '@/lib/componentBrandConfig';
+import { findGadgetLeaf } from '@/lib/gadgetCatalog';
 
 /**
  * Storefront listing URL for a category (or brand-leaf) slug.
- * PDP breadcrumbs must land on the filtered category page, not /products.
+ * PDP breadcrumbs must land on that category's listing, not the components page.
+ * `parentSlug` is the crumb above this one (Accessories, Gaming, Components, …).
  */
-export function resolveStorefrontCategoryHref(slug: string): string {
+export function resolveStorefrontCategoryHref(slug: string, parentSlug?: string | null): string {
   switch (slug) {
     case 'components':
     case 'component':
@@ -56,8 +58,30 @@ export function resolveStorefrontCategoryHref(slug: string): string {
     case 'cooler':
       return '/products?category=components&sub=cpu-cooler';
 
-    default:
-      return `/products?category=components&sub=${slug}`;
+    case 'accessories':
+      return '/products?category=accessories';
+    case 'gaming':
+      return '/products?category=gaming';
+    case 'watch':
+      return '/products?category=gadget&sub=watch';
+    case 'monitor':
+      return '/products?category=monitor';
+    case 'gadget':
+      return '/products?category=gadget';
+
+    default: {
+      if (findGadgetLeaf(slug)) return `/products?category=gadget&sub=${slug}`;
+      if (parentSlug === 'accessories' || parentSlug === 'gaming' || parentSlug === 'gadget') {
+        return `/products?category=${parentSlug}&sub=${slug}`;
+      }
+      if (parentSlug === 'components' || parentSlug === 'component') {
+        return `/products?category=components&sub=${slug}`;
+      }
+      if (parentSlug) {
+        return `/products?category=${parentSlug}&sub=${slug}`;
+      }
+      return `/products?category=${slug}`;
+    }
   }
 }
 

@@ -90,6 +90,7 @@ model Category {
 
   // Products in this category
   products Product[]
+  listings ProductListing[]
 
   // Specification definitions specific to this category
   specificationDefinitions SpecificationDefinition[]
@@ -100,6 +101,18 @@ model Category {
   @@index([parentId])
   @@index([slug])
   @@map("categories")
+}
+
+/// Extra category placements when Star Tech lists one product in more than one category.
+model ProductListing {
+  productId  String
+  categoryId String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([productId, categoryId])
+  @@index([categoryId])
+  @@map("product_listings")
 }
 
 // ============================================
@@ -168,6 +181,7 @@ model Product {
   images           ProductImage[]
   specifications   ProductSpecification[]
   orderItems       OrderItem[]
+  listings         ProductListing[]
 
   @@index([slug])
   @@index([sku])

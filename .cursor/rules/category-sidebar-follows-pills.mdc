@@ -1,0 +1,47 @@
+---
+description: Top brand/platform pills must drive context-aware left sidebar filters (no conflicting options)
+alwaysApply: true
+---
+
+# Category Sidebar Filters Follow Top Selection
+
+When a category has **top brand / platform pills** (or equivalent scope pills), the **left sidebar filters must match that selection**. Do not show options that cannot apply or that fight the pill (e.g. other brands, wrong-platform sockets).
+
+## Required behavior (Motherboard reference)
+
+| Top selection | Sidebar must |
+|---------------|--------------|
+| Maker + platform pill (e.g. `msi-amd`, `gigabyte-intel`) | Hide **Brand** and **Processor Type**; show only that platform’s sockets / platform-specific filters |
+| Platform-only pill (e.g. `amd-motherboard`, `intel-motherboard`) | Hide **Processor Type**; keep maker Brand list; show only that platform’s sockets |
+| No pill (all products in category) | Full sidebar (processor type, brands, both platform filter groups) |
+
+Also:
+
+- Clicking a top pill must **clear conflicting sidebar query params** (e.g. `mb_brand`, `processor_type`, `cpu_socket`) so users never land on “No Products Found” from pill + leftover checkboxes.
+- Filter **counts** should be computed in the same scoped context when a pill is active.
+- Reference: `resolveMotherboardFilterContext` + `getMotherboardFilters(context)` in `src/lib/filterConfig.ts`, `MotherboardFilters`, `/api/products/motherboard`.
+
+## Same idea for other categories
+
+Processors already use brand-scoped filters (`getProcessorFilters('intel' | 'amd' | 'all')`). GPUs use chipset brand (`nvidia` / `amd`). Desktop RAM uses brand pills (`resolveRamFilterContext` → hide **Brands**, scope Capacity / Memory Type / BUS Speed / Other Feature counts). **Any new category** with top pills that imply a platform, chipset, or maker must:
+
+1. Add a `resolve*FilterContext` (or pass platform/brand into `get*Filters`)
+2. Pass that context into the sidebar `*Filters` component (desktop + mobile)
+3. Clear conflicting URL filter keys in the pill click handler
+4. Scope API filter counts to the active pill when present
+
+## Desktop RAM (Star Tech G.Skill pattern)
+
+| Top selection | Sidebar must |
+|---------------|--------------|
+| Brand pill (e.g. `gskill`, `corsair`) | Hide **Brands**; show Capacity, Memory Type, BUS Speed, Other Feature with counts scoped to that brand; hide zero-count options |
+| No pill | Full sidebar including Brands |
+
+Clear on pill click: `capacity`, `memory_type`, `speed`, `ram_features`.
+
+## Do not
+
+- Leave full Brand + both Intel/AMD socket lists visible while a maker+platform pill is active
+- Allow sidebar Brand checkboxes to contradict the top pill without clearing one or the other
+- Ship a new pill-based category with a static, unscoped sidebar
+- Leave Desktop RAM Brands visible while a top brand pill is active

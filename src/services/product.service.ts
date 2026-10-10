@@ -4,6 +4,85 @@ import { Prisma } from '@prisma/client';
 
 type SpecInput = { specificationDefinitionId?: string; key?: string; value: string };
 
+const KEYBOARD_TEXT_KEYS = new Set(['kb_type', 'kb_switch', 'kb_interface', 'kb_feature']);
+const WATCH_SPEC_KEYS = new Set([
+  'watch_use',
+  'watch_dial',
+  'watch_strap',
+  'watch_display',
+  'watch_os',
+  'watch_feature',
+]);
+
+function appendListingSpecFilters(
+  where: Prisma.ProductWhereInput,
+  specs: Record<string, string> | undefined
+) {
+  if (!specs || Object.keys(specs).length === 0) return;
+
+  const textEntries = Object.entries(specs).filter(([key]) => KEYBOARD_TEXT_KEYS.has(key));
+  const watchEntries = Object.entries(specs).filter(
+    ([key]) => WATCH_SPEC_KEYS.has(key) || key.startsWith('gd_') || key.startsWith('mon_')
+  );
+  const specEntries = Object.entries(specs).filter(
+    ([key]) =>
+      !KEYBOARD_TEXT_KEYS.has(key) &&
+      !WATCH_SPEC_KEYS.has(key) &&
+      !key.startsWith('gd_') &&
+      !key.startsWith('mon_')
+  );
+
+  const extra: Prisma.ProductWhereInput[] = [];
+
+  if (textEntries.length > 0) {
+    extra.push(
+      ...textEntries.map(([, raw]) => {
+        const values = raw.split(',').map((value) => value.trim()).filter(Boolean);
+        return {
+          OR: values.flatMap((value) => [
+            { name: { contains: value, mode: 'insensitive' as const } },
+            { shortDescription: { contains: value, mode: 'insensitive' as const } },
+            { description: { contains: value, mode: 'insensitive' as const } },
+          ]),
+        };
+      })
+    );
+  }
+
+  if (watchEntries.length > 0) {
+    extra.push(
+      ...watchEntries.map(([key, raw]) => {
+        const values = raw.split(',').map((value) => value.trim()).filter(Boolean);
+        return {
+          specifications: {
+            some: {
+              specificationDefinition: { key },
+              OR: values.map((value) => ({
+                value: { contains: `|${value}|`, mode: 'insensitive' as const },
+              })),
+            },
+          },
+        };
+      })
+    );
+  }
+
+  if (extra.length > 0) {
+    where.AND = [...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []), ...extra];
+  }
+
+  if (specEntries.length > 0) {
+    where.specifications = {
+      some: {
+        AND: specEntries.map(([key, value]) => ({
+          specificationDefinition: { key },
+          value: { contains: value, mode: 'insensitive' as const },
+        })),
+      },
+    };
+  }
+}
+
 export class ProductService {
   /** Collect category ID and all descendant category IDs (BFS). */
   static async getCategoryDescendantIds(rootSlug: string): Promise<string[]> {
@@ -353,17 +432,8 @@ export class ProductService {
       ];
     }
 
-    // Dynamic specification filters
-    if (filters.specs && Object.keys(filters.specs).length > 0) {
-      where.specifications = {
-        some: {
-          AND: Object.entries(filters.specs).map(([key, value]) => ({
-            specificationDefinition: { key },
-            value: { contains: value, mode: 'insensitive' },
-          })),
-        },
-      };
-    }
+    // Keyboard text filters and watch facet specs.
+    appendListingSpecFilters(where, filters.specs);
 
     // Sorting
     const orderBy: Prisma.ProductOrderByWithRelationInput = this.getSortOrder(filters.sort);
@@ -493,10 +563,23 @@ export class ProductService {
         if (category) {
           // Walk full tree so parent "components" includes leaf products (intel, nvidia, …)
           const categoryIds =
-            slug === 'components' || slug === 'component'
+            slug === 'components' ||
+            slug === 'component' ||
+            slug === 'accessories' ||
+            slug === 'gaming' ||
+            slug === 'gadget'
               ? await this.getCategoryDescendantIds(slug)
               : [category.id, ...category.children.map((c) => c.id)];
-          where.categoryId = { in: categoryIds.length > 0 ? categoryIds : [category.id] };
+          const ids = categoryIds.length > 0 ? categoryIds : [category.id];
+          where.AND = [
+            ...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []),
+            {
+              OR: [
+                { categoryId: { in: ids } },
+                { listings: { some: { categoryId: { in: ids } } } },
+              ],
+            },
+          ];
         } else {
           where.category = { slug };
         }
@@ -539,17 +622,8 @@ export class ProductService {
       ];
     }
 
-    // Dynamic specification filters
-    if (filters.specs && Object.keys(filters.specs).length > 0) {
-      where.specifications = {
-        some: {
-          AND: Object.entries(filters.specs).map(([key, value]) => ({
-            specificationDefinition: { key },
-            value: { contains: value, mode: 'insensitive' },
-          })),
-        },
-      };
-    }
+    // Keyboard text filters and watch facet specs.
+    appendListingSpecFilters(where, filters.specs);
 
     // Sorting
     const orderBy: Prisma.ProductOrderByWithRelationInput = this.getSortOrder(filters.sort);
@@ -726,8 +800,6 @@ export class ProductService {
    */
   private static getSortOrder(sort?: string): Prisma.ProductOrderByWithRelationInput {
     switch (sort) {
-      case 'price_asc':
-        return { price: 'asc' };
       case 'price_desc':
         return { price: 'desc' };
       case 'name':
@@ -736,10 +808,11 @@ export class ProductService {
         return { updatedAt: 'desc' };
       case 'newest':
         return { createdAt: 'desc' };
+      case 'price_asc':
       case 'default':
       default:
-        // Category pages: Default = newest first (same as Star Tech–style “Default”)
-        return { createdAt: 'desc' };
+        // Category pages: landing / Default = price low → high
+        return { price: 'asc' };
     }
   }
 }

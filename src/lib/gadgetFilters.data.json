@@ -1,0 +1,976 @@
+[
+  {
+    "slug": "smart-band",
+    "url": "https://www.startech.com.bd/smart-band",
+    "error": "fetch failed"
+  },
+  {
+    "slug": "earphone",
+    "url": "https://www.startech.com.bd/earphone",
+    "total": "156",
+    "children": [
+      {
+        "name": "Apple",
+        "href": "https://www.startech.com.bd/apple-earphone"
+      },
+      {
+        "name": "Acefast",
+        "href": "https://www.startech.com.bd/acefast-earphone"
+      },
+      {
+        "name": "Awei",
+        "href": "https://www.startech.com.bd/awei-earphone"
+      },
+      {
+        "name": "Baseus",
+        "href": "https://www.startech.com.bd/baseus-earphone"
+      },
+      {
+        "name": "BLON",
+        "href": "https://www.startech.com.bd/blon-earphone"
+      },
+      {
+        "name": "CHARG",
+        "href": "https://www.startech.com.bd/charg-earphone"
+      },
+      {
+        "name": "Edifier",
+        "href": "https://www.startech.com.bd/edifier-earphone"
+      },
+      {
+        "name": "Fantech",
+        "href": "https://www.startech.com.bd/fantech-earphone"
+      },
+      {
+        "name": "FONENG",
+        "href": "https://www.startech.com.bd/foneng-earphone"
+      },
+      {
+        "name": "JBL",
+        "href": "https://www.startech.com.bd/jbl-earphone"
+      },
+      {
+        "name": "JOYROOM",
+        "href": "https://www.startech.com.bd/joyroom-earphone"
+      },
+      {
+        "name": "KZ",
+        "href": "https://www.startech.com.bd/kz-earphone"
+      },
+      {
+        "name": "OnePlus",
+        "href": "https://www.startech.com.bd/oneplus-earphone"
+      },
+      {
+        "name": "Oraimo",
+        "href": "https://www.startech.com.bd/oraimo-earphone"
+      },
+      {
+        "name": "RECCI",
+        "href": "https://www.startech.com.bd/recci-earphone"
+      },
+      {
+        "name": "RIVERSONG",
+        "href": "https://www.startech.com.bd/riversong-earphone"
+      },
+      {
+        "name": "SteelSeries",
+        "href": "https://www.startech.com.bd/steelseries-earphone"
+      },
+      {
+        "name": "Thonet & Vander",
+        "href": "https://www.startech.com.bd/thonet-and-vander-earphone"
+      },
+      {
+        "name": "Xiaomi",
+        "href": "https://www.startech.com.bd/xiaomi-earphone"
+      },
+      {
+        "name": "Yison",
+        "href": "https://www.startech.com.bd/yison-earphone"
+      },
+      {
+        "name": "Jiayou",
+        "href": "https://www.startech.com.bd/jiayou-earphone"
+      },
+      {
+        "name": "WiWU",
+        "href": "https://www.startech.com.bd/wiwu-earphone"
+      },
+      {
+        "name": "XO",
+        "href": "https://www.startech.com.bd/xo-earphone"
+      },
+      {
+        "name": "TECNO",
+        "href": "https://www.startech.com.bd/tecno-earphone"
+      }
+    ],
+    "groups": [
+      {
+        "name": "Connector",
+        "options": [
+          "3.5mm",
+          "Type-C",
+          "Lightning"
+        ]
+      },
+      {
+        "name": "Feature",
+        "options": [
+          "Stereo Bass",
+          "Magnetic Design",
+          "Gaming",
+          "Metal",
+          "Splash-Proof",
+          "Water Proof",
+          "L-Shape Jack",
+          "Detachable Microphone"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "earbuds",
+    "url": "https://www.startech.com.bd/earbuds",
+    "total": "705",
+    "children": [
+      {
+        "name": "Anker",
+        "href": "https://www.startech.com.bd/anker-earbuds"
+      },
+      {
+        "name": "Apple",
+        "href": "https://www.startech.com.bd/apple-airpods"
+      },
+      {
+        "name": "CHARG",
+        "href": "https://www.startech.com.bd/charg-earbuds"
+      },
+      {
+        "name": "BWOO",
+        "href": "https://www.startech.com.bd/bwoo-earbuds"
+      },
+      {
+        "name": "AUKEY",
+        "href": "https://www.startech.com.bd/aukey-earbuds"
+      },
+      {
+        "name": "AULA",
+        "href": "https://www.startech.com.bd/aula-earbuds"
+      },
+      {
+        "name": "Awei",
+        "href": "https://www.startech.com.bd/awei-earbuds"
+      },
+      {
+        "name": "Baseus",
+        "href": "https://www.startech.com.bd/baseus-earbuds"
+      },
+      {
+        "name": "EarFun",
+        "href": "https://www.startech.com.bd/earfun-earbuds"
+      },
+      {
+        "name": "Edifier",
+        "href": "https://www.startech.com.bd/edifier-earbuds"
+      },
+      {
+        "name": "Fantech",
+        "href": "https://www.startech.com.bd/fantech-earbuds"
+      },
+      {
+        "name": "Fastrack",
+        "href": "https://www.startech.com.bd/fastrack-earbuds"
+      },
+      {
+        "name": "FONENG",
+        "href": "https://www.startech.com.bd/foneng-earbuds"
+      },
+      {
+        "name": "Havit",
+        "href": "https://www.startech.com.bd/havit-earbuds"
+      },
+      {
+        "name": "ACEFAST",
+        "href": "https://www.startech.com.bd/acefast-earbuds"
+      },
+      {
+        "name": "Haylou",
+        "href": "https://www.startech.com.bd/haylou-earbuds"
+      },
+      {
+        "name": "HiFuture",
+        "href": "https://www.startech.com.bd/hifuture-earbuds"
+      },
+      {
+        "name": "Hoco",
+        "href": "https://www.startech.com.bd/hoco-earbuds"
+      },
+      {
+        "name": "HONOR",
+        "href": "https://www.startech.com.bd/honor-earbuds"
+      },
+      {
+        "name": "HUAWEI",
+        "href": "https://www.startech.com.bd/huawei-earbuds"
+      },
+      {
+        "name": "IMILAB",
+        "href": "https://www.startech.com.bd/imilab-earbuds"
+      },
+      {
+        "name": "Jabra",
+        "href": "https://www.startech.com.bd/jabra-earbuds"
+      },
+      {
+        "name": "JBL",
+        "href": "https://www.startech.com.bd/jbl-earbuds"
+      },
+      {
+        "name": "JOYROOM",
+        "href": "https://www.startech.com.bd/joyroom-earbuds"
+      },
+      {
+        "name": "Lenovo",
+        "href": "https://www.startech.com.bd/lenovo-earbuds"
+      },
+      {
+        "name": "Mibro",
+        "href": "https://www.startech.com.bd/mibro-earbuds"
+      },
+      {
+        "name": "OnePlus",
+        "href": "https://www.startech.com.bd/oneplus-earbuds"
+      },
+      {
+        "name": "Oraimo",
+        "href": "https://www.startech.com.bd/oraimo-earbuds"
+      },
+      {
+        "name": "QCY",
+        "href": "https://www.startech.com.bd/qcy-earbuds"
+      },
+      {
+        "name": "Realme",
+        "href": "https://www.startech.com.bd/realme-earbuds"
+      },
+      {
+        "name": "RECCI",
+        "href": "https://www.startech.com.bd/recci-earbuds"
+      },
+      {
+        "name": "RIVERSONG",
+        "href": "https://www.startech.com.bd/riversong-earbuds"
+      },
+      {
+        "name": "Samsung",
+        "href": "https://www.startech.com.bd/samsung-earbuds"
+      },
+      {
+        "name": "Sony",
+        "href": "https://www.startech.com.bd/sony-earbuds"
+      },
+      {
+        "name": "SoundPEATS",
+        "href": "https://www.startech.com.bd/soundpeats-earbuds"
+      },
+      {
+        "name": "UGREEN",
+        "href": "https://www.startech.com.bd/ugreen-earbuds"
+      },
+      {
+        "name": "Vyvylabs",
+        "href": "https://www.startech.com.bd/vyvylabs-earbuds"
+      },
+      {
+        "name": "WiWU",
+        "href": "https://www.startech.com.bd/wiwu-earbuds"
+      },
+      {
+        "name": "Xiaomi",
+        "href": "https://www.startech.com.bd/xiaomi-earbuds"
+      },
+      {
+        "name": "XINJI",
+        "href": "https://www.startech.com.bd/xinji-earbuds"
+      },
+      {
+        "name": "Yison",
+        "href": "https://www.startech.com.bd/yison-earbuds"
+      },
+      {
+        "name": "Choetech",
+        "href": "https://www.startech.com.bd/choetech-earbuds"
+      },
+      {
+        "name": "cmf",
+        "href": "https://www.startech.com.bd/cmf-earbuds"
+      },
+      {
+        "name": "SteelSeries",
+        "href": "https://www.startech.com.bd/steelseries-earbuds"
+      },
+      {
+        "name": "Onikuma",
+        "href": "https://www.startech.com.bd/onikuma-earbuds"
+      },
+      {
+        "name": "Tecno",
+        "href": "https://www.startech.com.bd/tecno-earbuds"
+      },
+      {
+        "name": "Vention",
+        "href": "https://www.startech.com.bd/vention-earbuds"
+      },
+      {
+        "name": "MOVR",
+        "href": "https://www.startech.com.bd/movr-earbuds"
+      },
+      {
+        "name": "TOZO",
+        "href": "https://www.startech.com.bd/tozo-earbuds"
+      },
+      {
+        "name": "Monster",
+        "href": "https://www.startech.com.bd/monster-earbuds"
+      },
+      {
+        "name": "Weofly",
+        "href": "https://www.startech.com.bd/weofly-earbuds"
+      },
+      {
+        "name": "Jiayou",
+        "href": "https://www.startech.com.bd/jiayou-earbuds"
+      },
+      {
+        "name": "Onten",
+        "href": "https://www.startech.com.bd/onten-earbuds"
+      },
+      {
+        "name": "Unikyy",
+        "href": "https://www.startech.com.bd/unikyy-earbuds"
+      },
+      {
+        "name": "Kieslect",
+        "href": "https://www.startech.com.bd/kieslect-earbuds"
+      },
+      {
+        "name": "XO",
+        "href": "https://www.startech.com.bd/xo-earbuds"
+      }
+    ],
+    "groups": [
+      {
+        "name": "Codec",
+        "options": [
+          "SBC",
+          "AAC",
+          "aptX",
+          "aptX Adaptive",
+          "aptX HD",
+          "LDAC"
+        ]
+      },
+      {
+        "name": "Noise Cancellation",
+        "options": [
+          "ANC",
+          "ENC"
+        ]
+      },
+      {
+        "name": "Charging",
+        "options": [
+          "Type-C Charging",
+          "Wireless Charging"
+        ]
+      },
+      {
+        "name": "Features",
+        "options": [
+          "Water-Resistant",
+          "Touch Control",
+          "Voice Assistant Compatible",
+          "LED Display",
+          "Gaming Mode"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "neckband",
+    "url": "https://www.startech.com.bd/neckband",
+    "total": "121",
+    "children": [
+      {
+        "name": "BWOO",
+        "href": "https://www.startech.com.bd/bwoo-neckband"
+      },
+      {
+        "name": "Anker",
+        "href": "https://www.startech.com.bd/anker-neckband"
+      },
+      {
+        "name": "Baseus",
+        "href": "https://www.startech.com.bd/baseus-neckband"
+      },
+      {
+        "name": "CHARG",
+        "href": "https://www.startech.com.bd/charg-neckband"
+      },
+      {
+        "name": "boAt",
+        "href": "https://www.startech.com.bd/boat-neckband"
+      },
+      {
+        "name": "DIZO",
+        "href": "https://www.startech.com.bd/dizo-neckband"
+      },
+      {
+        "name": "Edifier",
+        "href": "https://www.startech.com.bd/edifier-neckband"
+      },
+      {
+        "name": "Awei",
+        "href": "https://www.startech.com.bd/awei-neckband"
+      },
+      {
+        "name": "Havit",
+        "href": "https://www.startech.com.bd/havit-neckband"
+      },
+      {
+        "name": "HiFuture",
+        "href": "https://www.startech.com.bd/hifuture-neckband"
+      },
+      {
+        "name": "Hoco",
+        "href": "https://www.startech.com.bd/hoco-neckband"
+      },
+      {
+        "name": "HONOR",
+        "href": "https://www.startech.com.bd/honor-neckband"
+      },
+      {
+        "name": "JBL",
+        "href": "https://www.startech.com.bd/jbl-neckband"
+      },
+      {
+        "name": "Lenovo",
+        "href": "https://www.startech.com.bd/lenovo-neckband"
+      },
+      {
+        "name": "Megastar",
+        "href": "https://www.startech.com.bd/megastar-neckband"
+      },
+      {
+        "name": "OnePlus",
+        "href": "https://www.startech.com.bd/oneplus-neckband"
+      },
+      {
+        "name": "Oraimo",
+        "href": "https://www.startech.com.bd/oraimo-neckband"
+      },
+      {
+        "name": "Realme",
+        "href": "https://www.startech.com.bd/realme-neckband"
+      },
+      {
+        "name": "RIVERSONG",
+        "href": "https://www.startech.com.bd/riversong-neckband"
+      },
+      {
+        "name": "Wavefun",
+        "href": "https://www.startech.com.bd/wavefun-neckband"
+      },
+      {
+        "name": "WiWU",
+        "href": "https://www.startech.com.bd/wiwu-neckband"
+      },
+      {
+        "name": "XIAOMI",
+        "href": "https://www.startech.com.bd/xiaomi-neckband"
+      },
+      {
+        "name": "XTRA",
+        "href": "https://www.startech.com.bd/xtra-neckband"
+      },
+      {
+        "name": "Yison",
+        "href": "https://www.startech.com.bd/yison-neckband"
+      },
+      {
+        "name": "QCY",
+        "href": "https://www.startech.com.bd/qcy-neckband"
+      },
+      {
+        "name": "FONENG",
+        "href": "https://www.startech.com.bd/foneng-neckband"
+      },
+      {
+        "name": "cmf",
+        "href": "https://www.startech.com.bd/cmf-neckband"
+      },
+      {
+        "name": "Thonet & Vander",
+        "href": "https://www.startech.com.bd/thonet-and-vander-neckband"
+      },
+      {
+        "name": "Acefast",
+        "href": "https://www.startech.com.bd/acefast-neckband"
+      },
+      {
+        "name": "Microlab",
+        "href": "https://www.startech.com.bd/microlab-neckband"
+      },
+      {
+        "name": "TOZO",
+        "href": "https://www.startech.com.bd/tozo-neckband"
+      },
+      {
+        "name": "Jiayou",
+        "href": "https://www.startech.com.bd/jiayou-neckband"
+      },
+      {
+        "name": "Onikuma",
+        "href": "https://www.startech.com.bd/onikuma-neckband"
+      },
+      {
+        "name": "Unikyy",
+        "href": "https://www.startech.com.bd/unikyy-neckband"
+      },
+      {
+        "name": "XO",
+        "href": "https://www.startech.com.bd/xo-neckband"
+      }
+    ],
+    "groups": [
+      {
+        "name": "Codec",
+        "options": [
+          "SBC",
+          "AAC",
+          "aptX",
+          "LDAC"
+        ]
+      },
+      {
+        "name": "Noise Cancellation",
+        "options": [
+          "ANC",
+          "ENC"
+        ]
+      },
+      {
+        "name": "Features",
+        "options": [
+          "Dual Driver",
+          "Built-in Mic",
+          "In-line Control",
+          "Magnetic Design",
+          "Water-Resistant",
+          "Gaming Mode",
+          "Voice Assistant Compatible"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "smart-ring",
+    "url": "https://www.startech.com.bd/smart-ring",
+    "total": "6",
+    "children": [],
+    "groups": []
+  },
+  {
+    "slug": "smart-glasses",
+    "url": "https://www.startech.com.bd/smart-glasses",
+    "total": "13",
+    "children": [],
+    "groups": []
+  },
+  {
+    "slug": "power-bank",
+    "url": "https://www.startech.com.bd/power-bank",
+    "total": "476",
+    "children": [
+      {
+        "name": "Anker",
+        "href": "https://www.startech.com.bd/anker-power-bank"
+      },
+      {
+        "name": "Awei",
+        "href": "https://www.startech.com.bd/awei-power-bank"
+      },
+      {
+        "name": "Baseus",
+        "href": "https://www.startech.com.bd/basues-power-bank"
+      },
+      {
+        "name": "Havit",
+        "href": "https://www.startech.com.bd/havit-power-bank"
+      },
+      {
+        "name": "Hoco",
+        "href": "https://www.startech.com.bd/hoco-power-bank"
+      },
+      {
+        "name": "JOYROOM",
+        "href": "https://www.startech.com.bd/joyroom-power-bank"
+      },
+      {
+        "name": "Oraimo",
+        "href": "https://www.startech.com.bd/oraimo-power-bank"
+      },
+      {
+        "name": "RECCI",
+        "href": "https://www.startech.com.bd/recci-power-bank"
+      },
+      {
+        "name": "Remax",
+        "href": "https://www.startech.com.bd/remax-power-bank"
+      },
+      {
+        "name": "Vyvylabs",
+        "href": "https://www.startech.com.bd/vyvylabs-power-bank"
+      },
+      {
+        "name": "UGREEN",
+        "href": "https://www.startech.com.bd/ugreen-power-bank"
+      },
+      {
+        "name": "Xiaomi",
+        "href": "https://www.startech.com.bd/xiaomi-power-bank"
+      },
+      {
+        "name": "WiWU",
+        "href": "https://www.startech.com.bd/wiwu-power-bank"
+      },
+      {
+        "name": "Yison",
+        "href": "https://www.startech.com.bd/yison-power-bank"
+      },
+      {
+        "name": "LDNIO",
+        "href": "https://www.startech.com.bd/ldnio-power-bank"
+      },
+      {
+        "name": "Vention",
+        "href": "https://www.startech.com.bd/vention-power-bank"
+      },
+      {
+        "name": "Choetech",
+        "href": "https://www.startech.com.bd/choetech-power-bank"
+      },
+      {
+        "name": "Fantech",
+        "href": "https://www.startech.com.bd/fantech-power-bank"
+      },
+      {
+        "name": "FONENG",
+        "href": "https://www.startech.com.bd/foneng-power-bank"
+      },
+      {
+        "name": "Charg",
+        "href": "https://www.startech.com.bd/charg-power-bank"
+      },
+      {
+        "name": "MKB",
+        "href": "https://www.startech.com.bd/mkb-power-bank"
+      },
+      {
+        "name": "BWOO",
+        "href": "https://www.startech.com.bd/bwoo-power-bank"
+      },
+      {
+        "name": "ACEFAST",
+        "href": "https://www.startech.com.bd/acefast-power-bank"
+      },
+      {
+        "name": "QCY",
+        "href": "https://www.startech.com.bd/qcy-power-bank"
+      },
+      {
+        "name": "Jiayou",
+        "href": "https://www.startech.com.bd/jiayou-power-bank"
+      },
+      {
+        "name": "BYZ",
+        "href": "https://www.startech.com.bd/byz-power-bank"
+      },
+      {
+        "name": "XO",
+        "href": "https://www.startech.com.bd/xo-power-bank"
+      },
+      {
+        "name": "Tecno",
+        "href": "https://www.startech.com.bd/tecno-power-bank"
+      }
+    ],
+    "groups": [
+      {
+        "name": "Capacity",
+        "options": [
+          "Up to 5000mAh",
+          "5001mAh to 10000mAh",
+          "10001mAh to 20000mAh",
+          "20001mAh to 30000mAh",
+          "30001mAh to 40000mAh",
+          "40001mAh to 50000mAh",
+          "Above 50000mAh"
+        ]
+      },
+      {
+        "name": "OutputPort",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4 & Above"
+        ]
+      },
+      {
+        "name": "Output Wattage",
+        "options": [
+          "Up to 15W",
+          "16W to 25W",
+          "26W to 35W",
+          "36W to 45W",
+          "46W to 65W",
+          "66W to 100W",
+          "Above 100W"
+        ]
+      },
+      {
+        "name": "Compatibility",
+        "options": [
+          "Mobile Phone",
+          "Laptop"
+        ]
+      },
+      {
+        "name": "Special Features",
+        "options": [
+          "Wireless Charging",
+          "Digital Display",
+          "Built in Cables",
+          "Kickstand"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "car-charger",
+    "url": "https://www.startech.com.bd/car-charger",
+    "total": "51",
+    "children": [],
+    "groups": [
+      {
+        "name": "Type",
+        "options": [
+          "USB Charger",
+          "Type-C Charger",
+          "Wireless Charger",
+          "Car Charger"
+        ]
+      },
+      {
+        "name": "Wattage",
+        "options": [
+          "5W-25W",
+          "26W-35W",
+          "36W-55W",
+          "56W-100W",
+          "101W-Above"
+        ]
+      },
+      {
+        "name": "Output Port",
+        "options": [
+          "1 Port",
+          "2 Ports",
+          "3 Ports",
+          "4 Ports"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "tv-box",
+    "url": "https://www.startech.com.bd/tv-box",
+    "total": "13",
+    "children": [],
+    "groups": []
+  },
+  {
+    "slug": "health-monitor",
+    "url": "https://www.startech.com.bd/health-monitor",
+    "total": "26",
+    "children": [],
+    "groups": []
+  },
+  {
+    "slug": "studio-equipment",
+    "url": "https://www.startech.com.bd/studio-equipment",
+    "total": "131",
+    "children": [
+      {
+        "name": "Studio Microphones",
+        "href": "https://www.startech.com.bd/studio-microphones"
+      },
+      {
+        "name": "Studio Monitors",
+        "href": "https://www.startech.com.bd/studio-monitors"
+      },
+      {
+        "name": "Studio Headphones",
+        "href": "https://www.startech.com.bd/studio-headphones"
+      },
+      {
+        "name": "Audio Interfaces",
+        "href": "https://www.startech.com.bd/audio-interfaces"
+      },
+      {
+        "name": "Switcher",
+        "href": "https://www.startech.com.bd/switcher"
+      }
+    ],
+    "groups": []
+  },
+  {
+    "slug": "drone",
+    "url": "https://www.startech.com.bd/drone",
+    "total": "74",
+    "children": [
+      {
+        "name": "DJI",
+        "href": "https://www.startech.com.bd/dji-drone"
+      },
+      {
+        "name": "Mini Toy Drone",
+        "href": "https://www.startech.com.bd/mini-toy-drone"
+      },
+      {
+        "name": "Professional Drone",
+        "href": "https://www.startech.com.bd/professional-drone"
+      },
+      {
+        "name": "4K Drone",
+        "href": "https://www.startech.com.bd/4k-drone"
+      },
+      {
+        "name": "Enterprise Drone",
+        "href": "https://www.startech.com.bd/enterprise-drone"
+      },
+      {
+        "name": "Drone Accessories",
+        "href": "https://www.startech.com.bd/drone-accessories"
+      }
+    ],
+    "groups": []
+  },
+  {
+    "slug": "gimbal",
+    "url": "https://www.startech.com.bd/gimbal",
+    "total": "60",
+    "children": [
+      {
+        "name": "DJI",
+        "href": "https://www.startech.com.bd/dji-gimbal"
+      },
+      {
+        "name": "Zhiyun",
+        "href": "https://www.startech.com.bd/zhiyun-gimbal"
+      },
+      {
+        "name": "Insta360",
+        "href": "https://www.startech.com.bd/insta360-gimbal"
+      },
+      {
+        "name": "Baseus",
+        "href": "https://www.startech.com.bd/baseus-gimbal"
+      },
+      {
+        "name": "Hohem",
+        "href": "https://www.startech.com.bd/hohem-gimbal"
+      },
+      {
+        "name": "Feiyu",
+        "href": "https://www.startech.com.bd/feiyutech-gimbal"
+      }
+    ],
+    "groups": [
+      {
+        "name": "Axis",
+        "options": [
+          "2 Axis",
+          "3 Axis"
+        ]
+      },
+      {
+        "name": "Maximum Load",
+        "options": [
+          "101g - 200g",
+          "201g - 300g",
+          "500g - 1Kg",
+          "Over 1Kg"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "calculator",
+    "url": "https://www.startech.com.bd/calculator",
+    "total": "50",
+    "children": [
+      {
+        "name": "Scientific Calculator",
+        "href": "https://www.startech.com.bd/scientific-calculator"
+      },
+      {
+        "name": "Casio",
+        "href": "https://www.startech.com.bd/casio-calculator"
+      }
+    ],
+    "groups": []
+  },
+  {
+    "slug": "stream-deck",
+    "url": "https://www.startech.com.bd/stream-deck",
+    "total": "6",
+    "children": [],
+    "groups": []
+  },
+  {
+    "slug": "power-tools",
+    "url": "https://www.startech.com.bd/power-tools",
+    "total": "89",
+    "children": [
+      {
+        "name": "Blower Machine",
+        "href": "https://www.startech.com.bd/blower-machine"
+      },
+      {
+        "name": "Drill Machine",
+        "href": "https://www.startech.com.bd/drill-machine"
+      },
+      {
+        "name": "Angle Grinder",
+        "href": "https://www.startech.com.bd/angle-grinder"
+      },
+      {
+        "name": "Saw Machine",
+        "href": "https://www.startech.com.bd/saw-machine"
+      },
+      {
+        "name": "Sander Machine",
+        "href": "https://www.startech.com.bd/sander-machine"
+      },
+      {
+        "name": "Screwdriver",
+        "href": "https://www.startech.com.bd/screwdriver"
+      }
+    ],
+    "groups": []
+  }
+]

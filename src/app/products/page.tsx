@@ -10,15 +10,20 @@ import { SsdFilters } from '@/components/products/SsdFilters';
 import { CasingFilters } from '@/components/products/CasingFilters';
 import { CpuCoolerFilters } from '@/components/products/CpuCoolerFilters';
 import { ComponentsOverviewFilters } from '@/components/products/ComponentsOverviewFilters';
+import { CatalogListingFilters } from '@/components/products/CatalogListingFilters';
+import { WatchListingFilters } from '@/components/products/WatchListingFilters';
+import { MonitorListingFilters } from '@/components/products/MonitorListingFilters';
+import { canPurchase } from '@/lib/purchaseStatus';
 import {
   COMPONENT_OVERVIEW_PILLS,
   componentOverviewHref,
 } from '@/lib/componentOverviewConfig';
-import { categorySortOptions, GPU_MANUFACTURER_BRANDS } from '@/lib/filterConfig';
+import { categorySortOptions, GPU_MANUFACTURER_BRANDS, resolveMotherboardFilterContext, resolveRamFilterContext } from '@/lib/filterConfig';
 import { PROCESSOR_SPEC_FILTER_KEYS } from '@/lib/processorFilterMappings';
 import { GPU_SPEC_FILTER_KEYS } from '@/lib/gpuFilterMappings';
 import { getGpuListingCardLines } from '@/lib/gpuSpecDefinitions';
 import { getMotherboardListingCardLines } from '@/lib/motherboardPdpDisplay';
+import { getRamListingCardLines } from '@/lib/ramPdpDisplay';
 import { RAM_SPEC_FILTER_KEYS } from '@/lib/ramFilterMappings';
 import { RAM_BRANDS } from '@/lib/ramSpecDefinitions';
 import { PSU_BRANDS } from '@/lib/psuSpecDefinitions';
@@ -26,6 +31,16 @@ import { SSD_BRANDS } from '@/lib/ssdSpecDefinitions';
 import { CASING_BRANDS } from '@/lib/casingSpecDefinitions';
 import { CPU_COOLER_BRANDS, getCpuCoolerListingCardLines } from '@/lib/cpuCoolerSpecDefinitions';
 import { MOTHERBOARD_BRANDS } from '@/lib/componentBrandConfig';
+import { ACCESSORIES_BRAND_FLYOUTS } from '@/lib/accessoriesBrandMenu';
+import { findGadgetLeaf, gadgetNestedLeaves } from '@/lib/gadgetCatalog';
+import { MONITOR_BRANDS, MONITOR_TYPE_FILTERS } from '@/lib/monitorCatalog';
+import {
+  catalogGroupHref,
+  catalogLeafHref,
+  catalogLeaves,
+  findCatalogLeaf,
+  type CatalogGroup,
+} from '@/lib/storefrontCatalog';
 import { ChevronRight, Eye, Grid, Heart, List, ShoppingCart, SlidersHorizontal, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -76,6 +91,7 @@ function ProductsPageContent() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [filterCounts, setFilterCounts] = useState<FilterCounts>({});
+  const [catalogBrands, setCatalogBrands] = useState<{ slug: string; name: string; count: number }[]>([]);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 });
 
   // Get current page, sort, category, and brand tab from URL
@@ -141,7 +157,18 @@ function ProductsPageContent() {
     subCategory === 'cooler' ||
     categoryParam === 'cpu-cooler';
 
-  const currentSort = sortParam || (isCpuCoolerCategory ? 'price_asc' : 'default');
+  const isWatchCategory =
+    categoryParam === 'watch' || (categoryParam === 'gadget' && subCategory === 'watch');
+  const isMonitorCategory = categoryParam === 'monitor';
+  const catalogGroup: CatalogGroup | null =
+    (categoryParam === 'accessories' || categoryParam === 'gaming' || categoryParam === 'gadget') &&
+    !isWatchCategory
+      ? categoryParam
+      : null;
+  const isCatalogCategory = catalogGroup !== null;
+  const activeCatalogLeaf = catalogGroup ? findCatalogLeaf(catalogGroup, subCategory) : null;
+
+  const currentSort = sortParam || 'price_asc';
 
   // Desktop RAM category (including DDR4/DDR5 menu shortcuts)
   const isRamCategory =
@@ -159,6 +186,16 @@ function ProductsPageContent() {
     subCategory === 'intel-motherboard' ||
     subCategory === 'amd-motherboard' ||
     categoryParam === 'motherboard';
+
+  const motherboardFilterContext = resolveMotherboardFilterContext({
+    brand: brandParam || null,
+    processorType: searchParams.get('processor_type'),
+    sub: subCategory || typeParam || null,
+  });
+
+  const ramFilterContext = resolveRamFilterContext({
+    brand: isRamCategory ? brandParam || null : null,
+  });
 
   // Power Supply category
   const isPsuCategory =
@@ -200,8 +237,17 @@ function ProductsPageContent() {
         params.set('limit', itemsPerPage.toString());
       }
 
-      if (isCpuCoolerCategory && !params.has('sort')) {
+      if (!params.has('sort')) {
         params.set('sort', 'price_asc');
+      }
+
+      if (isMonitorCategory) {
+        params.set('category', 'monitor');
+        const typeFilter = MONITOR_TYPE_FILTERS[params.get('sub') || ''];
+        if (typeFilter && !params.get(typeFilter.key)) {
+          params.set(typeFilter.key, typeFilter.value);
+        }
+        params.delete('sub');
       }
 
       // Mega-menu leaf (intel / amd-ryzen) still scopes brand; parent Processor shows all
@@ -260,6 +306,7 @@ function ProductsPageContent() {
       
       if (data.filters) {
         setFilterCounts(data.filters.counts || {});
+        setCatalogBrands(Array.isArray(data.filters.brands) ? data.filters.brands : []);
         if (isProcessorCategory) {
           // Star Tech–style fixed slider domain for processors
           setPriceRange({ min: 0, max: 85000 });
@@ -277,13 +324,9 @@ function ProductsPageContent() {
 
   const handleSortChange = (sort: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (sort === 'default') {
-      // Cooler landing page treats a missing sort as price_asc — keep Default explicit.
-      if (isCpuCoolerCategory) {
-        params.set('sort', 'default');
-      } else {
-        params.delete('sort');
-      }
+    if (sort === 'price_asc') {
+      // Clean URL — missing sort already means price low → high
+      params.delete('sort');
     } else {
       params.set('sort', sort);
     }
@@ -350,6 +393,46 @@ function ProductsPageContent() {
     router.push(`/products?${params.toString()}`);
   };
 
+  const handleCatalogBrandClick = (brandSlug: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (params.get('brand') === brandSlug) {
+      params.delete('brand');
+    } else {
+      params.set('brand', brandSlug);
+    }
+    params.delete('kb_type');
+    params.delete('kb_switch');
+    params.delete('kb_interface');
+    params.delete('kb_feature');
+    params.set('page', '1');
+    router.push(`/products?${params.toString()}`);
+  };
+
+  const handleWatchBrandClick = (brandSlug: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (params.get('brand') === brandSlug) {
+      params.delete('brand');
+    } else {
+      params.set('brand', brandSlug);
+    }
+    params.set('category', 'watch');
+    params.delete('sub');
+    params.set('page', '1');
+    router.push(`/products?${params.toString()}`);
+  };
+
+  const handleMonitorBrandClick = (brandSlug: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (params.get('brand') === brandSlug) {
+      params.delete('brand');
+    } else {
+      params.set('brand', brandSlug);
+    }
+    params.set('category', 'monitor');
+    params.set('page', '1');
+    router.push(`/products?${params.toString()}`);
+  };
+
   const handleRamBrandClick = (brandSlug: string) => {
     const params = new URLSearchParams(searchParams.toString());
     const current = params.get('brand');
@@ -360,6 +443,11 @@ function ProductsPageContent() {
     } else {
       params.set('brand', brandSlug);
     }
+    // Clear sidebar filters that conflict with the top brand pill
+    params.delete('capacity');
+    params.delete('memory_type');
+    params.delete('speed');
+    params.delete('ram_features');
     params.set('page', '1');
     if (!params.has('sub')) {
       params.set('sub', 'desktop-ram');
@@ -380,6 +468,10 @@ function ProductsPageContent() {
     } else {
       params.set('brand', brandSlug);
     }
+    // Clear sidebar filters that conflict with the top brand/platform pill
+    params.delete('mb_brand');
+    params.delete('processor_type');
+    params.delete('cpu_socket');
     params.set('page', '1');
     if (!params.has('sub')) {
       params.set('sub', 'motherboard');
@@ -509,6 +601,23 @@ function ProductsPageContent() {
     if (isSsdCategory) return 'SSD Price in Bangladesh';
     if (isCasingCategory) return 'Computer Casing Price in Bangladesh';
     if (isCpuCoolerCategory) return 'CPU Cooler Price in Bangladesh';
+    if (catalogGroup === 'accessories') {
+      return activeCatalogLeaf
+        ? `${activeCatalogLeaf.name} Price in Bangladesh`
+        : 'Computer Accessories Price in Bangladesh';
+    }
+    if (catalogGroup === 'gaming') {
+      return activeCatalogLeaf
+        ? `${activeCatalogLeaf.name} Price in Bangladesh`
+        : 'Gaming Accessories Price in Bangladesh';
+    }
+    if (catalogGroup === 'gadget') {
+      return activeCatalogLeaf ? `${activeCatalogLeaf.name} Price in Bangladesh` : 'Gadget';
+    }
+    if (isWatchCategory) return 'Smart Watch Price in Bangladesh';
+    if (isMonitorCategory) {
+      return MONITOR_TYPE_FILTERS[subCategory || '']?.title || 'Monitor Price in Bangladesh';
+    }
     return 'All Products';
   };
 
@@ -523,6 +632,11 @@ function ProductsPageContent() {
     if (isSsdCategory) return 'SSD';
     if (isCasingCategory) return 'Casing';
     if (isCpuCoolerCategory) return 'CPU Cooler';
+    if (catalogGroup === 'accessories') return activeCatalogLeaf?.name || 'Accessories';
+    if (catalogGroup === 'gaming') return activeCatalogLeaf?.name || 'Gaming';
+    if (catalogGroup === 'gadget') return activeCatalogLeaf?.name || 'Gadget';
+    if (isWatchCategory) return 'Smart Watch';
+    if (isMonitorCategory) return subCategory ? MONITOR_TYPE_FILTERS[subCategory]?.title.replace(' Price in Bangladesh', '') || 'Monitor' : 'Monitor';
     return 'Products';
   };
 
@@ -531,6 +645,21 @@ function ProductsPageContent() {
    * (e.g. brand=asus-amd → "ASUS (AMD)", manufacturer=asus → "ASUS").
    */
   const getActiveBrandFilterLabel = (): string | null => {
+    if (isCatalogCategory && catalogGroup && brandParam) {
+      const counted = catalogBrands.find((brand) => brand.slug === brandParam);
+      if (counted) return counted.name;
+      const flyout =
+        catalogGroup === 'accessories'
+          ? ACCESSORIES_BRAND_FLYOUTS[subCategory || '']
+          : GAMING_BRAND_FLYOUTS[subCategory || ''];
+      return flyout?.find((brand) => brand.slug === brandParam)?.label ?? brandParam;
+    }
+    if (isWatchCategory && brandParam) {
+      return WATCH_BRANDS.find((brand) => brand.slug === brandParam)?.label ?? brandParam;
+    }
+    if (isMonitorCategory && brandParam) {
+      return MONITOR_BRANDS.find((brand) => brand.slug === brandParam)?.label ?? brandParam;
+    }
     if (isMotherboardCategory && brandParam) {
       return MOTHERBOARD_BRANDS.find((b) => b.slug === brandParam)?.label ?? null;
     }
@@ -571,6 +700,11 @@ function ProductsPageContent() {
   /** Category listing URL without brand/manufacturer filter (breadcrumb parent) */
   const getCategoryListingHref = () => {
     const params = new URLSearchParams();
+    if (isCatalogCategory && catalogGroup) {
+      params.set('category', catalogGroup);
+      if (activeCatalogLeaf) params.set('sub', activeCatalogLeaf.slug);
+      return `/products?${params.toString()}`;
+    }
     params.set('category', categoryParam || 'components');
     if (isProcessorCategory) {
       params.set('sub', 'processor');
@@ -604,7 +738,67 @@ function ProductsPageContent() {
               Home
             </Link>
             <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
-            {isComponentsOverview ? (
+            {isCatalogCategory && catalogGroup ? (
+              activeCatalogLeaf ? (
+                <>
+                  <Link
+                    href={catalogGroupHref(catalogGroup)}
+                    className="text-gray-500 hover:text-blue-600"
+                  >
+                    {catalogGroup === 'accessories' ? 'Accessories' : catalogGroup === 'gaming' ? 'Gaming' : 'Gadget'}
+                  </Link>
+                  <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
+                  {activeBrandFilterLabel ? (
+                    <>
+                      <Link
+                        href={catalogLeafHref(activeCatalogLeaf)}
+                        className="text-gray-500 hover:text-blue-600"
+                      >
+                        {activeCatalogLeaf.name}
+                      </Link>
+                      <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
+                      <span className="text-gray-900 font-medium">{activeBrandFilterLabel}</span>
+                    </>
+                  ) : (
+                    <span className="text-gray-900 font-medium">{activeCatalogLeaf.name}</span>
+                  )}
+                </>
+              ) : (
+                <span className="text-gray-900 font-medium">
+                  {catalogGroup === 'accessories' ? 'Accessories' : catalogGroup === 'gaming' ? 'Gaming' : 'Gadget'}
+                </span>
+              )
+            ) : isWatchCategory ? (
+              <>
+                <Link href="/products?category=gadget" className="text-gray-500 hover:text-blue-600">
+                  Gadget
+                </Link>
+                <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
+                {activeBrandFilterLabel ? (
+                  <>
+                    <Link href="/products?category=gadget&sub=watch" className="text-gray-500 hover:text-blue-600">
+                      Smart Watch
+                    </Link>
+                    <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
+                    <span className="text-gray-900 font-medium">{activeBrandFilterLabel}</span>
+                  </>
+                ) : (
+                  <span className="text-gray-900 font-medium">Smart Watch</span>
+                )}
+              </>
+            ) : isMonitorCategory ? (
+              activeBrandFilterLabel ? (
+                <>
+                  <Link href="/products?category=monitor" className="text-gray-500 hover:text-blue-600">
+                    Monitor
+                  </Link>
+                  <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
+                  <span className="text-gray-900 font-medium">{activeBrandFilterLabel}</span>
+                </>
+              ) : (
+                <span className="text-gray-900 font-medium">Monitor</span>
+              )
+            ) : isComponentsOverview ? (
               <span className="text-gray-900 font-medium">Component</span>
             ) : (
               <>
@@ -640,7 +834,9 @@ function ProductsPageContent() {
         <div className="max-w-[1400px] mx-auto px-4 py-6">
           <h1
             className={`text-2xl font-bold mb-2 ${
-              isComponentsOverview || isProcessorCategory ? 'text-blue-600' : 'text-gray-900'
+              isComponentsOverview || isProcessorCategory || isCatalogCategory || isWatchCategory || isMonitorCategory
+                ? 'text-blue-600'
+                : 'text-gray-900'
             }`}
           >
             {getPageTitle()}
@@ -938,6 +1134,128 @@ function ProductsPageContent() {
               </div>
             </>
           )}
+
+          {isWatchCategory && (
+            <>
+              <p className="text-sm text-gray-600 max-w-4xl">
+                Smart Watch Price in Bangladesh. Choose a brand, then filter by price, availability,
+                use, dial shape, strap, display, OS, and features.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {WATCH_BRANDS.map((brand) => {
+                  const isActive = brandParam === brand.slug;
+                  return (
+                    <button
+                      key={brand.slug}
+                      type="button"
+                      onClick={() => handleWatchBrandClick(brand.slug)}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                        isActive
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600'
+                      }`}
+                    >
+                      {brand.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {isMonitorCategory && (
+            <>
+              <p className="text-sm text-gray-600 max-w-4xl">
+                Monitor Price in Bangladesh. Choose a brand, then filter by screen size, resolution,
+                panel, refresh rate, response time, inputs, and features.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {MONITOR_BRANDS.map((brand) => {
+                  const isActive = brandParam === brand.slug;
+                  return (
+                    <button
+                      key={brand.slug}
+                      type="button"
+                      onClick={() => handleMonitorBrandClick(brand.slug)}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                        isActive
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600'
+                      }`}
+                    >
+                      {brand.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {isCatalogCategory && catalogGroup && (
+            <>
+              <p className="text-sm text-gray-600 max-w-4xl">
+                {activeCatalogLeaf
+                  ? `${activeCatalogLeaf.name} Price in Bangladesh. Choose a brand, then filter by price and availability.`
+                  : catalogGroup === 'accessories'
+                    ? 'Computer accessories price in Bangladesh. Choose a category to see its brands and products.'
+                    : catalogGroup === 'gaming'
+                      ? 'Gaming accessories price in Bangladesh. Choose a category to see its brands and products.'
+                      : 'Browse gadget categories, then open a category to filter by brand and features.'}
+              </p>
+              {!activeCatalogLeaf && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {catalogLeaves(catalogGroup).map((leaf) => (
+                    <Link
+                      key={leaf.slug}
+                      href={catalogLeafHref(leaf)}
+                      className="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 transition-colors hover:border-blue-500 hover:text-blue-600"
+                    >
+                      {leaf.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+              {activeCatalogLeaf && catalogGroup === 'gadget' && gadgetNestedLeaves(activeCatalogLeaf.slug).length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {gadgetNestedLeaves(activeCatalogLeaf.slug).map((child) => (
+                    <Link
+                      key={child.slug}
+                      href={`/products?category=gadget&sub=${child.slug}`}
+                      className="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 transition-colors hover:border-blue-500 hover:text-blue-600"
+                    >
+                      {child.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+              {activeCatalogLeaf && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {(catalogGroup === 'accessories'
+                    ? ACCESSORIES_BRAND_FLYOUTS[activeCatalogLeaf.slug] || []
+                    : catalogGroup === 'gaming'
+                      ? GAMING_BRAND_FLYOUTS[activeCatalogLeaf.slug] || []
+                      : findGadgetLeaf(activeCatalogLeaf.slug)?.brands || []
+                  ).map((brand) => {
+                    const isActive = brandParam === brand.slug;
+                    return (
+                      <button
+                        key={brand.slug}
+                        type="button"
+                        onClick={() => handleCatalogBrandClick(brand.slug)}
+                        className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
+                          isActive
+                            ? 'border-blue-600 bg-blue-600 text-white'
+                            : 'border-gray-300 bg-white text-gray-700 hover:border-blue-500 hover:text-blue-600'
+                        }`}
+                      >
+                        {brand.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
 
@@ -950,6 +1268,40 @@ function ProductsPageContent() {
               <ComponentsOverviewFilters
                 priceRange={priceRange}
                 filterCounts={filterCounts}
+              />
+            </div>
+          )}
+
+          {isCatalogCategory && catalogGroup && (
+            <div className="hidden lg:block w-[280px] flex-shrink-0">
+              <CatalogListingFilters
+                priceRange={priceRange}
+                filterCounts={filterCounts}
+                subSlug={activeCatalogLeaf?.slug}
+                hideBrand={catalogGroup === 'gadget' && Boolean(brandParam)}
+                contextKey={`${catalogGroup}-${activeCatalogLeaf?.slug || 'all'}-${brandParam || 'all'}`}
+              />
+            </div>
+          )}
+
+          {isWatchCategory && (
+            <div className="hidden lg:block w-[280px] flex-shrink-0">
+              <WatchListingFilters
+                priceRange={priceRange}
+                filterCounts={filterCounts}
+                hideBrand={Boolean(brandParam)}
+                contextKey={`watch-${brandParam || 'all'}`}
+              />
+            </div>
+          )}
+
+          {isMonitorCategory && (
+            <div className="hidden lg:block w-[280px] flex-shrink-0">
+              <MonitorListingFilters
+                priceRange={priceRange}
+                filterCounts={filterCounts}
+                hideBrand={Boolean(brandParam)}
+                contextKey={`monitor-${brandParam || 'all'}-${subCategory || 'all'}`}
               />
             </div>
           )}
@@ -976,13 +1328,21 @@ function ProductsPageContent() {
 
           {isRamCategory && (
             <div className="hidden lg:block w-[280px] flex-shrink-0">
-              <RamFilters priceRange={priceRange} filterCounts={filterCounts} />
+              <RamFilters
+                priceRange={priceRange}
+                filterCounts={filterCounts}
+                filterContext={ramFilterContext}
+              />
             </div>
           )}
 
           {isMotherboardCategory && (
             <div className="hidden lg:block w-[280px] flex-shrink-0">
-              <MotherboardFilters priceRange={priceRange} filterCounts={filterCounts} />
+              <MotherboardFilters
+                priceRange={priceRange}
+                filterCounts={filterCounts}
+                filterContext={motherboardFilterContext}
+              />
             </div>
           )}
 
@@ -1012,6 +1372,7 @@ function ProductsPageContent() {
 
           {/* Mobile Filter Button */}
           {(isComponentsOverview ||
+            isCatalogCategory ||
             isProcessorCategory ||
             isGpuCategory ||
             isRamCategory ||
@@ -1019,7 +1380,9 @@ function ProductsPageContent() {
             isPsuCategory ||
             isSsdCategory ||
             isCasingCategory ||
-            isCpuCoolerCategory) && (
+            isCpuCoolerCategory ||
+            isWatchCategory ||
+            isMonitorCategory) && (
             <button
               onClick={() => setShowMobileFilters(true)}
               className="lg:hidden fixed bottom-4 left-4 z-40 bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2"
@@ -1031,6 +1394,7 @@ function ProductsPageContent() {
 
           {/* Mobile Filters Overlay */}
           {(isComponentsOverview ||
+            isCatalogCategory ||
             isProcessorCategory ||
             isGpuCategory ||
             isRamCategory ||
@@ -1038,7 +1402,9 @@ function ProductsPageContent() {
             isPsuCategory ||
             isSsdCategory ||
             isCasingCategory ||
-            isCpuCoolerCategory) &&
+            isCpuCoolerCategory ||
+            isWatchCategory ||
+            isMonitorCategory) &&
             showMobileFilters && (
             <div className="lg:hidden fixed inset-0 z-[150] bg-black/50">
               <div className="absolute right-0 top-0 bottom-0 w-[320px] bg-white overflow-y-auto">
@@ -1057,6 +1423,15 @@ function ProductsPageContent() {
                     filterCounts={filterCounts}
                   />
                 )}
+                {isCatalogCategory && catalogGroup && (
+                  <CatalogListingFilters
+                    priceRange={priceRange}
+                    filterCounts={filterCounts}
+                    subSlug={activeCatalogLeaf?.slug}
+                    hideBrand={catalogGroup === 'gadget' && Boolean(brandParam)}
+                    contextKey={`mobile-${catalogGroup}-${activeCatalogLeaf?.slug || 'all'}-${brandParam || 'all'}`}
+                  />
+                )}
                 {isProcessorCategory && (
                   <ProcessorFilters
                     brand={processorFilterBrand}
@@ -1072,10 +1447,18 @@ function ProductsPageContent() {
                   />
                 )}
                 {isRamCategory && (
-                  <RamFilters priceRange={priceRange} filterCounts={filterCounts} />
+                  <RamFilters
+                    priceRange={priceRange}
+                    filterCounts={filterCounts}
+                    filterContext={ramFilterContext}
+                  />
                 )}
                 {isMotherboardCategory && (
-                  <MotherboardFilters priceRange={priceRange} filterCounts={filterCounts} />
+                  <MotherboardFilters
+                    priceRange={priceRange}
+                    filterCounts={filterCounts}
+                    filterContext={motherboardFilterContext}
+                  />
                 )}
                 {isPsuCategory && (
                   <PsuFilters priceRange={priceRange} filterCounts={filterCounts} />
@@ -1088,6 +1471,22 @@ function ProductsPageContent() {
                 )}
                 {isCpuCoolerCategory && (
                   <CpuCoolerFilters priceRange={priceRange} filterCounts={filterCounts} />
+                )}
+                {isWatchCategory && (
+                  <WatchListingFilters
+                    priceRange={priceRange}
+                    filterCounts={filterCounts}
+                    hideBrand={Boolean(brandParam)}
+                    contextKey={`watch-mobile-${brandParam || 'all'}`}
+                  />
+                )}
+                {isMonitorCategory && (
+                  <MonitorListingFilters
+                    priceRange={priceRange}
+                    filterCounts={filterCounts}
+                    hideBrand={Boolean(brandParam)}
+                    contextKey={`monitor-mobile-${brandParam || 'all'}`}
+                  />
                 )}
               </div>
             </div>
@@ -1249,6 +1648,12 @@ function ProductsPageContent() {
                           product.shortDescription
                         )
                       : [];
+                    const ramFeatureLines = isRamCategory
+                      ? getRamListingCardLines(
+                          (key) => gpuSpecMap.get(key) || null,
+                          product.shortDescription
+                        )
+                      : [];
                     const cardFeatureLines = isProcessorCategory
                       ? processorFeatureLines
                       : isGpuCategory
@@ -1257,7 +1662,9 @@ function ProductsPageContent() {
                           ? coolerFeatureLines
                           : isMotherboardCategory
                             ? motherboardFeatureLines
-                            : featuredFromShort;
+                            : isRamCategory
+                              ? ramFeatureLines
+                              : featuredFromShort;
 
                     return viewMode === 'grid' ? (
                       // Grid View Card
@@ -1318,13 +1725,13 @@ function ProductsPageContent() {
                           )}
 
                           <div className="mt-auto">
-                            {/* Price */}
-                            <div className="mb-2 flex items-baseline gap-2">
-                              <span className="text-lg font-bold text-gray-900">
+                            {/* Price — Star Tech style: centered, red */}
+                            <div className="mb-2 flex flex-wrap items-baseline justify-center gap-2 text-center">
+                              <span className="text-lg font-bold text-red-600">
                                 {product.price.toLocaleString()}৳
                               </span>
                               {product.compareAtPrice && (
-                                <span className="text-sm text-gray-500 line-through">
+                                <span className="text-sm text-gray-400 line-through">
                                   {product.compareAtPrice.toLocaleString()}৳
                                 </span>
                               )}
@@ -1339,10 +1746,18 @@ function ProductsPageContent() {
 
                             {/* Action Buttons */}
                             <div className="flex gap-2">
-                              <button className="flex-1 rounded bg-orange-500 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600">
+                              <button
+                                type="button"
+                                disabled={!canPurchase(product.stockStatus)}
+                                className="flex-1 rounded bg-orange-500 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 disabled:hover:bg-gray-300"
+                              >
                                 <ShoppingCart className="mr-1 inline w-4 h-4" />
                               </button>
-                              <button className="flex-1 rounded bg-blue-600 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+                              <button
+                                type="button"
+                                disabled={!canPurchase(product.stockStatus)}
+                                className="flex-1 rounded bg-blue-600 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 disabled:hover:bg-gray-300"
+                              >
                                 Buy Now
                               </button>
                             </div>
@@ -1403,21 +1818,29 @@ function ProductsPageContent() {
                           
                           <div className="flex items-center justify-between mt-4">
                             <div className="flex items-baseline gap-2">
-                              <span className="text-2xl font-bold text-blue-600">
+                              <span className="text-2xl font-bold text-red-600">
                                 ৳ {product.price.toLocaleString()}
                               </span>
                               {product.compareAtPrice && (
-                                <span className="text-sm text-gray-500 line-through">
+                                <span className="text-sm text-gray-400 line-through">
                                   ৳ {product.compareAtPrice.toLocaleString()}
                                 </span>
                               )}
                             </div>
                             <div className="flex gap-2">
-                              <button className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition-colors text-sm font-medium">
+                              <button
+                                type="button"
+                                disabled={!canPurchase(product.stockStatus)}
+                                className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition-colors text-sm font-medium disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 disabled:hover:bg-gray-300"
+                              >
                                 <ShoppingCart className="w-4 h-4 inline mr-1" />
                                 Add to Cart
                               </button>
-                              <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors text-sm font-medium">
+                              <button
+                                type="button"
+                                disabled={!canPurchase(product.stockStatus)}
+                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors text-sm font-medium disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 disabled:hover:bg-gray-300"
+                              >
                                 Buy Now
                               </button>
                             </div>

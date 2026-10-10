@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Product, Brand, Category, ProductImage } from '@prisma/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { canPurchase } from '@/lib/purchaseStatus';
 
 type ProductWithRelations = Product & {
   brand: Brand;
@@ -82,13 +83,13 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.name}
           </h3>
 
-          {/* Price */}
-          <div className="flex items-baseline gap-2">
-            <span className="text-lg font-bold text-primary">
+          {/* Price — Star Tech style: centered, red */}
+          <div className="flex flex-wrap items-baseline justify-center gap-2 text-center">
+            <span className="text-lg font-bold text-red-600">
               ৳{Number(product.price).toLocaleString('en-BD')}
             </span>
             {product.compareAtPrice && (
-              <span className="text-sm text-muted-foreground line-through">
+              <span className="text-sm text-gray-400 line-through">
                 ৳{Number(product.compareAtPrice).toLocaleString('en-BD')}
               </span>
             )}
@@ -100,7 +101,7 @@ export function ProductCard({ product }: ProductCardProps) {
               variant="default"
               size="sm"
               className="flex-1"
-              disabled={product.stockStatus === 'OUT_OF_STOCK'}
+              disabled={!canPurchase(product.stockStatus)}
             >
               {product.stockStatus === 'PRE_ORDER' ? 'Pre-Order' : 'Add to Cart'}
             </Button>

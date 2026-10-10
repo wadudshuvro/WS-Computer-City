@@ -3,6 +3,7 @@
 import { ProcessorFilters } from '@/components/products/ProcessorFilters';
 import { ProductGridSkeleton } from '@/components/products/ProductCardSkeleton';
 import { categorySortOptions } from '@/lib/filterConfig';
+import { canPurchase } from '@/lib/purchaseStatus';
 import { PROCESSOR_SPEC_FILTER_KEYS } from '@/lib/processorFilterMappings';
 import { ChevronRight, Eye, Grid, Heart, List, ShoppingCart, SlidersHorizontal, X } from 'lucide-react';
 import Link from 'next/link';
@@ -61,7 +62,7 @@ function ProcessorPageContent() {
 
   // Get current page, sort, and brand tab from URL
   const currentPage = Number(searchParams.get('page')) || 1;
-  const currentSort = searchParams.get('sort') || 'default';
+  const currentSort = searchParams.get('sort') || 'price_asc';
   const brandParam = searchParams.get('brand') || '';
   const activeBrandTab = brandParam === 'amd' ? 'amd' : brandParam === 'intel' ? 'intel' : 'intel'; // default Intel when no brand
   const itemsPerPage = 30;
@@ -117,7 +118,11 @@ function ProcessorPageContent() {
 
   const handleSortChange = (sort: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set('sort', sort);
+    if (sort === 'price_asc') {
+      params.delete('sort');
+    } else {
+      params.set('sort', sort);
+    }
     params.set('page', '1');
     router.push(`/products/processor?${params.toString()}`);
   };
@@ -435,13 +440,13 @@ function ProcessorPageContent() {
                           })()}
 
                           <div className="mt-auto">
-                            {/* Price */}
-                            <div className="mb-3 flex items-baseline gap-2">
-                              <span className="text-xl font-bold text-blue-600">
+                            {/* Price — Star Tech style: centered, red */}
+                            <div className="mb-3 flex flex-wrap items-baseline justify-center gap-2 text-center">
+                              <span className="text-xl font-bold text-red-600">
                                 ৳ {product.price.toLocaleString()}
                               </span>
                               {product.compareAtPrice && (
-                                <span className="text-sm text-gray-500 line-through">
+                                <span className="text-sm text-gray-400 line-through">
                                   ৳ {product.compareAtPrice.toLocaleString()}
                                 </span>
                               )}
@@ -456,10 +461,18 @@ function ProcessorPageContent() {
 
                             {/* Action Buttons */}
                             <div className="flex gap-2">
-                              <button className="flex-1 bg-orange-500 text-white py-2 rounded hover:bg-orange-600 transition-colors text-sm font-medium">
+                              <button
+                                type="button"
+                                disabled={!canPurchase(product.stockStatus)}
+                                className="flex-1 bg-orange-500 text-white py-2 rounded hover:bg-orange-600 transition-colors text-sm font-medium disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 disabled:hover:bg-gray-300"
+                              >
                                 <ShoppingCart className="w-4 h-4 inline mr-1" />
                               </button>
-                              <button className="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors text-sm font-medium">
+                              <button
+                                type="button"
+                                disabled={!canPurchase(product.stockStatus)}
+                                className="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors text-sm font-medium disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 disabled:hover:bg-gray-300"
+                              >
                                 Buy Now
                               </button>
                             </div>
@@ -526,21 +539,29 @@ function ProcessorPageContent() {
                           
                           <div className="flex items-center justify-between mt-4">
                             <div className="flex items-baseline gap-2">
-                              <span className="text-2xl font-bold text-blue-600">
+                              <span className="text-2xl font-bold text-red-600">
                                 ৳ {product.price.toLocaleString()}
                               </span>
                               {product.compareAtPrice && (
-                                <span className="text-sm text-gray-500 line-through">
+                                <span className="text-sm text-gray-400 line-through">
                                   ৳ {product.compareAtPrice.toLocaleString()}
                                 </span>
                               )}
                             </div>
                             <div className="flex gap-2">
-                              <button className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition-colors text-sm font-medium">
+                              <button
+                                type="button"
+                                disabled={!canPurchase(product.stockStatus)}
+                                className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition-colors text-sm font-medium disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 disabled:hover:bg-gray-300"
+                              >
                                 <ShoppingCart className="w-4 h-4 inline mr-1" />
                                 Add to Cart
                               </button>
-                              <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors text-sm font-medium">
+                              <button
+                                type="button"
+                                disabled={!canPurchase(product.stockStatus)}
+                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors text-sm font-medium disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 disabled:hover:bg-gray-300"
+                              >
                                 Buy Now
                               </button>
                             </div>

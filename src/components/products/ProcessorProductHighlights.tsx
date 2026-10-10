@@ -1,5 +1,3 @@
-import Link from 'next/link';
-
 interface ProcessorProductHighlightsProps {
   stockStatus: string;
   stockLabel: string;
@@ -84,10 +82,7 @@ export function ProcessorProductHighlights({
           PID: <span className="text-gray-900">{sku}</span>
         </span>
         <span className="text-gray-500">
-          Brand:{' '}
-          <Link href={`/brands/${brand.slug}`} className="text-blue-600 hover:underline">
-            {brand.name}
-          </Link>
+          Brand: <span className="text-gray-900">{brand.name}</span>
         </span>
       </div>
 

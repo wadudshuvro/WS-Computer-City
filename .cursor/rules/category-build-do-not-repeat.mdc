@@ -1,0 +1,27 @@
+---
+description: Do not repeat category listing/PDP mistakes from processor, motherboard, GPU, RAM, and CPU cooler
+alwaysApply: true
+---
+
+# New category checklist (do not repeat past mistakes)
+
+When adding or fixing a product category (processor, motherboard, GPU, RAM, CPU cooler, or the next one), finish the full Star Tech–style pattern in the first pass. Do not ship a title + price list and wait for the user to catch the same gaps.
+
+Copy the last completed category (Desktop RAM + Motherboard). Read these rules before coding: `category-brand-pills-single-select`, `category-sidebar-follows-pills`, `category-page-sort-by`, `product-warranty-information`, `product-pdp-images`, `gpu-listing-pdp-card`, `cpu-cooler-listing-pdp-card`, `cms-edit-persist-storefront`.
+
+## Must be true before you say it is done
+
+1. **Pills are single-select.** Click sets one brand/platform; click again clears it. Never append comma-separated brands on pill click.
+2. **Sidebar follows the pill.** Hide filters that contradict the pill (Brand when a brand pill is on; wrong sockets/platforms). Scope counts to that pill. Hide options with count 0. Clear conflicting query params on pill click so the grid is not empty.
+3. **Filters apply instantly.** Checkbox and price changes write the URL immediately. No Apply button.
+4. **Sort By is on the toolbar.** Default, Price (Low > High), Price (High > Low). Default and omitted sort are price low → high in the API, not only in the browser.
+5. **Listing cards show spec bullets** under the name (category-specific keys), then a centered red price.
+6. **PDP matches Star Tech section order** for that category (grouped spec table + highlights). Brand on the processor-style highlights row is plain text, not a link.
+7. **Warranty** is a structured `warranty` spec and a Warranty Information panel. Empty value shows **No Warranty**.
+8. **Images are local** `/uploads/<folder>/<slug>.<ext>` with the file on disk and the CMS URL updated. Do not leave Star Tech CDN URLs.
+9. **Import is in-stock, no duplicates, correct category slug.** Match tightly (slug/name). Do not dump products into the parent category. Do not copy competitor descriptions or prices into CMS fields beyond what the import task requires.
+10. **CMS save writes PostgreSQL** and the storefront reads it with no stale cache.
+
+## Verify
+
+Open the listing, click a brand/platform pill, confirm the sidebar and product set match that pill, then open one PDP (specs, warranty, local image). Check desktop and the mobile filter drawer.

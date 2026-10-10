@@ -140,9 +140,10 @@ export function buildRamSpecCondition(
 export function buildRamFilterCounts(
   specValuesByKey: Record<string, { value: string; count: number }[]>,
   stockCounts: Record<string, number>,
-  brandCounts: Record<string, number>
+  brandCounts: Record<string, number>,
+  hideBrand = false
 ): Record<string, Record<string, number>> {
-  const ramFilters = getRamFilters();
+  const ramFilters = getRamFilters({ hideBrand });
   const counts: Record<string, Record<string, number>> = {
     stockStatus: stockCounts,
     brand: brandCounts,

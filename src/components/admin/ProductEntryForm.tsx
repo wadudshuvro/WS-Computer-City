@@ -1023,6 +1023,9 @@ export default function ProductEntryForm({ defaultCategorySlug }: ProductEntryFo
               <option value="UPCOMING">Upcoming</option>
               <option value="DISCONTINUED">Discontinued</option>
             </select>
+            <p className="text-xs text-gray-500 mt-1">
+              In Stock turns on Add to Cart and Buy Now. Out of Stock and Upcoming turn both off for this product.
+            </p>
           </div>
 
           <div>

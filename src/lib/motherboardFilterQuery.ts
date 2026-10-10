@@ -179,9 +179,10 @@ export function buildMotherboardSpecCondition(
 export function buildMotherboardFilterCounts(
   specValuesByKey: Record<string, { value: string; count: number }[]>,
   stockCounts: Record<string, number>,
-  brandCountsBySlug: Record<string, number>
+  brandCountsBySlug: Record<string, number>,
+  filterContext?: Parameters<typeof getMotherboardFilters>[0]
 ): Record<string, Record<string, number>> {
-  const mbFilters = getMotherboardFilters();
+  const mbFilters = getMotherboardFilters(filterContext ?? 'all');
   const counts: Record<string, Record<string, number>> = {
     stockStatus: stockCounts,
   };

@@ -7,6 +7,7 @@ import {
   buildMotherboardSpecCondition,
   MOTHERBOARD_SPEC_FILTER_KEYS,
 } from '@/lib/motherboardFilterQuery';
+import { resolveMotherboardFilterContext } from '@/lib/filterConfig';
 
 /**
  * GET /api/products/motherboard
@@ -18,7 +19,7 @@ export async function GET(req: NextRequest) {
 
     const page = Number(searchParams.get('page')) || 1;
     const limit = Number(searchParams.get('limit')) || 30;
-    const sort = searchParams.get('sort') || 'default';
+    const sort = searchParams.get('sort') || 'price_asc';
     const search = searchParams.get('search') || undefined;
 
     const sub = searchParams.get('sub');
@@ -94,9 +95,6 @@ export async function GET(req: NextRequest) {
 
     let orderBy: Prisma.ProductOrderByWithRelationInput;
     switch (sort) {
-      case 'price_asc':
-        orderBy = { price: 'asc' };
-        break;
       case 'price_desc':
         orderBy = { price: 'desc' };
         break;
@@ -106,8 +104,10 @@ export async function GET(req: NextRequest) {
       case 'newest':
         orderBy = { createdAt: 'desc' };
         break;
+      case 'default':
+      case 'price_asc':
       default:
-        orderBy = { createdAt: 'desc' };
+        orderBy = { price: 'asc' };
     }
 
     const [products, total, priceAggregation, filterCounts] = await Promise.all([
@@ -131,7 +131,7 @@ export async function GET(req: NextRequest) {
         _min: { price: true },
         _max: { price: true },
       }),
-      getFilterCounts(sub, type),
+      getFilterCounts(sub, type, brands[0] || null, specFilters.processor_type?.join(',') || null),
     ]);
 
     const formattedProducts = products.map((product) => ({
@@ -190,13 +190,26 @@ export async function GET(req: NextRequest) {
 
 async function getFilterCounts(
   sub?: string | null,
-  type?: string | null
+  type?: string | null,
+  brand?: string | null,
+  processorType?: string | null
 ): Promise<Record<string, Record<string, number>>> {
   try {
+    const filterContext = resolveMotherboardFilterContext({
+      brand,
+      processorType,
+      sub: sub || type,
+    });
+
     const baseWhere: Prisma.ProductWhereInput = {
       isActive: true,
       ...(await buildMotherboardCategoryWhere(sub, type)),
     };
+
+    // Scope counts to the selected top-bar brand when present
+    if (brand) {
+      baseWhere.brand = { slug: brand };
+    }
 
     const stockCountsRaw = await prisma.product.groupBy({
       by: ['stockStatus'],
@@ -255,7 +268,12 @@ async function getFilterCounts(
       }));
     }
 
-    return buildMotherboardFilterCounts(specValuesByKey, stockCounts, brandCounts);
+    return buildMotherboardFilterCounts(
+      specValuesByKey,
+      stockCounts,
+      brandCounts,
+      filterContext
+    );
   } catch (error) {
     console.error('Error getting motherboard filter counts:', error);
     return {};

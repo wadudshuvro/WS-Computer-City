@@ -439,6 +439,7 @@ export const PROCESSOR_BRAND_SPEC_FILTER_KEYS = [
 /**
  * Default Sort By options for EVERY storefront category listing page.
  * Keep in sync with category APIs (`price_asc` / `price_desc` / `default`).
+ * Landing with no `sort` param uses price low → high (`price_asc`).
  */
 export const categorySortOptions = [
   { value: 'default', label: 'Default' },
@@ -550,9 +551,8 @@ const ramStockStatusFilter: FilterDefinition = {
   defaultExpanded: true,
   options: [
     { value: 'IN_STOCK', label: 'In Stock' },
-    { value: 'OUT_OF_STOCK', label: 'Out of Stock' },
     { value: 'PRE_ORDER', label: 'Pre Order' },
-    { value: 'UPCOMING', label: 'Up Coming' },
+    { value: 'UPCOMING', label: 'Upcoming' },
   ],
 };
 
@@ -567,7 +567,7 @@ const ramBrandFilter: FilterDefinition = {
 
 const ramSpeedFilter: FilterDefinition = {
   key: 'speed',
-  name: 'RAM Speed',
+  name: 'BUS Speed',
   type: 'checkbox',
   defaultExpanded: false,
   options: RAM_SPEED_OPTIONS.map((s) => ({ value: s, label: s })),
@@ -575,7 +575,7 @@ const ramSpeedFilter: FilterDefinition = {
 
 const ramTypeFilter: FilterDefinition = {
   key: 'memory_type',
-  name: 'RAM Type',
+  name: 'Memory Type',
   type: 'checkbox',
   defaultExpanded: false,
   options: RAM_TYPE_OPTIONS.map((t) => ({ value: t, label: t })),
@@ -583,7 +583,7 @@ const ramTypeFilter: FilterDefinition = {
 
 const ramSizeFilter: FilterDefinition = {
   key: 'capacity',
-  name: 'RAM Size',
+  name: 'Capacity',
   type: 'checkbox',
   defaultExpanded: false,
   options: RAM_SIZE_OPTIONS.map((s) => ({ value: s, label: s })),
@@ -591,22 +591,43 @@ const ramSizeFilter: FilterDefinition = {
 
 const ramFeaturesFilter: FilterDefinition = {
   key: 'ram_features',
-  name: 'RAM Features',
+  name: 'Other Feature',
   type: 'checkbox',
   defaultExpanded: false,
   options: RAM_FEATURE_OPTIONS.map((f) => ({ value: f, label: f })),
 };
 
-export function getRamFilters(): FilterDefinition[] {
-  return [
-    ramStockStatusFilter,
+/** When a top brand pill is active, hide Brands — Star Tech G.Skill pattern. */
+export type RamFilterContext = {
+  hideBrand: boolean;
+};
+
+export function resolveRamFilterContext(opts: {
+  brand?: string | null;
+}): RamFilterContext {
+  const brand = (opts.brand || '').trim().toLowerCase();
+  return { hideBrand: Boolean(brand) };
+}
+
+export function getRamFilters(
+  context: RamFilterContext | boolean = { hideBrand: false }
+): FilterDefinition[] {
+  const ctx: RamFilterContext =
+    typeof context === 'boolean' ? { hideBrand: context } : context;
+
+  // Star Tech order when brand scoped: Price → Availability → Capacity → Memory Type → BUS Speed → Other Feature
+  const filters: FilterDefinition[] = [
     priceRangeFilter,
-    ramBrandFilter,
-    ramSpeedFilter,
-    ramTypeFilter,
-    ramSizeFilter,
-    ramFeaturesFilter,
+    ramStockStatusFilter,
   ];
+
+  if (!ctx.hideBrand) {
+    filters.push(ramBrandFilter);
+  }
+
+  filters.push(ramSizeFilter, ramTypeFilter, ramSpeedFilter, ramFeaturesFilter);
+
+  return filters;
 }
 
 export const ramSortOptions = categorySortOptions;
@@ -682,18 +703,99 @@ const motherboardSpecialFeaturesFilter: FilterDefinition = {
   options: MOTHERBOARD_SPECIAL_FEATURES.map((f) => ({ value: f, label: f })),
 };
 
-export function getMotherboardFilters(): FilterDefinition[] {
-  return [
+export type MotherboardFilterPlatform = 'all' | 'intel' | 'amd';
+
+export type MotherboardFilterContext = {
+  platform: MotherboardFilterPlatform;
+  /** Top maker+platform pill active (e.g. msi-amd) — hide Brand sidebar */
+  hideBrand: boolean;
+  /** Platform already fixed by pill / sub — hide Processor Type */
+  hideProcessorType: boolean;
+};
+
+/**
+ * Derive sidebar motherboard filters from URL brand pill / processor type / sub.
+ * Matches Star Tech: MSI (AMD) → AMD sockets only, no Brand / Processor Type.
+ */
+export function resolveMotherboardFilterContext(opts: {
+  brand?: string | null;
+  processorType?: string | null;
+  sub?: string | null;
+}): MotherboardFilterContext {
+  const brand = (opts.brand || '').trim().toLowerCase();
+  const makerMatch = brand.match(
+    /^(msi|asrock|asus|gigabyte|colorful)-(intel|amd)$/
+  );
+  if (makerMatch) {
+    return {
+      platform: makerMatch[2] as 'intel' | 'amd',
+      hideBrand: true,
+      hideProcessorType: true,
+    };
+  }
+  if (brand === 'intel-motherboard' || brand === 'intel') {
+    return { platform: 'intel', hideBrand: false, hideProcessorType: true };
+  }
+  if (brand === 'amd-motherboard' || brand === 'amd') {
+    return { platform: 'amd', hideBrand: false, hideProcessorType: true };
+  }
+
+  const types = (opts.processorType || '')
+    .split(',')
+    .map((v) => v.trim().toLowerCase())
+    .filter(Boolean);
+  if (types.length === 1 && types[0] === 'amd') {
+    return { platform: 'amd', hideBrand: false, hideProcessorType: false };
+  }
+  if (types.length === 1 && types[0] === 'intel') {
+    return { platform: 'intel', hideBrand: false, hideProcessorType: false };
+  }
+
+  if (opts.sub === 'amd-motherboard') {
+    return { platform: 'amd', hideBrand: false, hideProcessorType: true };
+  }
+  if (opts.sub === 'intel-motherboard') {
+    return { platform: 'intel', hideBrand: false, hideProcessorType: true };
+  }
+
+  return { platform: 'all', hideBrand: false, hideProcessorType: false };
+}
+
+export function getMotherboardFilters(
+  context: MotherboardFilterContext | MotherboardFilterPlatform = 'all'
+): FilterDefinition[] {
+  const ctx: MotherboardFilterContext =
+    typeof context === 'string'
+      ? { platform: context, hideBrand: false, hideProcessorType: false }
+      : context;
+
+  const filters: FilterDefinition[] = [
     priceRangeFilter,
     motherboardStockStatusFilter,
-    motherboardProcessorTypeFilter,
-    motherboardMakerBrandFilter,
-    motherboardAmdSocketFilter,
-    motherboardIntelSocketFilter,
+  ];
+
+  if (!ctx.hideProcessorType) {
+    filters.push(motherboardProcessorTypeFilter);
+  }
+  if (!ctx.hideBrand) {
+    filters.push(motherboardMakerBrandFilter);
+  }
+
+  if (ctx.platform === 'amd') {
+    filters.push({ ...motherboardAmdSocketFilter, defaultExpanded: true });
+  } else if (ctx.platform === 'intel') {
+    filters.push({ ...motherboardIntelSocketFilter, defaultExpanded: true });
+  } else {
+    filters.push(motherboardAmdSocketFilter, motherboardIntelSocketFilter);
+  }
+
+  filters.push(
     motherboardFormFactorFilter,
     motherboardRamTypeFilter,
-    motherboardSpecialFeaturesFilter,
-  ];
+    motherboardSpecialFeaturesFilter
+  );
+
+  return filters;
 }
 
 export const motherboardSortOptions = categorySortOptions;

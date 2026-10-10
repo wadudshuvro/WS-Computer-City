@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import type { Prisma } from '@prisma/client';
 import { ProductService } from '@/services/product.service';
 import { productFilterSchema } from '@/lib/validations/product.schema';
 import { ZodError } from 'zod';
+import { WATCH_FILTER_KEYS } from '@/lib/watchFilters';
+import { GADGET_FILTER_KEYS, findGadgetLeaf } from '@/lib/gadgetCatalog';
+import { MONITOR_FILTER_KEYS } from '@/lib/monitorFilters';
 
 /**
  * GET /api/products
@@ -24,7 +28,7 @@ export async function GET(req: NextRequest) {
       maxPrice: searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined,
       stockStatus: searchParams.get('stockStatus')?.split(',') || undefined,
       search: searchParams.get('search') || undefined,
-      sort: searchParams.get('sort') || 'default',
+      sort: searchParams.get('sort') || 'price_asc',
       page: searchParams.get('page') ? Number(searchParams.get('page')) : 1,
       limit: searchParams.get('limit') ? Number(searchParams.get('limit')) : 20,
     };
@@ -46,7 +50,10 @@ export async function GET(req: NextRequest) {
 
     const result = await ProductService.getFilteredWithChildren(validated);
 
-    const availableFilters = await getAvailableFilters(validated.category);
+    const availableFilters = await getAvailableFilters(
+      validated.category,
+      searchParams.get('brand')?.split(',').filter(Boolean)[0]
+    );
 
     return NextResponse.json({
       data: result.products,
@@ -83,31 +90,35 @@ export async function GET(req: NextRequest) {
 /**
  * Helper: Get available filters for a category
  */
-async function getAvailableFilters(categorySlug?: string) {
+async function getAvailableFilters(categorySlug?: string, brandSlug?: string) {
   const { prisma } = await import('@/lib/prisma');
 
-  let where: { isActive: boolean; categoryId?: { in: string[] }; category?: { slug: string } } = {
-    isActive: true,
-  };
+  let where: Prisma.ProductWhereInput = { isActive: true };
+  let brandCountWhere: Prisma.ProductWhereInput = { isActive: true };
 
   if (categorySlug) {
-    if (categorySlug === 'components' || categorySlug === 'component') {
-      const categoryIds = await ProductService.getCategoryDescendantIds(categorySlug);
-      if (categoryIds.length > 0) {
-        where = { isActive: true, categoryId: { in: categoryIds } };
-      } else {
-        where = { isActive: true, category: { slug: categorySlug } };
-      }
-    } else {
-      where = { isActive: true, category: { slug: categorySlug } };
-    }
+    const ids = await ProductService.getCategoryDescendantIds(categorySlug);
+    const placement: Prisma.ProductWhereInput =
+      ids.length > 0
+        ? {
+            OR: [
+              { categoryId: { in: ids } },
+              { listings: { some: { categoryId: { in: ids } } } },
+            ],
+          }
+        : { category: { slug: categorySlug } };
+    where = { isActive: true, AND: [placement] };
+    brandCountWhere = { isActive: true, AND: [placement] };
   }
 
-  // Get brands with product counts
+  if (brandSlug) {
+    where = { ...where, brand: { slug: brandSlug } };
+  }
+
   const brands = await prisma.brand.findMany({
     where: {
       products: {
-        some: where,
+        some: brandCountWhere,
       },
     },
     select: {
@@ -116,7 +127,7 @@ async function getAvailableFilters(categorySlug?: string) {
       _count: {
         select: {
           products: {
-            where,
+            where: brandCountWhere,
           },
         },
       },
@@ -178,12 +189,57 @@ async function getAvailableFilters(categorySlug?: string) {
     }
   }
 
+  const stockCounts: Record<string, number> = {};
+  stockStatuses.forEach((row) => {
+    stockCounts[row.stockStatus] = row._count;
+  });
+  const brandCounts: Record<string, number> = {};
+  brands.forEach((brand) => {
+    brandCounts[brand.slug] = brand._count.products;
+  });
+
+  const facetCounts: Record<string, Record<string, number>> = {};
+  if (
+    categorySlug === 'watch' ||
+    categorySlug === 'gadget' ||
+    categorySlug === 'monitor' ||
+    findGadgetLeaf(categorySlug)
+  ) {
+    const keys =
+      categorySlug === 'watch'
+        ? [...WATCH_FILTER_KEYS]
+        : categorySlug === 'monitor'
+          ? [...MONITOR_FILTER_KEYS]
+          : [...GADGET_FILTER_KEYS, ...WATCH_FILTER_KEYS];
+    const rows = await prisma.productSpecification.findMany({
+      where: {
+        product: where,
+        specificationDefinition: { key: { in: keys } },
+      },
+      select: { value: true, specificationDefinition: { select: { key: true } } },
+    });
+    for (const row of rows) {
+      const key = row.specificationDefinition.key;
+      facetCounts[key] = facetCounts[key] || {};
+      for (const part of row.value.split('|')) {
+        const label = part.trim();
+        if (!label) continue;
+        facetCounts[key][label] = (facetCounts[key][label] || 0) + 1;
+      }
+    }
+  }
+
   return {
     brands: brands.map((b) => ({
       slug: b.slug,
       name: b.name,
       count: b._count.products,
     })),
+    counts: {
+      stockStatus: stockCounts,
+      brand: brandCounts,
+      ...facetCounts,
+    },
     priceRange: {
       min: priceRange._min.price ? Number(priceRange._min.price) : 0,
       max: priceRange._max.price ? Number(priceRange._max.price) : 0,

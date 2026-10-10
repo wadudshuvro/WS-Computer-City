@@ -28,7 +28,7 @@ Reference: Star Tech–style toolbar on `/products?category=...&sub=...` ([`src/
 ## Backend
 
 - Category APIs (`/api/products`, `/api/products/processor`, `gpu`, `ram`, `motherboard`, `ssd`, `psu`, `casing`, `cpu-cooler`) must honor `sort=price_asc` and `sort=price_desc`.
-- `default` → newest / catalog default order (`createdAt desc` is fine).
+- Omitted sort / `default` → **price low → high** (`price_asc`).
 - Generic filter schema must allow `default` (see `productFilterSchema`).
 
 ## When adding a new product category

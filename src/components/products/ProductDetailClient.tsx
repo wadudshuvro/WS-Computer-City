@@ -34,6 +34,10 @@ import { CpuCoolerProductHighlights } from '@/components/products/CpuCoolerProdu
 import { ProcessorProductHighlights } from '@/components/products/ProcessorProductHighlights';
 import { MotherboardProductHighlights } from '@/components/products/MotherboardProductHighlights';
 import { MotherboardSpecificationTable } from '@/components/products/MotherboardSpecificationTable';
+import { RamProductHighlights } from '@/components/products/RamProductHighlights';
+import { RamSpecificationTable } from '@/components/products/RamSpecificationTable';
+import CatalogSpecificationTable from '@/components/products/CatalogSpecificationTable';
+import { canPurchase } from '@/lib/purchaseStatus';
 import {
   resolveMotherboardBrandCrumb,
   resolveStorefrontCategoryHref,
@@ -358,6 +362,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const isMotherboard = isMotherboardCategory(categorySlugs);
   const isRam = isRamCategory(categorySlugs);
   const isProcessor = isProcessorCategory(categorySlugs);
+  const isCatalog = categorySlugs.includes('accessories') || categorySlugs.includes('gaming') || categorySlugs.includes('watch') || categorySlugs.includes('gadget') || categorySlugs.includes('monitor');
   const hasPcBundleVariant = isProcessor || isGpu;
   const singleSurcharge = isGpu
     ? GPU_SINGLE_SURCHARGE_BDT
@@ -377,7 +382,10 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
     : 0;
   const primaryImage = product.images.find(img => img.isPrimary) || product.images[0];
 
+  const purchasable = canPurchase(product.stockStatus);
+
   const addCurrentProductToCart = () => {
+    if (!canPurchase(product.stockStatus)) return;
     const variant = hasPcBundleVariant ? purchaseVariant : undefined;
     addItem({
       productId: product.id,
@@ -402,13 +410,13 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
             <Link href="/" className="text-gray-500 hover:text-blue-600">
               Home
             </Link>
-            {product.category.breadcrumb?.map((cat) => {
+            {product.category.breadcrumb?.map((cat, index, crumbs) => {
               const isMotherboardPlatform =
                 cat.slug === 'intel-motherboard' || cat.slug === 'amd-motherboard';
               const crumb = isMotherboardPlatform
                 ? resolveMotherboardBrandCrumb(product.brand.slug, cat.slug)
                 : {
-                    href: resolveStorefrontCategoryHref(cat.slug),
+                    href: resolveStorefrontCategoryHref(cat.slug, crumbs[index - 1]?.slug),
                     label: cat.name,
                   };
 
@@ -564,24 +572,52 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                         sku={product.sku}
                         getSpecValue={getSpecValue}
                       />
+                    ) : isRam ? (
+                      <RamProductHighlights
+                        stockStatus={product.stockStatus}
+                        stockLabel={stockStatus.text}
+                        brand={product.brand}
+                        productName={product.name}
+                        shortDescription={product.shortDescription}
+                        getSpecValue={getSpecValue}
+                      />
                     ) : (
                       <>
-                        {/* Quick Info — other categories */}
                         <div className="flex flex-wrap items-center gap-4 text-sm mb-4">
                           <span className={`px-3 py-1 rounded-full text-xs font-medium ${stockStatus.bgColor} ${stockStatus.color}`}>
                             {stockStatus.text}
                           </span>
-                          <span className="text-gray-500">
-                            PID: <span className="text-gray-900">{product.sku}</span>
-                          </span>
+                          {!isCatalog && (
+                            <span className="text-gray-500">
+                              PID: <span className="text-gray-900">{product.sku}</span>
+                            </span>
+                          )}
                           <span className="text-gray-500">
                             Brand:{' '}
-                            <Link href={`/brands/${product.brand.slug}`} className="text-blue-600 hover:underline">
-                              {product.brand.name}
-                            </Link>
+                            {isCatalog ? (
+                              <span className="text-gray-900">{product.brand.name}</span>
+                            ) : (
+                              <Link href={`/brands/${product.brand.slug}`} className="text-blue-600 hover:underline">
+                                {product.brand.name}
+                              </Link>
+                            )}
                           </span>
                         </div>
 
+                        {isCatalog && product.shortDescription ? (
+                          <div className="mb-4">
+                            <h3 className="text-sm font-semibold text-gray-900 mb-2">Key Features</h3>
+                            <ul className="text-sm text-gray-700 space-y-1 list-disc pl-5">
+                              {product.shortDescription
+                                .split('\n')
+                                .map((line) => line.trim())
+                                .filter(Boolean)
+                                .map((line) => (
+                                  <li key={line}>{line}</li>
+                                ))}
+                            </ul>
+                          </div>
+                        ) : (
                         <div className="bg-gray-50 rounded-lg p-3 mb-4 text-sm text-gray-600">
                           {getSpecValue('base_clock') && (
                             <p>Clock Speed: {getSpecValue('base_clock')} GHz up to {getSpecValue('boost_clock') || 'N/A'} GHz</p>
@@ -595,6 +631,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                             <p>{product.shortDescription}</p>
                           )}
                         </div>
+                        )}
                       </>
                     )}
 
@@ -721,7 +758,8 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       <button
                         type="button"
                         onClick={addCurrentProductToCart}
-                        className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+                        disabled={!purchasable}
+                        className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:hover:bg-gray-300"
                       >
                         <ShoppingCart className="w-5 h-5" />
                         Add to Cart
@@ -731,7 +769,8 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       <button
                         type="button"
                         onClick={addCurrentProductToCart}
-                        className="bg-orange-500 text-white px-8 py-3 rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                        disabled={!purchasable}
+                        className="bg-orange-500 text-white px-8 py-3 rounded-lg hover:bg-orange-600 transition-colors font-medium disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:hover:bg-gray-300"
                       >
                         Buy Now
                       </button>
@@ -828,6 +867,10 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                 {activeTab === 'specification' && (
                   isMotherboard ? (
                     <MotherboardSpecificationTable getSpecValue={getSpecValue} />
+                  ) : isRam ? (
+                    <RamSpecificationTable getSpecValue={getSpecValue} />
+                  ) : isCatalog ? (
+                    <CatalogSpecificationTable getSpecValue={getSpecValue} />
                   ) : (
                   <div className="space-y-6">
                     {groupedSpecifications().map((group, groupIndex) => (

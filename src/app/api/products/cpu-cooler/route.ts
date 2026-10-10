@@ -100,10 +100,10 @@ export async function GET(req: NextRequest) {
       case 'name':
         orderBy = { name: 'asc' };
         break;
-      case 'default':
       case 'newest':
         orderBy = { createdAt: 'desc' };
         break;
+      case 'default':
       case 'price_asc':
       default:
         orderBy = { price: 'asc' };
