@@ -32,6 +32,7 @@ import { CASING_BRANDS } from '@/lib/casingSpecDefinitions';
 import { CPU_COOLER_BRANDS, getCpuCoolerListingCardLines } from '@/lib/cpuCoolerSpecDefinitions';
 import { MOTHERBOARD_BRANDS } from '@/lib/componentBrandConfig';
 import { ACCESSORIES_BRAND_FLYOUTS } from '@/lib/accessoriesBrandMenu';
+import { GAMING_BRAND_FLYOUTS } from '@/lib/gamingMenu';
 import { findGadgetLeaf, gadgetNestedLeaves } from '@/lib/gadgetCatalog';
 import { MONITOR_BRANDS, MONITOR_TYPE_FILTERS } from '@/lib/monitorCatalog';
 import {
@@ -651,7 +652,9 @@ function ProductsPageContent() {
       const flyout =
         catalogGroup === 'accessories'
           ? ACCESSORIES_BRAND_FLYOUTS[subCategory || '']
-          : GAMING_BRAND_FLYOUTS[subCategory || ''];
+          : catalogGroup === 'gaming'
+            ? GAMING_BRAND_FLYOUTS[subCategory || '']
+            : findGadgetLeaf(subCategory || '')?.brands;
       return flyout?.find((brand) => brand.slug === brandParam)?.label ?? brandParam;
     }
     if (isWatchCategory && brandParam) {

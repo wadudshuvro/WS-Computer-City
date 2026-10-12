@@ -169,6 +169,8 @@ model Product {
   // Features
   isFeatured       Boolean       @default(false)
   isActive         Boolean       @default(true)
+  /// Homepage Top Deals order. Null means the product is not in that carousel.
+  topDealOrder     Int?
   
   // Timestamps
   createdAt        DateTime      @default(now())
@@ -189,6 +191,7 @@ model Product {
   @@index([brandId])
   @@index([stockStatus])
   @@index([price])
+  @@index([topDealOrder])
   @@map("products")
 }
 
