@@ -46,6 +46,9 @@ export function resolveStorefrontCategoryHref(slug: string, parentSlug?: string 
     case 'power-supply':
     case 'psu':
       return '/products?category=components&sub=power-supply';
+    case 'hdd':
+    case 'hard-disk-drive':
+      return '/products?category=components&sub=hdd';
     case 'ssd':
     case 'nvme':
     case 'storage':

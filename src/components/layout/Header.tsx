@@ -11,13 +11,13 @@ export function Header() {
     <>
     <header className="relative z-[190] overflow-visible bg-sidebar text-sidebar-foreground">
       <div className="container mx-auto px-4">
-        <div className="flex h-[72px] items-center gap-4 lg:gap-8">
+        <div className="flex h-[72px] items-center gap-3 lg:gap-8">
           <Link href="/" className="shrink-0">
             {SHOW_LIVE_LOGO ? (
               <img
                 src="/logo-white.png"
                 alt="LogicBay BD"
-                className="h-[44px] w-auto"
+                className="h-8 w-auto sm:h-10 lg:h-[44px]"
               />
             ) : (
               <span className="whitespace-nowrap text-base font-medium text-white">

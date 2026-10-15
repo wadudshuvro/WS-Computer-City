@@ -3,7 +3,6 @@ import { prisma } from '@/lib/prisma';
 import { getPsuFilters } from '@/lib/filterConfig';
 import {
   efficiencyDbValueMatches,
-  mapWattageFilterToPatterns,
   modularDbValueMatches,
   wattageDbValueMatches,
   PSU_SPEC_FILTER_KEYS,
@@ -40,61 +39,18 @@ export function buildPsuSpecCondition(
   if (values.length === 0) return null;
 
   switch (key) {
-    case 'wattage': {
-      const patterns = values.flatMap(mapWattageFilterToPatterns);
-      return {
-        OR: patterns.flatMap((pattern) => [
-          {
-            specifications: {
-              some: {
-                specificationDefinition: { key: 'wattage' },
-                value: { contains: pattern.replace(/\s/g, ''), mode: 'insensitive' as const },
-              },
-            },
-          },
-          {
-            name: { contains: pattern.replace(/\s/g, ''), mode: 'insensitive' as const },
-          },
-        ]),
-      };
-    }
-
+    case 'wattage':
     case 'efficiency':
-      return {
-        OR: values.flatMap((v) => {
-          const patterns =
-            v === '80 Plus'
-              ? ['80 Plus', '80+', '80 Plus White', '80 Plus Standard']
-              : [v, v.replace('80 Plus ', '80+ ')];
-          return patterns.map((pattern) => ({
-            specifications: {
-              some: {
-                specificationDefinition: { key: 'efficiency' },
-                value: { contains: pattern, mode: 'insensitive' as const },
-              },
-            },
-          }));
-        }),
-      };
-
     case 'modular_type':
       return {
-        OR: values.flatMap((v) => {
-          const patterns =
-            v === 'Full-Modular'
-              ? ['Full-Modular', 'Fully Modular', 'Full Modular']
-              : v === 'Semi-Modular'
-                ? ['Semi-Modular', 'Semi Modular']
-                : ['Non-Modular', 'Non Modular', 'Fixed'];
-          return patterns.map((pattern) => ({
-            specifications: {
-              some: {
-                specificationDefinition: { key: 'modular_type' },
-                value: { contains: pattern, mode: 'insensitive' as const },
-              },
+        OR: values.map((value) => ({
+          specifications: {
+            some: {
+              specificationDefinition: { key },
+              value: { equals: value, mode: 'insensitive' as const },
             },
-          }));
-        }),
+          },
+        })),
       };
 
     case 'form_factor':

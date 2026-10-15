@@ -177,8 +177,12 @@ export function MegaMenu() {
   return (
     <nav className="sticky top-0 z-[200] overflow-visible border-b border-gray-200 bg-white">
       <div className="container mx-auto overflow-visible">
-        {/* Compact Star Tech density — never overflow-x-auto (clips flyouts). */}
-        <ul className="relative z-[200] flex flex-nowrap items-center justify-start gap-0 overflow-visible whitespace-nowrap">
+        {/*
+          Compact Star Tech density. On small screens the row scrolls
+          horizontally so it can never widen the page; flyouts stay unclipped
+          from lg up, where the hover menus are actually used.
+        */}
+        <ul className="relative z-[200] flex flex-nowrap items-center justify-start gap-0 overflow-x-auto overflow-y-hidden whitespace-nowrap [scrollbar-width:none] [-ms-overflow-style:none] lg:overflow-visible [&::-webkit-scrollbar]:hidden">
           {menu.map((category) => {
             const isActive = activeCategory === category.id;
             const showDropdown = category.children.length > 0 && isActive;

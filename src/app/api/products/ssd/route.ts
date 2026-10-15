@@ -130,7 +130,7 @@ export async function GET(req: NextRequest) {
         _min: { price: true },
         _max: { price: true },
       }),
-      getFilterCounts(sub, type),
+      getFilterCounts(sub, type, brands),
     ]);
 
     const formattedProducts = products.map((product) => ({
@@ -189,12 +189,14 @@ export async function GET(req: NextRequest) {
 
 async function getFilterCounts(
   sub?: string | null,
-  type?: string | null
+  type?: string | null,
+  brandSlugs: string[] = []
 ): Promise<Record<string, Record<string, number>>> {
   try {
     const baseWhere: Prisma.ProductWhereInput = {
       isActive: true,
       ...(await buildSsdCategoryWhere(sub, type)),
+      ...(brandSlugs.length > 0 ? { brand: { slug: { in: brandSlugs } } } : {}),
     };
 
     const stockCountsRaw = await prisma.product.groupBy({

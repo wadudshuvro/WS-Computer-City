@@ -6,6 +6,7 @@ import { GpuFilters } from '@/components/products/GpuFilters';
 import { RamFilters } from '@/components/products/RamFilters';
 import { MotherboardFilters } from '@/components/products/MotherboardFilters';
 import { PsuFilters } from '@/components/products/PsuFilters';
+import { HddFilters } from '@/components/products/HddFilters';
 import { SsdFilters } from '@/components/products/SsdFilters';
 import { CasingFilters } from '@/components/products/CasingFilters';
 import { CpuCoolerFilters } from '@/components/products/CpuCoolerFilters';
@@ -27,6 +28,7 @@ import { getRamListingCardLines } from '@/lib/ramPdpDisplay';
 import { RAM_SPEC_FILTER_KEYS } from '@/lib/ramFilterMappings';
 import { RAM_BRANDS } from '@/lib/ramSpecDefinitions';
 import { PSU_BRANDS } from '@/lib/psuSpecDefinitions';
+import { HDD_BRANDS } from '@/lib/hddSpecDefinitions';
 import { SSD_BRANDS } from '@/lib/ssdSpecDefinitions';
 import { CASING_BRANDS } from '@/lib/casingSpecDefinitions';
 import { CPU_COOLER_BRANDS, getCpuCoolerListingCardLines } from '@/lib/cpuCoolerSpecDefinitions';
@@ -205,6 +207,12 @@ function ProductsPageContent() {
     categoryParam === 'power-supply' ||
     categoryParam === 'psu';
 
+  const isHddCategory =
+    subCategory === 'hdd' ||
+    subCategory === 'hard-disk-drive' ||
+    categoryParam === 'hdd' ||
+    categoryParam === 'hard-disk-drive';
+
   /** Show All Component — Star Tech–style overview (no sub) */
   const isComponentsOverview = categoryParam === 'components' && !subCategory;
 
@@ -286,6 +294,8 @@ function ProductsPageContent() {
               ? `/api/products/motherboard?${params.toString()}`
               : isPsuCategory
                 ? `/api/products/psu?${params.toString()}`
+                : isHddCategory
+                  ? `/api/products/hdd?${params.toString()}`
                 : isSsdCategory
                   ? `/api/products/ssd?${params.toString()}`
                   : isCasingCategory
@@ -500,6 +510,23 @@ function ProductsPageContent() {
     router.push(`/products?${params.toString()}`);
   };
 
+  const handleHddBrandClick = (brandSlug: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const current = params.get('brand');
+
+    if (current === brandSlug) {
+      params.delete('brand');
+    } else {
+      params.set('brand', brandSlug);
+    }
+    params.set('page', '1');
+    params.set('sub', 'hdd');
+    if (!params.has('category')) {
+      params.set('category', 'components');
+    }
+    router.push(`/products?${params.toString()}`);
+  };
+
   const handleSsdBrandClick = (brandSlug: string) => {
     const params = new URLSearchParams(searchParams.toString());
     const current = params.get('brand');
@@ -599,7 +626,8 @@ function ProductsPageContent() {
     if (isRamCategory) return 'Desktop RAM Price in Bangladesh';
     if (isMotherboardCategory) return 'Motherboard Price in Bangladesh';
     if (isPsuCategory) return 'Power Supply Price in Bangladesh';
-    if (isSsdCategory) return 'SSD Price in Bangladesh';
+    if (isHddCategory) return 'Hard Disk Price in Bangladesh';
+    if (isSsdCategory) return 'SSD Price in Bangladesh 2026';
     if (isCasingCategory) return 'Computer Casing Price in Bangladesh';
     if (isCpuCoolerCategory) return 'CPU Cooler Price in Bangladesh';
     if (catalogGroup === 'accessories') {
@@ -630,6 +658,7 @@ function ProductsPageContent() {
     if (isRamCategory) return 'Desktop RAM';
     if (isMotherboardCategory) return 'Motherboard';
     if (isPsuCategory) return 'Power Supply';
+    if (isHddCategory) return 'Hard Disk Drive';
     if (isSsdCategory) return 'SSD';
     if (isCasingCategory) return 'Casing';
     if (isCpuCoolerCategory) return 'CPU Cooler';
@@ -671,6 +700,9 @@ function ProductsPageContent() {
     }
     if (isPsuCategory && brandParam) {
       return PSU_BRANDS.find((b) => b.slug === brandParam)?.label ?? null;
+    }
+    if (isHddCategory && brandParam) {
+      return HDD_BRANDS.find((b) => b.slug === brandParam)?.label ?? null;
     }
     if (isSsdCategory && brandParam) {
       return SSD_BRANDS.find((b) => b.slug === brandParam)?.label ?? null;
@@ -719,6 +751,8 @@ function ProductsPageContent() {
       params.set('sub', 'motherboard');
     } else if (isPsuCategory) {
       params.set('sub', 'power-supply');
+    } else if (isHddCategory) {
+      params.set('sub', 'hdd');
     } else if (isSsdCategory) {
       params.set('sub', 'ssd');
     } else if (isCasingCategory) {
@@ -1023,7 +1057,7 @@ function ProductsPageContent() {
             <>
               <p className="text-sm text-gray-600 max-w-4xl mb-4">
                 Power Supply Price in Bangladesh covers reliable PSUs from leading brands. Filter by wattage,
-                80 Plus efficiency, modular type, and form factor to match your PC build.
+                efficiency, and modular type to match your PC build.
               </p>
 
               <div className="flex flex-wrap gap-2 mt-4">
@@ -1034,6 +1068,35 @@ function ProductsPageContent() {
                       key={brand.slug}
                       type="button"
                       onClick={() => handlePsuBrandClick(brand.slug)}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                        isActive
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600'
+                      }`}
+                    >
+                      {brand.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {isHddCategory && (
+            <>
+              <p className="text-sm text-gray-600 max-w-4xl mb-4">
+                Hard Disk Price in Bangladesh covers internal desktop, surveillance, and NAS drives.
+                Filter by brand, type, capacity, speed, and form factor.
+              </p>
+
+              <div className="flex flex-wrap gap-2 mt-4">
+                {HDD_BRANDS.map((brand) => {
+                  const isActive = brandParam === brand.slug;
+                  return (
+                    <button
+                      key={brand.slug}
+                      type="button"
+                      onClick={() => handleHddBrandClick(brand.slug)}
                       className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
                         isActive
                           ? 'bg-blue-600 text-white border-blue-600'
@@ -1351,13 +1414,19 @@ function ProductsPageContent() {
 
           {isPsuCategory && (
             <div className="hidden lg:block w-[280px] flex-shrink-0">
-              <PsuFilters priceRange={priceRange} filterCounts={filterCounts} />
+              <PsuFilters priceRange={priceRange} filterCounts={filterCounts} hideBrand={Boolean(brandParam)} />
+            </div>
+          )}
+
+          {isHddCategory && (
+            <div className="hidden lg:block w-[280px] flex-shrink-0">
+              <HddFilters priceRange={priceRange} filterCounts={filterCounts} hideBrand={Boolean(brandParam)} />
             </div>
           )}
 
           {isSsdCategory && (
             <div className="hidden lg:block w-[280px] flex-shrink-0">
-              <SsdFilters priceRange={priceRange} filterCounts={filterCounts} />
+              <SsdFilters priceRange={priceRange} filterCounts={filterCounts} hideBrand={Boolean(brandParam)} />
             </div>
           )}
 
@@ -1381,6 +1450,7 @@ function ProductsPageContent() {
             isRamCategory ||
             isMotherboardCategory ||
             isPsuCategory ||
+            isHddCategory ||
             isSsdCategory ||
             isCasingCategory ||
             isCpuCoolerCategory ||
@@ -1403,6 +1473,7 @@ function ProductsPageContent() {
             isRamCategory ||
             isMotherboardCategory ||
             isPsuCategory ||
+            isHddCategory ||
             isSsdCategory ||
             isCasingCategory ||
             isCpuCoolerCategory ||
@@ -1464,10 +1535,13 @@ function ProductsPageContent() {
                   />
                 )}
                 {isPsuCategory && (
-                  <PsuFilters priceRange={priceRange} filterCounts={filterCounts} />
+                  <PsuFilters priceRange={priceRange} filterCounts={filterCounts} hideBrand={Boolean(brandParam)} />
+                )}
+                {isHddCategory && (
+                  <HddFilters priceRange={priceRange} filterCounts={filterCounts} hideBrand={Boolean(brandParam)} />
                 )}
                 {isSsdCategory && (
-                  <SsdFilters priceRange={priceRange} filterCounts={filterCounts} />
+                  <SsdFilters priceRange={priceRange} filterCounts={filterCounts} hideBrand={Boolean(brandParam)} />
                 )}
                 {isCasingCategory && (
                   <CasingFilters priceRange={priceRange} filterCounts={filterCounts} />

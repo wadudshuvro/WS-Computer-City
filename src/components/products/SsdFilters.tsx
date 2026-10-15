@@ -7,10 +7,11 @@ import { ProductSidebarFilters } from '@/components/products/ProductSidebarFilte
 interface SsdFiltersProps {
   priceRange: { min: number; max: number };
   filterCounts?: Record<string, Record<string, number>>;
+  hideBrand?: boolean;
 }
 
-export function SsdFilters({ priceRange, filterCounts = {} }: SsdFiltersProps) {
-  const filters = useMemo(() => getSsdFilters(), []);
+export function SsdFilters({ priceRange, filterCounts = {}, hideBrand = false }: SsdFiltersProps) {
+  const filters = useMemo(() => getSsdFilters(hideBrand), [hideBrand]);
 
   return (
     <ProductSidebarFilters

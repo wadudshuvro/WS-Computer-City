@@ -34,11 +34,17 @@ import {
 import {
   PSU_BRANDS,
   PSU_EFFICIENCY_OPTIONS,
-  PSU_FORM_FACTOR_OPTIONS,
   PSU_MODULAR_OPTIONS,
   PSU_SPEC_FILTER_KEYS,
   PSU_WATTAGE_OPTIONS,
 } from '@/lib/psuSpecDefinitions';
+import {
+  HDD_BRANDS,
+  HDD_CAPACITY_OPTIONS,
+  HDD_FORM_FACTOR_OPTIONS,
+  HDD_SPEED_OPTIONS,
+  HDD_TYPE_OPTIONS,
+} from '@/lib/hddSpecDefinitions';
 import {
   SSD_BRANDS,
   SSD_CAPACITY_FILTER_OPTIONS,
@@ -46,6 +52,7 @@ import {
   SSD_INTERFACE_OPTIONS,
   SSD_PCIE_GEN_OPTIONS,
   SSD_READ_SPEED_OPTIONS,
+  SSD_SIDEBAR_BRANDS,
   SSD_SPEC_FILTER_KEYS,
   SSD_TECHNOLOGY_OPTIONS,
   SSD_WRITE_SPEED_OPTIONS,
@@ -831,7 +838,7 @@ const psuWattageFilter: FilterDefinition = {
 
 const psuEfficiencyFilter: FilterDefinition = {
   key: 'efficiency',
-  name: 'Efficiency Rating',
+  name: 'Efficiency',
   type: 'checkbox',
   defaultExpanded: true,
   options: PSU_EFFICIENCY_OPTIONS.map((e) => ({ value: e, label: e })),
@@ -839,33 +846,89 @@ const psuEfficiencyFilter: FilterDefinition = {
 
 const psuModularFilter: FilterDefinition = {
   key: 'modular_type',
-  name: 'Modular Type',
+  name: 'Modular',
   type: 'checkbox',
   defaultExpanded: true,
   options: PSU_MODULAR_OPTIONS.map((m) => ({ value: m, label: m })),
 };
 
-const psuFormFactorFilter: FilterDefinition = {
-  key: 'form_factor',
-  name: 'Form Factor',
-  type: 'checkbox',
-  defaultExpanded: true,
-  options: PSU_FORM_FACTOR_OPTIONS.map((f) => ({ value: f, label: f })),
-};
-
-export function getPsuFilters(): FilterDefinition[] {
+export function getPsuFilters(hideBrand = false): FilterDefinition[] {
   return [
     priceRangeFilter,
     psuStockStatusFilter,
-    psuBrandFilter,
+    ...(hideBrand ? [] : [psuBrandFilter]),
     psuWattageFilter,
-    psuEfficiencyFilter,
     psuModularFilter,
-    psuFormFactorFilter,
+    psuEfficiencyFilter,
   ];
 }
 
 export const psuSortOptions = categorySortOptions;
+
+const hddStockStatusFilter: FilterDefinition = {
+  key: 'stockStatus',
+  name: 'Availability',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: [
+    { value: 'IN_STOCK', label: 'In Stock' },
+    { value: 'PRE_ORDER', label: 'Pre Order' },
+    { value: 'UPCOMING', label: 'Up Coming' },
+  ],
+};
+
+const hddBrandFilter: FilterDefinition = {
+  key: 'brand',
+  name: 'Brand',
+  type: 'checkbox',
+  defaultExpanded: true,
+  showClearButton: true,
+  options: HDD_BRANDS.map((brand) => ({ value: brand.slug, label: brand.label })),
+};
+
+const hddTypeFilter: FilterDefinition = {
+  key: 'hdd_type',
+  name: 'Type',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: HDD_TYPE_OPTIONS.map((value) => ({ value, label: value })),
+};
+
+const hddCapacityFilter: FilterDefinition = {
+  key: 'capacity',
+  name: 'Capacity',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: HDD_CAPACITY_OPTIONS.map((value) => ({ value, label: value })),
+};
+
+const hddSpeedFilter: FilterDefinition = {
+  key: 'rpm_speed',
+  name: 'Speed',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: HDD_SPEED_OPTIONS.map((value) => ({ value, label: value })),
+};
+
+const hddFormFactorFilter: FilterDefinition = {
+  key: 'form_factor',
+  name: 'From Factor',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: HDD_FORM_FACTOR_OPTIONS.map((value) => ({ value, label: value })),
+};
+
+export function getHddFilters(hideBrand = false): FilterDefinition[] {
+  return [
+    priceRangeFilter,
+    hddStockStatusFilter,
+    ...(hideBrand ? [] : [hddBrandFilter]),
+    hddTypeFilter,
+    hddCapacityFilter,
+    hddSpeedFilter,
+    hddFormFactorFilter,
+  ];
+}
 
 const ssdStockStatusFilter: FilterDefinition = {
   key: 'stockStatus',
@@ -885,7 +948,7 @@ const ssdBrandFilter: FilterDefinition = {
   type: 'checkbox',
   defaultExpanded: true,
   showClearButton: true,
-  options: SSD_BRANDS.map((b) => ({ value: b.slug, label: b.label })),
+  options: SSD_SIDEBAR_BRANDS.map((b) => ({ value: b.slug, label: b.label })),
 };
 
 const ssdCapacityFilter: FilterDefinition = {
@@ -906,7 +969,7 @@ const ssdInterfaceFilter: FilterDefinition = {
 
 const ssdFormFactorFilter: FilterDefinition = {
   key: 'form_factor',
-  name: 'Form Factor',
+  name: 'FormFactor',
   type: 'checkbox',
   defaultExpanded: true,
   options: SSD_FORM_FACTOR_OPTIONS.map((v) => ({ value: v, label: v })),
@@ -914,7 +977,7 @@ const ssdFormFactorFilter: FilterDefinition = {
 
 const ssdPcieGenFilter: FilterDefinition = {
   key: 'pcie_gen',
-  name: 'PCI-Express Generation',
+  name: 'PCIe/NVMe Generation',
   type: 'checkbox',
   defaultExpanded: true,
   options: SSD_PCIE_GEN_OPTIONS.map((v) => ({ value: v, label: v })),
@@ -938,7 +1001,7 @@ const ssdTechnologyFilter: FilterDefinition = {
 
 const ssdReadSpeedFilter: FilterDefinition = {
   key: 'read_speed',
-  name: 'Read Speed',
+  name: 'ReadSpeed',
   type: 'checkbox',
   defaultExpanded: true,
   options: SSD_READ_SPEED_OPTIONS.map((v) => ({ value: v, label: v })),
@@ -946,19 +1009,19 @@ const ssdReadSpeedFilter: FilterDefinition = {
 
 const ssdWriteSpeedFilter: FilterDefinition = {
   key: 'write_speed',
-  name: 'Write Speed',
+  name: 'WriteSpeed',
   type: 'checkbox',
   defaultExpanded: true,
   options: SSD_WRITE_SPEED_OPTIONS.map((v) => ({ value: v, label: v })),
 };
 
-export function getSsdFilters(): FilterDefinition[] {
+export function getSsdFilters(hideBrand = false): FilterDefinition[] {
   return [
     priceRangeFilter,
     ssdStockStatusFilter,
-    ssdBrandFilter,
-    ssdCapacityFilter,
+    ...(hideBrand ? [] : [ssdBrandFilter]),
     ssdInterfaceFilter,
+    ssdCapacityFilter,
     ssdFormFactorFilter,
     ssdPcieGenFilter,
     ssdDramFilter,

@@ -7,10 +7,11 @@ import { ProductSidebarFilters } from '@/components/products/ProductSidebarFilte
 interface PsuFiltersProps {
   priceRange: { min: number; max: number };
   filterCounts?: Record<string, Record<string, number>>;
+  hideBrand?: boolean;
 }
 
-export function PsuFilters({ priceRange, filterCounts = {} }: PsuFiltersProps) {
-  const filters = useMemo(() => getPsuFilters(), []);
+export function PsuFilters({ priceRange, filterCounts = {}, hideBrand = false }: PsuFiltersProps) {
+  const filters = useMemo(() => getPsuFilters(hideBrand), [hideBrand]);
 
   return (
     <ProductSidebarFilters

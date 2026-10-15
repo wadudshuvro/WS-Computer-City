@@ -7,8 +7,8 @@ export const PSU_BRANDS = [
   { slug: 'msi', label: 'MSI' },
   { slug: 'antec', label: 'Antec' },
   { slug: 'gamdias', label: 'Gamdias' },
-  { slug: '1stplayer', label: '1STPLAYER' },
   { slug: 'maxgreen', label: 'MaxGreen' },
+  { slug: '1stplayer', label: '1STPLAYER' },
   { slug: 'corsair', label: 'Corsair' },
   { slug: 'cooler-master', label: 'Cooler Master' },
   { slug: 'gigabyte', label: 'Gigabyte' },
@@ -16,57 +16,37 @@ export const PSU_BRANDS = [
   { slug: 'deepcool', label: 'DeepCool' },
   { slug: 'nzxt', label: 'NZXT' },
   { slug: 'ocypus', label: 'Ocypus' },
-  { slug: 'value-top', label: 'Value-Top' },
-  { slug: 'xtreme', label: 'Xtreme' },
   { slug: 'acer', label: 'Acer' },
   { slug: 'xigmatek', label: 'Xigmatek' },
   { slug: 'cougar', label: 'Cougar' },
   { slug: 'ocpc', label: 'OCPC' },
   { slug: 't-wolf', label: 'T-WOLF' },
   { slug: 'solitine', label: 'Solitine' },
-  { slug: 'huntkey', label: 'Huntkey' },
 ] as const;
 
 export const PSU_WATTAGE_OPTIONS = [
-  '450W',
-  '500W',
-  '550W',
-  '600W',
-  '650W',
-  '700W',
-  '750W',
-  '850W',
-  '1000W',
-  '1050W',
-  '1200W',
-  '1300W',
-  '1600W',
+  'Up to 499Watt',
+  '500 to 799Watt',
+  '800 to 999Watt',
+  '1000 & Above',
 ] as const;
 
 export const PSU_EFFICIENCY_OPTIONS = [
-  '80 Plus',
-  '80 Plus Bronze',
-  '80 Plus Silver',
-  '80 Plus Gold',
-  '80 Plus Platinum',
-  '80 Plus Titanium',
+  '80+ Titanium',
+  '80+ Platinum',
+  '80+ Gold',
+  '80+ Silver',
+  '80+ Bronze',
+  '80+ White',
+  '80+',
 ] as const;
 
-export const PSU_MODULAR_OPTIONS = [
-  'Non-Modular',
-  'Semi-Modular',
-  'Full-Modular',
-] as const;
+export const PSU_MODULAR_OPTIONS = ['Full Modular', 'Semi Modular', 'Non Modular'] as const;
 
 export const PSU_FORM_FACTOR_OPTIONS = ['ATX', 'SFX', 'SFX-L', 'TFX'] as const;
 
 /** Spec / URL keys used by PSU sidebar filters (excludes price, availability, brand). */
-export const PSU_SPEC_FILTER_KEYS = [
-  'wattage',
-  'efficiency',
-  'modular_type',
-  'form_factor',
-] as const;
+export const PSU_SPEC_FILTER_KEYS = ['wattage', 'modular_type', 'efficiency'] as const;
 
 export type PsuSpecFilterKey = (typeof PSU_SPEC_FILTER_KEYS)[number];
 

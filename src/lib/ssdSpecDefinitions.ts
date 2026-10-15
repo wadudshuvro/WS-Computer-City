@@ -12,34 +12,50 @@ export const SSD_BRANDS = [
   { slug: 'western-digital', label: 'Western Digital' },
   { slug: 'lexar', label: 'Lexar' },
   { slug: 'transcend', label: 'Transcend' },
+  { slug: 'silicon-power', label: 'Silicon Power' },
+  { slug: 'memory-ghost', label: 'Memory Ghost' },
   { slug: 'seagate', label: 'Seagate' },
+  { slug: 'msi', label: 'MSI' },
   { slug: 'aitc', label: 'AITC' },
   { slug: 'netac', label: 'Netac' },
   { slug: 'ocpc', label: 'OCPC' },
   { slug: 'oscoo', label: 'OSCOO' },
   { slug: 'addlink', label: 'Addlink' },
-  { slug: 'kingbank', label: 'KingBank' },
-  { slug: 'adata', label: 'ADATA' },
-  { slug: 'samsung', label: 'Samsung' },
-  { slug: 'hp', label: 'HP' },
-  { slug: 'gigabyte', label: 'Gigabyte' },
-  { slug: 'dahua', label: 'Dahua' },
-  { slug: 'pny', label: 'PNY' },
-  { slug: 'twinmos', label: 'TwinMOS' },
-  { slug: 'apacer', label: 'Apacer' },
-  { slug: 'patriot', label: 'Patriot' },
   { slug: 'biostar', label: 'Biostar' },
-  { slug: 'acer', label: 'Acer' },
-  { slug: 'kingspec', label: 'Kingspec' },
+] as const;
+
+/** Sidebar brand list from the live Star Tech SSD page. */
+export const SSD_SIDEBAR_BRANDS = [
+  { slug: 'team', label: 'TEAM' },
+  { slug: 'western-digital', label: 'Western Digital' },
+  { slug: 'transcend', label: 'Transcend' },
+  { slug: 'corsair', label: 'Corsair' },
+  { slug: 'seagate', label: 'Seagate' },
+  { slug: 'colorful', label: 'Colorful' },
+  { slug: 'lexar', label: 'Lexar' },
+  { slug: 'netac', label: 'Netac' },
+  { slug: 'kingston', label: 'Kingston' },
+  { slug: 'dahua', label: 'Dahua' },
+  { slug: 'msi', label: 'MSI' },
+  { slug: 'robot', label: 'ROBOT' },
+  { slug: 'ocpc', label: 'OCPC' },
+  { slug: 'miphi', label: 'MiPhi' },
+  { slug: 'kingsman', label: 'KINGSMAN' },
+  { slug: 'biostar', label: 'Biostar' },
+  { slug: 'oscoo', label: 'OSCOO' },
+  { slug: 'kingbank', label: 'KingBank' },
+  { slug: 'twinmos', label: 'TwinMOS' },
+  { slug: 'memory-ghost', label: 'Memory Ghost' },
+  { slug: 'silicon-power', label: 'Silicon Power' },
 ] as const;
 
 /** Capacity filter buckets (Star Tech style) */
 export const SSD_CAPACITY_FILTER_OPTIONS = [
-  { value: '120GB-128GB', label: '120GB-128GB' },
-  { value: '240GB-256GB', label: '240GB-256GB' },
-  { value: '480GB-512GB', label: '480GB-512GB' },
-  { value: '1TB-2TB', label: '1TB-2TB' },
-  { value: 'Over 2TB', label: 'Over 2TB' },
+  { value: '0 to 128GB', label: '0 to 128GB' },
+  { value: '129GB to 256GB', label: '129GB to 256GB' },
+  { value: '257GB to 512GB', label: '257GB to 512GB' },
+  { value: '513GB to 1TB', label: '513GB to 1TB' },
+  { value: 'Over 1TB', label: 'Over 1TB' },
 ] as const;
 
 /** Actual capacities for CMS entry */
@@ -58,27 +74,28 @@ export const SSD_CAPACITY_CMS_OPTIONS = [
   '8 TB',
 ] as const;
 
-export const SSD_INTERFACE_OPTIONS = ['SATA', 'NVMe'] as const;
+export const SSD_INTERFACE_OPTIONS = ['SATA', 'PCI-E'] as const;
 
-export const SSD_FORM_FACTOR_OPTIONS = ['2.5 Inch', 'M.2'] as const;
+export const SSD_FORM_FACTOR_OPTIONS = ['2.5 inches', 'M.2'] as const;
 
 export const SSD_PCIE_GEN_OPTIONS = ['Gen3', 'Gen4', 'Gen5'] as const;
 
 export const SSD_DRAM_OPTIONS = ['With DRAM', 'DRAM-less'] as const;
 
-export const SSD_TECHNOLOGY_OPTIONS = ['TLC', 'QLC'] as const;
+export const SSD_TECHNOLOGY_OPTIONS = ['AHCI', 'NVME'] as const;
 
 export const SSD_READ_SPEED_OPTIONS = [
   'Up to 500MB/s',
-  '500MB/s to 900MB/s',
-  '900MB/s to 4000MB/s',
-  '4000MB/s & Above',
+  '500MB/s to 800MB/s',
+  '801MB/s to 1000MB/s',
+  '1001MB/s & Above',
 ] as const;
 
 export const SSD_WRITE_SPEED_OPTIONS = [
-  'Up to 400MB/s',
-  '400MB/s to 1000MB/s',
-  '1000MB/s & Above',
+  'Up to 500MB/s',
+  '500MB/s to 800MB/s',
+  '801MB/s to 1000MB/s',
+  '1001MB/s & Above',
 ] as const;
 
 export const SSD_SPEC_FILTER_KEYS = [

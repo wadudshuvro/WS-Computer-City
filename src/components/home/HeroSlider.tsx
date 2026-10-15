@@ -67,7 +67,7 @@ export function HeroSlider() {
                     <div className="mb-3 text-4xl" aria-hidden>
                       {slide.image}
                     </div>
-                    <h2 className="mb-1 text-2xl font-semibold leading-snug tracking-tight">
+                    <h2 className="mb-1 text-2xl font-semibold leading-snug tracking-tight text-white">
                       {slide.title}
                     </h2>
                     <p className="mb-4 text-sm text-white/85">{slide.subtitle}</p>
@@ -124,7 +124,7 @@ export function HeroSlider() {
           <div className="flex flex-col gap-3">
             <Card className="flex flex-1 flex-col justify-center border-0 bg-gradient-to-br from-[#2d3548] to-sidebar text-white shadow-none">
               <CardContent className="p-4">
-                <h3 className="mb-1 text-base font-semibold leading-snug">Banani Branch</h3>
+                <h3 className="mb-1 text-base font-semibold leading-snug text-white">Banani Branch</h3>
                 <p className="mb-2 text-xs leading-relaxed text-white/75">
                   Concord Colosseum, 156 Kemal Ataturk Ave, Dhaka 1213
                 </p>
@@ -143,7 +143,7 @@ export function HeroSlider() {
 
             <Card className="flex flex-1 flex-col justify-center border-0 bg-gradient-to-br from-teal-700 to-sidebar text-white shadow-none">
               <CardContent className="p-4">
-                <h3 className="mb-1 text-base font-semibold leading-snug">B2B / Reseller</h3>
+                <h3 className="mb-1 text-base font-semibold leading-snug text-white">B2B / Reseller</h3>
                 <p className="mb-3 text-xs leading-relaxed text-white/80">
                   Special pricing for bulk orders
                 </p>

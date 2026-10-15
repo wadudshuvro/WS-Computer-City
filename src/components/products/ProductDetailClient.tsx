@@ -362,7 +362,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const isMotherboard = isMotherboardCategory(categorySlugs);
   const isRam = isRamCategory(categorySlugs);
   const isProcessor = isProcessorCategory(categorySlugs);
-  const isCatalog = categorySlugs.includes('accessories') || categorySlugs.includes('gaming') || categorySlugs.includes('watch') || categorySlugs.includes('gadget') || categorySlugs.includes('monitor');
+  const isCatalog = categorySlugs.includes('accessories') || categorySlugs.includes('gaming') || categorySlugs.includes('watch') || categorySlugs.includes('gadget') || categorySlugs.includes('monitor') || categorySlugs.includes('power-supply') || categorySlugs.includes('psu') || categorySlugs.includes('hdd') || categorySlugs.includes('hard-disk-drive') || categorySlugs.includes('ssd') || categorySlugs.includes('nvme');
   const hasPcBundleVariant = isProcessor || isGpu;
   const singleSurcharge = isGpu
     ? GPU_SINGLE_SURCHARGE_BDT
@@ -814,10 +814,10 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 mt-6">
               {/* Tab Headers */}
               <div className="border-b border-gray-200">
-                <div className="flex">
+                <div className="flex overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                   <button
                     onClick={() => setActiveTab('specification')}
-                    className={`px-6 py-4 text-sm font-medium transition-colors ${
+                    className={`shrink-0 whitespace-nowrap px-4 py-4 text-sm font-medium transition-colors sm:px-6 ${
                       activeTab === 'specification'
                         ? 'text-blue-600 border-b-2 border-blue-600'
                         : 'text-gray-500 hover:text-gray-700'
@@ -827,7 +827,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                   </button>
                   <button
                     onClick={() => setActiveTab('description')}
-                    className={`px-6 py-4 text-sm font-medium transition-colors ${
+                    className={`shrink-0 whitespace-nowrap px-4 py-4 text-sm font-medium transition-colors sm:px-6 ${
                       activeTab === 'description'
                         ? 'text-blue-600 border-b-2 border-blue-600'
                         : 'text-gray-500 hover:text-gray-700'
@@ -837,7 +837,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                   </button>
                   <button
                     onClick={() => setActiveTab('reviews')}
-                    className={`px-6 py-4 text-sm font-medium transition-colors ${
+                    className={`shrink-0 whitespace-nowrap px-4 py-4 text-sm font-medium transition-colors sm:px-6 ${
                       activeTab === 'reviews'
                         ? 'text-blue-600 border-b-2 border-blue-600'
                         : 'text-gray-500 hover:text-gray-700'
