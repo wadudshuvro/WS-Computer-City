@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { LayoutGrid, Package, FolderTree, Tag, Home, LogOut, Menu, ShoppingBag, BadgePercent } from 'lucide-react';
 
@@ -30,9 +31,9 @@ export function AdminShell({ children, title, subtitle, breadcrumbs, actions }: 
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('adminLoggedIn');
-    window.location.href = '/admin/login';
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    await signOut({ callbackUrl: '/admin/login' });
   };
 
   return (

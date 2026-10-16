@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { guardCatalogRead } from '@/lib/rateLimit/http';
+import { boundPageSize } from '@/lib/rateLimit/policies';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import {
@@ -10,9 +12,11 @@ import {
 
 export async function GET(req: NextRequest) {
   try {
+    const limited = await guardCatalogRead(req);
+    if (limited) return limited;
     const searchParams = req.nextUrl.searchParams;
     const page = Number(searchParams.get('page')) || 1;
-    const limit = Number(searchParams.get('limit')) || 30;
+    const limit = boundPageSize(Number(searchParams.get('limit')) || 30);
     const sort = searchParams.get('sort') || 'price_asc';
     const search = searchParams.get('search') || undefined;
     const brands = searchParams.get('brand')?.split(',').filter(Boolean) || [];

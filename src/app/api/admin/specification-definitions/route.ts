@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authorizeAdmin, isAdminActor } from '@/lib/auth/guard';
 import { prisma } from '@/lib/prisma';
 
 async function getCategoryAncestorIds(categoryId: string): Promise<string[]> {
@@ -22,6 +23,8 @@ async function getCategoryAncestorIds(categoryId: string): Promise<string[]> {
  * Get specification definitions for a category (includes parent category specs)
  */
 export async function GET(req: NextRequest) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   try {
     const searchParams = req.nextUrl.searchParams;
     const categoryId = searchParams.get('categoryId');
@@ -66,6 +69,8 @@ export async function GET(req: NextRequest) {
  * Create a new specification definition for a category
  */
 export async function POST(req: NextRequest) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   try {
     const body = await req.json();
     

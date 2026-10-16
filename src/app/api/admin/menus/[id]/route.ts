@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authorizeAdmin, isAdminActor } from '@/lib/auth/guard';
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 
@@ -9,6 +10,8 @@ type RouteContext = { params: Promise<{ id: string }> };
  * Update fields and/or move among siblings (insertAfterId / move: up|down).
  */
 export async function PUT(req: NextRequest, context: RouteContext) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   try {
     const { id } = await context.params;
     const body = await req.json();
@@ -114,7 +117,9 @@ export async function PUT(req: NextRequest, context: RouteContext) {
  * DELETE /api/admin/menus/[id]
  * Deletes item and cascade children.
  */
-export async function DELETE(_req: NextRequest, context: RouteContext) {
+export async function DELETE(req: NextRequest, context: RouteContext) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   try {
     const { id } = await context.params;
 

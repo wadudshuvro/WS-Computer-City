@@ -229,6 +229,13 @@ function ProductsPageContent() {
   }, [isProcessorCategory]);
 
   useEffect(() => {
+    if (!isSsdCategory || searchParams.has('stockStatus')) return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('stockStatus', 'IN_STOCK');
+    router.replace(`/products?${params.toString()}`, { scroll: false });
+  }, [isSsdCategory, searchQuery, router, searchParams]);
+
+  useEffect(() => {
     fetchProducts();
     // Close mobile filters when category/query changes via mega menu.
     setShowMobileFilters(false);
@@ -248,6 +255,10 @@ function ProductsPageContent() {
 
       if (!params.has('sort')) {
         params.set('sort', 'price_asc');
+      }
+
+      if (isSsdCategory && !params.get('stockStatus')) {
+        params.set('stockStatus', 'IN_STOCK');
       }
 
       if (isMonitorCategory) {

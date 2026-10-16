@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { Prisma } from '@prisma/client';
 import { ProductService } from '@/services/product.service';
 import { productFilterSchema } from '@/lib/validations/product.schema';
+import { guardCatalogRead } from '@/lib/rateLimit/http';
+import { boundPageSize } from '@/lib/rateLimit/policies';
 import { ZodError } from 'zod';
 import { WATCH_FILTER_KEYS } from '@/lib/watchFilters';
 import { GADGET_FILTER_KEYS, findGadgetLeaf } from '@/lib/gadgetCatalog';
@@ -13,6 +15,8 @@ import { MONITOR_FILTER_KEYS } from '@/lib/monitorFilters';
  */
 export async function GET(req: NextRequest) {
   try {
+    const limited = await guardCatalogRead(req);
+    if (limited) return limited;
     const searchParams = req.nextUrl.searchParams;
 
     const categorySlug = ProductService.resolveCategorySlug(
@@ -30,7 +34,7 @@ export async function GET(req: NextRequest) {
       search: searchParams.get('search') || undefined,
       sort: searchParams.get('sort') || 'price_asc',
       page: searchParams.get('page') ? Number(searchParams.get('page')) : 1,
-      limit: searchParams.get('limit') ? Number(searchParams.get('limit')) : 20,
+      limit: boundPageSize(searchParams.get('limit') ? Number(searchParams.get('limit')) : 20),
     };
 
     // Parse dynamic specification filters (e.g., ?socket_type=LGA1700&cores=8)

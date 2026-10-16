@@ -22,22 +22,25 @@ async function main() {
   
   await ensureConnection();
 
-  // 1. Create Admin User
-  console.log('Creating admin user...');
-  const adminPassword = await bcrypt.hash('admin123', 10);
-  
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@wscomputercity.com' },
-    update: {},
-    create: {
-      email: 'admin@wscomputercity.com',
-      name: 'Admin User',
-      password: adminPassword,
-      role: 'ADMIN',
-      emailVerified: new Date(),
-    },
-  });
-  console.log('✅ Admin user created:', admin.email);
+  const initialPassword = process.env.ADMIN_INITIAL_PASSWORD;
+  if (!initialPassword) {
+    console.log('Skipping admin user (set ADMIN_INITIAL_PASSWORD to create one).');
+  } else {
+    console.log('Creating admin user...');
+    const adminPassword = await bcrypt.hash(initialPassword, 12);
+    const admin = await prisma.user.upsert({
+      where: { email: 'admin@wscomputercity.com' },
+      update: {},
+      create: {
+        email: 'admin@wscomputercity.com',
+        name: 'Admin User',
+        password: adminPassword,
+        role: 'ADMIN',
+        emailVerified: new Date(),
+      },
+    });
+    console.log('✅ Admin user created:', admin.email);
+  }
 
   // 2. Create Brands
   console.log('Creating brands...');

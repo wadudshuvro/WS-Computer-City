@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authorizeAdmin, isAdminActor } from '@/lib/auth/guard';
 import { prisma } from '@/lib/prisma';
 
 /**
@@ -7,6 +8,8 @@ import { prisma } from '@/lib/prisma';
  * Note: Remove auth check for now to allow easier testing
  */
 export async function GET(req: NextRequest) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   try {
     const categories = await prisma.category.findMany({
       where: { isActive: true },
@@ -34,6 +37,8 @@ export async function GET(req: NextRequest) {
  * Create a new category
  */
 export async function POST(req: NextRequest) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   try {
     const body = await req.json();
     

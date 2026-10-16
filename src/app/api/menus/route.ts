@@ -1,14 +1,17 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { buildMenuTree, FALLBACK_MENU_TREE } from '@/lib/menu';
 import { enrichMenuWithBrandFlyouts } from '@/lib/componentBrandMenu';
+import { guardCatalogRead } from '@/lib/rateLimit/http';
 
 /**
  * GET /api/menus
  * Public storefront mega-menu tree (visible items only).
  * Brand flyouts for Component subs are filled when CMS has no children yet.
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const limited = await guardCatalogRead(req);
+  if (limited) return limited;
   try {
     const rows = await prisma.menuItem.findMany({
       where: { isVisible: true },

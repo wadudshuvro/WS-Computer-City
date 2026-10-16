@@ -22,11 +22,15 @@ model User {
   role          UserRole  @default(USER)
   emailVerified DateTime?
   image         String?
+  /// Incremented on each successful admin login so older session cookies stop working.
+  sessionVersion Int      @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   accounts Account[]
   sessions Session[]
+  orders   Order[]
+  cart     Cart?
 
   @@map("users")
 }
@@ -192,6 +196,8 @@ model Product {
   @@index([stockStatus])
   @@index([price])
   @@index([topDealOrder])
+  @@index([isActive, categoryId, price])
+  @@index([isActive, stockStatus])
   @@map("products")
 }
 
@@ -313,6 +319,41 @@ enum PaymentMethod {
   CASH_ON_DELIVERY
 }
 
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String?    @unique
+  guestKey  String?    @unique
+  updatedAt DateTime   @updatedAt
+  items     CartItem[]
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        String      @id @default(cuid())
+  cartId    String
+  productId String
+  variant   String      @default("")
+  quantity  Int
+  cart      Cart        @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  writes    CartWrite[]
+
+  @@unique([cartId, productId, variant])
+  @@map("cart_items")
+}
+
+/// One successful add. Replaying the key returns the same line and does not insert another row.
+model CartWrite {
+  id             String   @id @default(cuid())
+  idempotencyKey String   @unique
+  cartItemId     String
+  createdAt      DateTime @default(now())
+  item           CartItem @relation(fields: [cartItemId], references: [id], onDelete: Cascade)
+
+  @@map("cart_writes")
+}
+
 model Order {
   id              String         @id @default(cuid())
   orderNumber     String         @unique
@@ -327,22 +368,47 @@ model Order {
   mobile          String
   email           String?
   comment         String?        @db.Text
+  userId          String?
 
   paymentMethod   PaymentMethod  @default(CASH_ON_DELIVERY)
   deliveryMethod  DeliveryMethod @default(HOME_DELIVERY)
   deliveryFee     Decimal        @db.Decimal(10, 2)
   subtotal        Decimal        @db.Decimal(10, 2)
   total           Decimal        @db.Decimal(10, 2)
+  /// Client retry key. The same key returns the original order and does not sell the item twice.
+  idempotencyKey  String?        @unique
+  paymentStatus   String         @default("UNPAID")
+  stockAdjusted   Boolean        @default(false)
 
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 
   items           OrderItem[]
+  paymentEvents   PaymentEvent[]
+  user            User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-  @@index([status])
+  @@index([status, createdAt])
   @@index([createdAt])
   @@index([mobile])
+  @@index([email])
+  @@index([userId])
   @@map("orders")
+}
+
+/// Processed payment notifications. The provider event id is unique so a replay does not change stock again.
+model PaymentEvent {
+  id         String   @id @default(cuid())
+  provider   String
+  eventId    String
+  type       String
+  orderId    String?
+  createdAt  DateTime @default(now())
+
+  order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@unique([provider, eventId])
+  @@index([orderId])
+  @@map("payment_events")
 }
 
 model OrderItem {

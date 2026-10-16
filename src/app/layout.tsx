@@ -23,6 +23,13 @@ export const metadata: Metadata = {
     locale: 'en_BD',
     type: 'website',
   },
+  alternates: {
+    canonical: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

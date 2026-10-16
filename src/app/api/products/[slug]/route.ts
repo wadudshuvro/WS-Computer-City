@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ProductService } from '@/services/product.service';
 import { prisma } from '@/lib/prisma';
+import { guardCatalogRead } from '@/lib/rateLimit/http';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +14,8 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const limited = await guardCatalogRead(_req);
+    if (limited) return limited;
     const { slug } = await params;
 
     const product = await ProductService.getBySlug(slug);

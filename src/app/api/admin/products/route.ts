@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authorizeAdmin, isAdminActor } from '@/lib/auth/guard';
 import { getServerSession } from 'next-auth';
 import { ProductService } from '@/services/product.service';
 import { createProductSchema, productFilterSchema } from '@/lib/validations/product.schema';
@@ -11,6 +12,8 @@ import { ZodError } from 'zod';
  * Note: Auth check temporarily disabled for testing
  */
 export async function GET(req: NextRequest) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   try {
     // Check authentication - TEMPORARILY DISABLED FOR TESTING
     // const session = await getServerSession();
@@ -85,6 +88,8 @@ export async function GET(req: NextRequest) {
  * Note: Auth check temporarily disabled for testing
  */
 export async function POST(req: NextRequest) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   try {
     // Check authentication - TEMPORARILY DISABLED FOR TESTING
     // const session = await getServerSession();

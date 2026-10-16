@@ -82,11 +82,6 @@ export default function AdminMenusPage() {
   const [form, setForm] = useState<FormState>(emptyForm());
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
-    if (!isLoggedIn) router.push('/admin/login');
-  }, [router]);
-
   const load = useCallback(async () => {
     try {
       setLoading(true);

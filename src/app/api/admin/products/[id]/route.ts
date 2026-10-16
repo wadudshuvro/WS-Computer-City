@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authorizeAdmin, isAdminActor } from '@/lib/auth/guard';
 import { prisma } from '@/lib/prisma';
 import { ProductService } from '@/services/product.service';
 import { updateProductSchema } from '@/lib/validations/product.schema';
@@ -13,6 +14,8 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   try {
     const { id } = await params;
 
@@ -81,6 +84,8 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   try {
     const { id } = await params;
     const body = await req.json();
@@ -192,6 +197,8 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   try {
     const { id } = await params;
 

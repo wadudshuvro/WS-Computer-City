@@ -937,6 +937,7 @@ const ssdStockStatusFilter: FilterDefinition = {
   defaultExpanded: true,
   options: [
     { value: 'IN_STOCK', label: 'In Stock' },
+    { value: 'OUT_OF_STOCK', label: 'Out of Stock' },
     { value: 'PRE_ORDER', label: 'Pre Order' },
     { value: 'UPCOMING', label: 'Up Coming' },
   ],

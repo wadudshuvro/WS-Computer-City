@@ -1,11 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { authorizeAdmin, isAdminActor } from '@/lib/auth/guard';
 import { prisma } from '@/lib/prisma';
 
 /**
  * GET /api/admin/orders
  * List recent customer orders for the admin CMS.
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   try {
     const orders = await prisma.order.findMany({
       orderBy: { createdAt: 'desc' },

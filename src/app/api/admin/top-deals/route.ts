@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authorizeAdmin, isAdminActor } from '@/lib/auth/guard';
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { getTopDeals } from '@/lib/topDeals';
 
 export async function GET(req: NextRequest) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   const search = req.nextUrl.searchParams.get('search')?.trim();
   const deals = await getTopDeals();
 
@@ -44,6 +47,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   const body = await req.json().catch(() => null);
   const productId = typeof body?.productId === 'string' ? body.productId : '';
   if (!productId) {
@@ -68,6 +73,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   const body = await req.json().catch(() => null);
   const ids: unknown = body?.ids;
   if (!Array.isArray(ids) || ids.some((id) => typeof id !== 'string')) {

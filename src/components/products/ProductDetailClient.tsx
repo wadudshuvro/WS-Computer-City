@@ -195,6 +195,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   /** Processors + GPUs: CMS price = Bundle with PC; Single adds surcharge */
   const [purchaseVariant, setPurchaseVariant] = useState<ProcessorPurchaseVariant>('bundle');
   const [cartDialogOpen, setCartDialogOpen] = useState(false);
+  const [cartLimitNote, setCartLimitNote] = useState('');
   const addItem = useCartStore((s) => s.addItem);
 
   useEffect(() => {
@@ -384,9 +385,26 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
   const purchasable = canPurchase(product.stockStatus);
 
-  const addCurrentProductToCart = () => {
+  const addCurrentProductToCart = async () => {
     if (!canPurchase(product.stockStatus)) return;
     const variant = hasPcBundleVariant ? purchaseVariant : undefined;
+    setCartLimitNote('');
+    try {
+      const res = await fetch('/api/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Idempotency-Key': crypto.randomUUID(),
+        },
+        body: JSON.stringify({ productId: product.id, quantity, variant }),
+      });
+      if (res.status === 429) {
+        setCartLimitNote('Too many cart updates. Please wait a minute and try again.');
+        return;
+      }
+    } catch {
+      // Cart service unreachable: keep the local cart so checkout can continue.
+    }
     addItem({
       productId: product.id,
       slug: product.slug,
@@ -775,6 +793,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                         Buy Now
                       </button>
                     </div>
+                    {cartLimitNote ? <p className="mb-4 text-sm text-red-600">{cartLimitNote}</p> : null}
 
                     {/* Wishlist & Compare */}
                     <div className="flex items-center gap-4 mb-6">

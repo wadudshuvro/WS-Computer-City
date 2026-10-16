@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { guardCatalogRead } from '@/lib/rateLimit/http';
+import { boundPageSize } from '@/lib/rateLimit/policies';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import {
@@ -14,17 +16,20 @@ import {
  */
 export async function GET(req: NextRequest) {
   try {
+    const limited = await guardCatalogRead(req);
+    if (limited) return limited;
     const searchParams = req.nextUrl.searchParams;
 
     const page = Number(searchParams.get('page')) || 1;
-    const limit = Number(searchParams.get('limit')) || 30;
+    const limit = boundPageSize(Number(searchParams.get('limit')) || 30);
     const sort = searchParams.get('sort') || 'price_asc';
     const search = searchParams.get('search') || undefined;
 
     const sub = searchParams.get('sub');
     const type = searchParams.get('type');
     const brands = searchParams.get('brand')?.split(',').filter(Boolean) || [];
-    const stockStatuses = searchParams.get('stockStatus')?.split(',').filter(Boolean) || [];
+    const requestedStock = searchParams.get('stockStatus')?.split(',').filter(Boolean) || [];
+    const stockStatuses = requestedStock.length > 0 ? requestedStock : ['IN_STOCK'];
     const minPrice = searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined;
     const maxPrice = searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined;
 
@@ -130,7 +135,7 @@ export async function GET(req: NextRequest) {
         _min: { price: true },
         _max: { price: true },
       }),
-      getFilterCounts(sub, type, brands),
+      getFilterCounts(sub, type, brands, stockStatuses),
     ]);
 
     const formattedProducts = products.map((product) => ({
@@ -190,13 +195,20 @@ export async function GET(req: NextRequest) {
 async function getFilterCounts(
   sub?: string | null,
   type?: string | null,
-  brandSlugs: string[] = []
+  brandSlugs: string[] = [],
+  stockStatuses: string[] = ['IN_STOCK']
 ): Promise<Record<string, Record<string, number>>> {
   try {
     const baseWhere: Prisma.ProductWhereInput = {
       isActive: true,
       ...(await buildSsdCategoryWhere(sub, type)),
       ...(brandSlugs.length > 0 ? { brand: { slug: { in: brandSlugs } } } : {}),
+    };
+    const listedWhere: Prisma.ProductWhereInput = {
+      ...baseWhere,
+      ...(stockStatuses.length > 0
+        ? { stockStatus: { in: stockStatuses as Prisma.EnumStockStatusFilter['in'] } }
+        : {}),
     };
 
     const stockCountsRaw = await prisma.product.groupBy({
@@ -212,7 +224,7 @@ async function getFilterCounts(
 
     const brandCountsRaw = await prisma.product.groupBy({
       by: ['brandId'],
-      where: baseWhere,
+      where: listedWhere,
       _count: true,
     });
 
@@ -237,7 +249,7 @@ async function getFilterCounts(
         by: ['value'],
         where: {
           specificationDefinition: { key },
-          product: baseWhere,
+          product: listedWhere,
         },
         _count: true,
       });

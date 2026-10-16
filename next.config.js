@@ -1,27 +1,57 @@
 /** @type {import('next').NextConfig} */
+
+function remoteImageHosts() {
+  const hosts = (process.env.IMAGE_REMOTE_HOSTS || 'placehold.co,utfs.io')
+    .split(',')
+    .map((host) => host.trim())
+    .filter(Boolean);
+  return hosts.map((hostname) => ({
+    protocol: 'https',
+    hostname,
+  }));
+}
+
+const securityHeaders = [
+  { key: 'X-DNS-Prefetch-Control', value: 'on' },
+  { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+  { key: 'X-Permitted-Cross-Domain-Policies', value: 'none' },
+  {
+    key: 'Content-Security-Policy',
+    value: [
+      "default-src 'self'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'self'",
+      "img-src 'self' data: blob: https:",
+      "font-src 'self' data:",
+      "style-src 'self' 'unsafe-inline'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "connect-src 'self'",
+      "object-src 'none'",
+    ].join('; '),
+  },
+];
+
+if (process.env.APP_ENV === 'production' || process.env.NODE_ENV === 'production') {
+  securityHeaders.push({
+    key: 'Strict-Transport-Security',
+    value: 'max-age=63072000; includeSubDomains; preload',
+  });
+}
+
 const nextConfig = {
   // Enable React strict mode for better development experience
   reactStrictMode: true,
 
   // Image optimization configuration
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**', // Allow all domains in development
-        // In production, restrict to specific domains:
-        // hostname: 'your-cdn-domain.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'placehold.co', // For placeholder images
-      },
-      {
-        protocol: 'https',
-        hostname: 'utfs.io', // UploadThing
-      },
-    ],
     formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 768, 1080, 1200, 1920],
+    imageSizes: [64, 96, 128, 256, 384],
+    remotePatterns: remoteImageHosts(),
   },
 
   // Experimental features
@@ -54,23 +84,12 @@ const nextConfig = {
     return [
       {
         source: '/:path*',
+        headers: securityHeaders,
+      },
+      {
+        source: '/uploads/:path*',
         headers: [
-          {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on',
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
       },
     ];

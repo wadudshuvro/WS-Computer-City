@@ -1,8 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { authorizeAdmin, isAdminActor } from '@/lib/auth/guard';
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 
-export async function DELETE(_req: Request, context: { params: Promise<{ productId: string }> }) {
+export async function DELETE(req: NextRequest, context: { params: Promise<{ productId: string }> }) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   const { productId } = await context.params;
   await prisma.product.updateMany({
     where: { id: productId },

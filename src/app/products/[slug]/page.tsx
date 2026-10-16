@@ -92,5 +92,36 @@ export default async function ProductDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  return <ProductDetailClient slug={slug} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: product.name,
+            sku: product.sku,
+            description:
+              product.metaDescription?.trim() ||
+              product.shortDescription?.trim() ||
+              product.name,
+            image: product.images.map((image) => new URL(image.url, SITE_URL).toString()),
+            brand: { '@type': 'Brand', name: product.brand.name },
+            offers: {
+              '@type': 'Offer',
+              url: new URL(`/products/${product.slug}`, SITE_URL).toString(),
+              priceCurrency: 'BDT',
+              price: Number(product.price),
+              availability:
+                product.stockStatus === 'IN_STOCK'
+                  ? 'https://schema.org/InStock'
+                  : 'https://schema.org/OutOfStock',
+            },
+          }),
+        }}
+      />
+      <ProductDetailClient slug={slug} />
+    </>
+  );
 }

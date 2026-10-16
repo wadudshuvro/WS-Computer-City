@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authorizeAdmin, isAdminActor } from '@/lib/auth/guard';
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { buildMenuTree } from '@/lib/menu';
@@ -7,7 +8,9 @@ import { buildMenuTree } from '@/lib/menu';
  * GET /api/admin/menus
  * Full menu tree (including hidden) for CMS.
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   try {
     const rows = await prisma.menuItem.findMany({
       orderBy: [{ level: 'asc' }, { sortOrder: 'asc' }],
@@ -34,6 +37,8 @@ export async function GET() {
  * Create a menu item. Optional insertAfterId places it after a sibling.
  */
 export async function POST(req: NextRequest) {
+  const gate = await authorizeAdmin(req);
+  if (!isAdminActor(gate)) return gate;
   try {
     const body = await req.json();
     const name = String(body.name || '').trim();

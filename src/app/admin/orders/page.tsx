@@ -48,20 +48,18 @@ export default function AdminOrdersPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
-    const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
-    if (!isLoggedIn) {
-      router.push('/admin/login');
-      return;
-    }
     fetchOrders();
-  }, [router]);
+  }, []);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
       const res = await fetch('/api/admin/orders');
       const json = await res.json();
-      if (!res.ok) throw new Error(json?.error?.message || 'Failed to load orders');
+      if (res.status === 401) {
+        router.push('/admin/login');
+        return;
+      }
       setOrders(json.data || []);
       setError('');
     } catch (err) {

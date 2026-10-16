@@ -7,9 +7,7 @@ const imageUrlSchema = z
   .min(1, 'Image URL is required')
   .refine(
     (value) =>
-      /^https?:\/\//i.test(value) ||
-      value.startsWith('/') ||
-      value.startsWith('data:image/'),
+      /^https?:\/\//i.test(value) || value.startsWith('/uploads/') || value.startsWith('/images/'),
     { message: 'Invalid image URL' }
   );
 
@@ -121,12 +119,12 @@ export const productFilterSchema = z.object({
   minPrice: z.number().positive().optional(),
   maxPrice: z.number().positive().optional(),
   stockStatus: z.array(z.nativeEnum(StockStatus)).or(z.nativeEnum(StockStatus)).optional(),
-  search: z.string().optional(),
+  search: z.string().max(80).optional(),
   sort: z
     .enum(['default', 'price_asc', 'price_desc', 'newest', 'updated', 'name'])
     .default('default'),
   page: z.number().int().positive().default(1),
-  limit: z.number().int().min(1).max(100).default(20),
+  limit: z.number().int().min(1).max(48).default(20),
   specs: z.record(z.string()).optional(), // Dynamic specification filters
 });
 

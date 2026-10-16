@@ -1,35 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
     setError('');
     setLoading(true);
-
     try {
-      // TODO: Implement actual authentication with NextAuth
-      // For now, simple validation
-      if (formData.email === 'admin@wscomputercity.com' && formData.password === 'admin123') {
-        // Store login state (temporary - will be replaced with proper auth)
-        sessionStorage.setItem('adminLoggedIn', 'true');
-        // Redirect to admin dashboard
-        router.push('/admin');
-      } else {
-        setError('Invalid email or password');
+      const result = await signIn('credentials', {
+        email: email.trim(),
+        password,
+        redirect: false,
+      });
+      if (result?.status === 429 || result?.error === 'RATE_LIMITED') {
+        setError('Too many attempts. Wait and try again.');
+        return;
       }
-    } catch (err) {
-      setError('An error occurred. Please try again.');
+      if (!result || result.error) {
+        setError('Invalid email or password');
+        return;
+      }
+      router.push('/admin');
+      router.refresh();
+    } catch {
+      setError('Could not sign in');
     } finally {
       setLoading(false);
     }
@@ -59,10 +62,10 @@ export default function AdminLoginPage() {
                 id="email"
                 type="email"
                 required
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                placeholder="admin@wscomputercity.com"
+                placeholder="Email"
               />
             </div>
 
@@ -75,8 +78,8 @@ export default function AdminLoginPage() {
                 id="password"
                 type="password"
                 required
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                 placeholder="Enter your password"
               />
@@ -98,15 +101,6 @@ export default function AdminLoginPage() {
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
-
-          {/* Demo Credentials */}
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <p className="text-xs text-gray-500 text-center">
-              <strong>Demo Credentials:</strong><br />
-              Email: admin@wscomputercity.com<br />
-              Password: admin123
-            </p>
-          </div>
         </div>
 
         {/* Back to Home Link */}

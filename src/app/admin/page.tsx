@@ -1,21 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AdminShell } from '@/components/admin/AdminShell';
 import { Package, FolderTree, Tag, ArrowRight, Menu, ShoppingBag } from 'lucide-react';
 
 export default function AdminPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
-    if (!isLoggedIn) {
-      router.push('/admin/login');
-    }
-  }, [router]);
-
   const cards = [
     {
       title: 'Orders',
