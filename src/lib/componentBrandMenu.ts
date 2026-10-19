@@ -6,8 +6,9 @@ import { CPU_COOLER_BRANDS } from '@/lib/cpuCoolerSpecDefinitions';
 import type { MenuTreeItem } from '@/lib/menu';
 import { enrichAccessoriesBrandFlyouts } from '@/lib/accessoriesBrandMenu';
 import { ACCESSORIES_MENU_ITEMS } from '@/lib/accessoriesMenuItems';
-import { enrichGamingBrandFlyouts, GAMING_MENU_ITEMS } from '@/lib/gamingMenu';
+import { enrichGamingBrandFlyouts, GAMING_MENU_HIDDEN_SLUGS, GAMING_MENU_ITEMS } from '@/lib/gamingMenu';
 import { gadgetListingHref, gadgetNestedLeaves, gadgetTopLeaves } from '@/lib/gadgetCatalog';
+import { ROUTER_BRANDS } from '@/lib/routerCatalog';
 
 type BrandRef = { slug: string; label: string };
 
@@ -254,6 +255,68 @@ function ensureGadgetTop(tree: MenuTreeItem[]): MenuTreeItem[] {
   return next;
 }
 
+function routerMenuItem(): MenuTreeItem {
+  return {
+    id: 'catalog-router',
+    name: 'Router',
+    slug: 'router',
+    level: 1,
+    sortOrder: 0,
+    href: '/products?category=networking&sub=router',
+    categoryId: null,
+    categorySlug: 'router',
+    isVisible: true,
+    hideArrow: false,
+    children: ROUTER_BRANDS.map((brand, index) => ({
+      id: `router-brand-${brand.slug}`,
+      name: brand.label,
+      slug: brand.slug,
+      level: 2,
+      sortOrder: index,
+      href: `/products?category=networking&sub=router&brand=${brand.slug}`,
+      categoryId: null,
+      categorySlug: null,
+      isVisible: true,
+      hideArrow: true,
+      children: [],
+    })),
+  };
+}
+
+function ensureNetworkingTop(tree: MenuTreeItem[]): MenuTreeItem[] {
+  const router = routerMenuItem();
+  const networking: MenuTreeItem = {
+    id: 'catalog-networking',
+    name: 'Networking',
+    slug: 'networking',
+    level: 0,
+    sortOrder: tree.length,
+    href: '/products?category=networking&sub=router',
+    categoryId: null,
+    categorySlug: 'networking',
+    isVisible: true,
+    hideArrow: false,
+    children: [router],
+  };
+  const existing = tree.find((item) => item.slug === 'networking');
+  if (!existing) {
+    const gamingIndex = tree.findIndex((item) => item.slug === 'gaming');
+    if (gamingIndex === -1) return [...tree, networking];
+    const next = [...tree];
+    next.splice(gamingIndex + 1, 0, networking);
+    return next;
+  }
+  return tree.map((item) => {
+    if (item.slug !== 'networking') return item;
+    const rest = item.children.filter((child) => child.slug !== 'router');
+    return {
+      ...item,
+      href: '/products?category=networking&sub=router',
+      children: [router, ...rest],
+    };
+  });
+}
+
 function ensureGamingTop(tree: MenuTreeItem[]): MenuTreeItem[] {
   if (tree.some((item) => item.slug === 'gaming')) return tree;
   const gaming: MenuTreeItem = {
@@ -284,9 +347,16 @@ function ensureGamingTop(tree: MenuTreeItem[]): MenuTreeItem[] {
 export function enrichMenuWithBrandFlyouts(tree: MenuTreeItem[]): MenuTreeItem[] {
   const withGadget = ensureGadgetTop(tree);
   const withGaming = ensureGamingTop(withGadget);
-  const withCatalog = withGaming.map((top) => {
+  const withNetworking = ensureNetworkingTop(withGaming);
+  const withCatalog = withNetworking.map((top) => {
     if (top.slug === 'accessories') return mergeCatalogChildren(top, ACCESSORIES_MENU_ITEMS);
-    if (top.slug === 'gaming') return mergeCatalogChildren(top, GAMING_MENU_ITEMS);
+    if (top.slug === 'gaming') {
+      const merged = mergeCatalogChildren(top, GAMING_MENU_ITEMS);
+      return {
+        ...merged,
+        children: merged.children.filter((child) => !GAMING_MENU_HIDDEN_SLUGS.has(child.slug)),
+      };
+    }
     if (top.slug !== 'components' && top.slug !== 'component') return top;
 
     return {

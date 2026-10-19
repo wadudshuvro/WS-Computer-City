@@ -11,7 +11,7 @@ function ProductCard({ product }: { product: ShowcaseProduct }) {
       <Link href={`/products/${product.slug}`} className="flex h-full flex-col">
         <div className="mb-4 flex h-44 items-center justify-center">
           {product.imageUrl ? (
-            <img src={product.imageUrl} alt="" className="max-h-44 max-w-full object-contain" />
+            <img src={product.imageUrl} alt={product.name} loading="lazy" decoding="async" className="max-h-44 max-w-full object-contain" />
           ) : null}
         </div>
         <h3 className="line-clamp-2 min-h-[2.5rem] text-sm leading-snug">{product.name}</h3>
@@ -63,7 +63,7 @@ function ShowcaseRow({ section }: { section: HomeShowcase }) {
             </Link>
           </div>
           <Link href={section.href} className="mt-6 block overflow-hidden rounded-2xl">
-            <img src={section.image} alt="" className="h-36 w-full object-cover" />
+            <img src={section.image} alt="" loading="lazy" decoding="async" className="h-36 w-full object-cover" />
           </Link>
         </div>
 

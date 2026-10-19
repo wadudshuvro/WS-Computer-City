@@ -60,6 +60,20 @@ export function buildCasingSpecCondition(
     case 'motherboard_type':
       return {
         OR: values.flatMap((v) => {
+          if (v === 'ATX') {
+            return [
+              { value: { equals: 'ATX', mode: 'insensitive' as const } },
+              { value: { startsWith: 'ATX,', mode: 'insensitive' as const } },
+              { value: { startsWith: 'ATX/', mode: 'insensitive' as const } },
+              { value: { startsWith: 'ATX ', mode: 'insensitive' as const } },
+              { value: { contains: ', ATX', mode: 'insensitive' as const } },
+              { value: { contains: ',ATX', mode: 'insensitive' as const } },
+              { value: { contains: '/ATX', mode: 'insensitive' as const } },
+              { value: { contains: '|ATX', mode: 'insensitive' as const } },
+            ].map((value) => ({
+              specifications: { some: { specificationDefinition: { key: 'motherboard_type' }, ...value } },
+            }));
+          }
           const patterns =
             v === 'Micro-ATX'
               ? ['Micro-ATX', 'Micro ATX', 'mATX', 'M-ATX']
@@ -67,7 +81,7 @@ export function buildCasingSpecCondition(
                 ? ['Mini-ITX', 'Mini ITX', 'ITX']
                 : v === 'E-ATX'
                   ? ['E-ATX', 'EATX', 'Extended ATX']
-                  : ['ATX'];
+                  : [v];
           return patterns.map((pattern) => ({
             specifications: {
               some: {

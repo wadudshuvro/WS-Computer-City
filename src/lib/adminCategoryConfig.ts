@@ -102,6 +102,8 @@ export const adminContentGroups: AdminContentGroup[] = [
     items: [
       { name: 'Laptop', slug: 'laptop', description: 'Laptops & notebooks' },
       { name: 'Networking', slug: 'networking', description: 'Routers & switches' },
+      { name: 'Router', slug: 'router', description: 'WiFi and wired routers' },
+      { name: 'UPS', slug: 'ups', description: 'Uninterruptible power supplies' },
       { name: 'Gaming', slug: 'gaming', description: 'Gaming gear' },
     ],
   },

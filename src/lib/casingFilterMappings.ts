@@ -3,22 +3,20 @@ import { CASING_SPEC_FILTER_KEYS } from '@/lib/casingSpecDefinitions';
 export { CASING_SPEC_FILTER_KEYS };
 
 export function motherboardTypeDbValueMatches(filterValue: string, dbValue: string): boolean {
-  const d = dbValue.toLowerCase().replace(/\s+/g, '');
+  const tokens = dbValue
+    .toLowerCase()
+    .split(/[,/|]+/)
+    .map((token) => token.replace(/\s+/g, ''));
   const f = filterValue.toLowerCase().replace(/\s+/g, '');
-  if (d.includes(f)) return true;
-  if (f === 'micro-atx' || f === 'matx') {
-    return d.includes('micro-atx') || d.includes('matx') || d.includes('m-atx');
-  }
-  if (f === 'mini-itx' || f === 'mitx') {
-    return d.includes('mini-itx') || d.includes('mitx') || d.includes('itx');
-  }
-  if (f === 'e-atx' || f === 'eatx') {
-    return d.includes('e-atx') || d.includes('eatx') || d.includes('extended');
-  }
-  if (f === 'atx') {
-    return (d.includes('atx') || /\batx\b/.test(dbValue.toLowerCase())) && !d.includes('micro') && !d.includes('mini') && !d.includes('e-atx') && !d.includes('eatx');
-  }
-  return false;
+  const isMicro = (token: string) => /micro-?atx|matx|m-atx/.test(token);
+  const isMini = (token: string) => /mini-?itx|mitx|^itx$/.test(token);
+  const isEatx = (token: string) => /e-?atx|extendedatx|extended/.test(token);
+  const isAtx = (token: string) => /atx/.test(token) && !isMicro(token) && !isEatx(token) && !token.includes('mini');
+  if (f === 'micro-atx' || f === 'matx') return tokens.some(isMicro);
+  if (f === 'mini-itx' || f === 'mitx') return tokens.some(isMini);
+  if (f === 'e-atx' || f === 'eatx') return tokens.some(isEatx);
+  if (f === 'atx') return tokens.some(isAtx);
+  return tokens.some((token) => token.includes(f));
 }
 
 export function sidePanelDbValueMatches(filterValue: string, dbValue: string): boolean {

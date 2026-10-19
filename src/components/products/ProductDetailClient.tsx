@@ -1,13 +1,12 @@
-﻿'use client';
+'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
   ChevronRight, 
   Heart, 
   ShoppingCart, 
-  Star, 
   Check, 
   X,
   Share2,
@@ -47,7 +46,7 @@ import { ProductDescription } from '@/components/products/ProductDescription';
 import { AddedToCartDialog } from '@/components/cart/AddedToCartDialog';
 import { useCartStore, formatVariantLabel } from '@/store/cartStore';
 
-/** Star Tech–style: Single unit costs this much more than Bundle with PC */
+/** Star Tech�style: Single unit costs this much more than Bundle with PC */
 const PROCESSOR_SINGLE_SURCHARGE_BDT = 500;
 const GPU_SINGLE_SURCHARGE_BDT = 1000;
 
@@ -136,6 +135,7 @@ interface RelatedProduct {
   id: string;
   name: string;
   slug: string;
+  categorySlug?: string;
   price: number;
   compareAtPrice?: number;
   stockStatus: string;
@@ -184,10 +184,18 @@ const specificationGroups: Record<string, { title: string; keys: string[] }> = {
   },
 };
 
-export default function ProductDetailClient({ slug }: { slug: string }) {
-  const [product, setProduct] = useState<Product | null>(null);
-  const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function ProductDetailClient({
+  slug,
+  initialProduct,
+  initialRelated = [],
+}: {
+  slug: string;
+  initialProduct?: Product;
+  initialRelated?: RelatedProduct[];
+}) {
+  const [product, setProduct] = useState<Product | null>(initialProduct ?? null);
+  const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>(initialRelated);
+  const [loading, setLoading] = useState(!initialProduct);
   const [error, setError] = useState('');
   const [selectedImage, setSelectedImage] = useState(0);
   const [activeTab, setActiveTab] = useState<'description' | 'specification' | 'reviews'>('specification');
@@ -198,13 +206,23 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const [cartLimitNote, setCartLimitNote] = useState('');
   const addItem = useCartStore((s) => s.addItem);
 
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [slug]);
+
   useEffect(() => {
-    if (slug) {
-      setActiveTab('specification');
-      setPurchaseVariant('bundle');
-      setQuantity(1);
-      fetchProduct();
-    }
+    const toTop = () => window.scrollTo(0, 0);
+    toTop();
+    const frame = requestAnimationFrame(toTop);
+    return () => cancelAnimationFrame(frame);
+  }, [slug]);
+
+  useEffect(() => {
+    if (!slug || initialProduct) return;
+    setActiveTab('specification');
+    setPurchaseVariant('bundle');
+    setQuantity(1);
+    fetchProduct();
   }, [slug]);
 
   const fetchProduct = async () => {
@@ -363,13 +381,13 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const isMotherboard = isMotherboardCategory(categorySlugs);
   const isRam = isRamCategory(categorySlugs);
   const isProcessor = isProcessorCategory(categorySlugs);
-  const isCatalog = categorySlugs.includes('accessories') || categorySlugs.includes('gaming') || categorySlugs.includes('watch') || categorySlugs.includes('gadget') || categorySlugs.includes('monitor') || categorySlugs.includes('power-supply') || categorySlugs.includes('psu') || categorySlugs.includes('hdd') || categorySlugs.includes('hard-disk-drive') || categorySlugs.includes('ssd') || categorySlugs.includes('nvme');
+  const isCatalog = categorySlugs.includes('accessories') || categorySlugs.includes('gaming') || categorySlugs.includes('watch') || categorySlugs.includes('gadget') || categorySlugs.includes('monitor') || categorySlugs.includes('power-supply') || categorySlugs.includes('psu') || categorySlugs.includes('hdd') || categorySlugs.includes('hard-disk-drive') || categorySlugs.includes('portable-hdd') || categorySlugs.includes('ssd') || categorySlugs.includes('nvme') || categorySlugs.includes('computer-case') || categorySlugs.includes('casing') || categorySlugs.includes('router') || categorySlugs.includes('networking') || categorySlugs.includes('ups');
   const hasPcBundleVariant = isProcessor || isGpu;
   const singleSurcharge = isGpu
     ? GPU_SINGLE_SURCHARGE_BDT
     : PROCESSOR_SINGLE_SURCHARGE_BDT;
 
-  // Stored CMS price = Bundle with PC; Single is +৳500 (processor) or +৳1000 (GPU)
+  // Stored CMS price = Bundle with PC; Single is +?500 (processor) or +?1000 (GPU)
   const bundlePrice = product.price;
   const singlePrice = product.price + singleSurcharge;
   const displayPrice = hasPcBundleVariant
@@ -466,14 +484,17 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
               {relatedProducts.slice(0, 8).map((relProduct) => (
                 <Link
                   key={relProduct.id}
-                  href={`/products/${relProduct.slug}`}
+                  href={relProduct.categorySlug ? `/${relProduct.categorySlug}/${relProduct.slug}` : `/products/${relProduct.slug}`}
                   className="flex gap-3 p-2 rounded-lg hover:bg-white hover:shadow-sm transition-all"
                 >
                   <div className="w-16 h-16 bg-gray-100 rounded flex-shrink-0">
                     {relProduct.images[0] && (
-                      <img
+                        <img
                         src={relProduct.images[0].url}
-                        alt={relProduct.name}
+                        alt={relProduct.images[0].alt || relProduct.name}
+                        width={64}
+                        height={64}
+                        loading="lazy"
                         className="w-full h-full object-contain p-1"
                       />
                     )}
@@ -483,11 +504,11 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       {relProduct.name}
                     </p>
                     <p className="text-sm font-bold text-blue-600 mt-1">
-                      ৳ {relProduct.price.toLocaleString()}
+                      ? {relProduct.price.toLocaleString()}
                     </p>
                     {relProduct.compareAtPrice && (
                       <p className="text-xs text-gray-500 line-through">
-                        ৳ {relProduct.compareAtPrice.toLocaleString()}
+                        ? {relProduct.compareAtPrice.toLocaleString()}
                       </p>
                     )}
                   </div>
@@ -503,7 +524,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
               {/* Save Badge */}
               {savings > 0 && (
                 <div className="bg-orange-500 text-white px-4 py-2 text-sm font-medium">
-                  Save : ৳ {savings.toLocaleString()}
+                  Save : ? {savings.toLocaleString()}
                 </div>
               )}
 
@@ -512,12 +533,16 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                   {/* Product Images */}
                   <div>
                     {/* Main Image */}
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4 aspect-square flex items-center justify-center">
+                    <div className="relative mb-4 aspect-square overflow-hidden rounded-lg bg-gray-50">
                       {product.images[selectedImage] ? (
                         <img
                           src={product.images[selectedImage].url}
                           alt={product.images[selectedImage].alt || product.name}
-                          className="max-w-full max-h-full object-contain"
+                          width={800}
+                          height={800}
+                          loading={selectedImage === 0 ? 'eager' : 'lazy'}
+                          fetchPriority={selectedImage === 0 ? 'high' : 'low'}
+                          className="absolute inset-0 h-full w-full object-contain"
                         />
                       ) : (
                         <div className="text-gray-400">No Image Available</div>
@@ -539,7 +564,10 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                           >
                             <img
                               src={image.url}
-                              alt={image.alt || `${product.name} - ${index + 1}`}
+                              alt={image.alt || `${product.name} photo ${index + 1}`}
+                              width={64}
+                              height={64}
+                              loading="lazy"
                               className="w-full h-full object-contain"
                             />
                           </button>
@@ -653,16 +681,6 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       </>
                     )}
 
-                    {/* Reviews */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="flex text-yellow-400">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <Star key={star} className="w-4 h-4 fill-current" />
-                        ))}
-                      </div>
-                      <span className="text-sm text-gray-600">(1 Reviews)</span>
-                    </div>
-
                     {/* Bundle with PC vs Single (processors + GPUs) */}
                     {hasPcBundleVariant && (
                       <div className="mb-4 space-y-3">
@@ -731,11 +749,11 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       <div className="bg-gray-50 rounded-lg p-4">
                         <span className="text-sm text-gray-500 block mb-1">Discount Price</span>
                         <span className="text-2xl font-bold text-gray-900">
-                          ৳ {displayPrice.toLocaleString()}
+                          ? {displayPrice.toLocaleString()}
                         </span>
                         {product.compareAtPrice && (
                           <span className="text-sm text-gray-500 line-through ml-2">
-                            ৳ {product.compareAtPrice.toLocaleString()}
+                            ? {product.compareAtPrice.toLocaleString()}
                           </span>
                         )}
                         <p className="text-xs text-blue-600 mt-1 cursor-pointer hover:underline">
@@ -745,10 +763,10 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       <div className="bg-gray-50 rounded-lg p-4">
                         <span className="text-sm text-gray-500 block mb-1">EMI Start From*</span>
                         <span className="text-2xl font-bold text-gray-900">
-                          ৳ {Math.round(displayPrice / 12).toLocaleString()}
+                          ? {Math.round(displayPrice / 12).toLocaleString()}
                         </span>
                         <p className="text-xs text-blue-600 mt-1 cursor-pointer hover:underline">
-                          💳 View Bank EMI Plans
+                          ?? View Bank EMI Plans
                         </p>
                       </div>
                     </div>
@@ -862,7 +880,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                         : 'text-gray-500 hover:text-gray-700'
                     }`}
                   >
-                    Reviews(1)
+                    Reviews
                   </button>
                 </div>
               </div>
@@ -938,34 +956,10 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
                 {/* Reviews Tab */}
                 {activeTab === 'reviews' && (
-                  <div className="space-y-6">
-                    <div className="text-center py-8 text-gray-500">
-                      <Star className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                      <p>No reviews yet. Be the first to review this product!</p>
-                      <button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-                        Write a Review
-                      </button>
-                    </div>
+                  <div className="py-8 text-center text-gray-500">
+                    <p>No reviews yet.</p>
                   </div>
                 )}
-              </div>
-            </div>
-
-            {/* SEO Content */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mt-6 p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">
-                What is the {product.name} Price in Bangladesh 2026?
-              </h2>
-              <div className="prose prose-sm max-w-none text-gray-600">
-                <p>
-                  The {product.name} Price in BD is ৳{displayPrice.toLocaleString()}. 
-                  This {product.brand.name} {product.category.name} Manufacturing by {product.brand.name} Comes With 
-                  {getSpecValue('warranty') ? ` ${getSpecValue('warranty')} Warranty` : ' No Warranty'} & Based on {0} reviews. 
-                  LogicBay BD Offers you {product.name} by ৳{displayPrice.toLocaleString()} 
-                  {product.compareAtPrice ? ` and its regular price is ৳${product.compareAtPrice.toLocaleString()}` : ''} Which is 
-                  {product.stockStatus === 'IN_STOCK' ? ' also In Stock Now' : ' currently not in stock'} at our Showroom. 
-                  Follow us on Facebook For Regular updates & Offer. Subscribe Our YouTube Channel for Product Reviews.
-                </p>
               </div>
             </div>
           </div>

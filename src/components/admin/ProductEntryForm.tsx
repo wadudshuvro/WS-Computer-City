@@ -97,6 +97,9 @@ export default function ProductEntryForm({ defaultCategorySlug }: ProductEntryFo
     // Visibility
     isFeatured: false,
     isActive: true,
+    sourceUrl: '',
+    priceRule: 'MATCH',
+    priceRuleValue: '',
   });
 
   const [images, setImages] = useState<ProductImage[]>([]);
@@ -473,6 +476,9 @@ export default function ProductEntryForm({ defaultCategorySlug }: ProductEntryFo
         metaKeywords: formData.metaKeywords || undefined,
         isFeatured: formData.isFeatured,
         isActive: formData.isActive,
+        sourceUrl: formData.sourceUrl.trim() || null,
+        priceRule: formData.priceRule,
+        priceRuleValue: formData.priceRuleValue ? Number(formData.priceRuleValue) : null,
         images: images.filter(img => img.url).map(img => ({
           url: img.url,
           alt: img.alt || undefined,
@@ -1026,6 +1032,46 @@ export default function ProductEntryForm({ defaultCategorySlug }: ProductEntryFo
             <p className="text-xs text-gray-500 mt-1">
               In Stock turns on Add to Cart and Buy Now. Out of Stock and Upcoming turn both off for this product.
             </p>
+          </div>
+
+          <div className="md:col-span-3">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Star Tech product URL</label>
+            <input
+              type="url"
+              name="sourceUrl"
+              value={formData.sourceUrl}
+              onChange={handleInputChange}
+              placeholder="https://www.startech.com.bd/..."
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            />
+            <p className="text-xs text-gray-500 mt-1">Leave empty to keep this price manual.</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Price rule</label>
+            <select
+              name="priceRule"
+              value={formData.priceRule}
+              onChange={handleInputChange}
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            >
+              <option value="MATCH">Match Star Tech</option>
+              <option value="MINUS_FIXED">Minus a fixed amount</option>
+              <option value="MINUS_PERCENT">Minus a percent</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Rule amount</label>
+            <input
+              type="number"
+              name="priceRuleValue"
+              value={formData.priceRuleValue}
+              onChange={handleInputChange}
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              min="0"
+              step="0.01"
+            />
           </div>
 
           <div>

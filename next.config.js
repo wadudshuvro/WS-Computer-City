@@ -43,6 +43,8 @@ if (process.env.APP_ENV === 'production' || process.env.NODE_ENV === 'production
 }
 
 const nextConfig = {
+  // Lets a production build run beside the dev server (NEXT_DIST_DIR=.next-prod)
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   // Enable React strict mode for better development experience
   reactStrictMode: true,
 

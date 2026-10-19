@@ -1,0 +1,34 @@
+---
+description: Star Tech price sync — how selling prices stay updated. Do not search Google or recrawl the catalog. Always apply.
+alwaysApply: true
+---
+
+# Star Tech price sync
+
+Selling prices stay aligned with each product’s saved Star Tech URL. The job does **not** search Google and does **not** browse the Star Tech catalog to find products.
+
+## How it works
+
+- Each linked product has `sourceUrl` (example: `https://www.startech.com.bd/{slug}`). Empty URL means “do not sync.”
+- `npm run prices:sync` opens that exact URL, reads the selling price and stock only, and writes them on the existing `Product` row.
+- Same price: leave it. Change of 15% or less: update. Larger jump: do not publish; set `priceSyncStatus` to flagged. Missing page or no price: do not change the price.
+- Default rule is `MATCH` (our price = Star Tech price). `MINUS_FIXED` and `MINUS_PERCENT` are per product.
+- One product failure must not stop the run. Wait 1.5 seconds between requests. No parallel flood, proxy, or browser automation.
+
+## Commands
+
+```bash
+npm run prices:sync -- --dry-run --limit 3
+npm run prices:sync
+```
+
+`npm run prices:link` is one-time. It fills empty `sourceUrl` from the slug only. Do not match products by name.
+
+Flagged rows: Admin → Products, Price sync strip, and the product edit page. Schedule on this PC with Task Scheduler at 02:00 (`npx tsx scripts/sync-startech-prices.ts` in the project folder). The database is local, so the PC must be on.
+
+## Do not
+
+- Search Google, or discover products by fuzzy name
+- Copy Star Tech titles, descriptions, or images during a price run
+- Replace this script with a Cursor agent loop or a full catalog crawl
+- Wipe specs or images by sending a full product update; update price and stock columns only

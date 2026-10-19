@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import {
   FALLBACK_MENU_TREE,
   resolveMenuHref,
@@ -175,7 +175,7 @@ export function MegaMenu() {
   }, [router]);
 
   return (
-    <nav className="sticky top-0 z-[200] overflow-visible border-b border-gray-200 bg-white">
+    <nav className="sticky top-0 z-[200] overflow-visible border-b border-slate-200 bg-white shadow-[0_8px_20px_-16px_rgba(15,23,42,0.55)]">
       <div className="container mx-auto overflow-visible">
         {/*
           Compact Star Tech density. On small screens the row scrolls
@@ -198,13 +198,25 @@ export function MegaMenu() {
                 <Link
                   href={categoryHref}
                   {...navigateTo(categoryHref)}
-                  className={`block px-3 py-3.5 text-[14px] font-normal leading-none transition-colors ${
-                    isActive
-                      ? 'text-nav'
-                      : 'text-gray-800 hover:text-nav'
+                  className={`group relative flex items-center gap-1.5 px-3.5 py-3.5 text-[13.5px] font-semibold leading-none tracking-wide transition-colors ${
+                    isActive ? 'text-nav' : 'text-slate-800 hover:text-nav'
                   }`}
                 >
-                  {category.name}
+                  <span>{category.name}</span>
+                  {category.children.length > 0 && (
+                    <ChevronDown
+                      className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                        isActive ? 'rotate-180' : 'text-slate-400 group-hover:text-nav'
+                      }`}
+                      aria-hidden
+                    />
+                  )}
+                  <span
+                    aria-hidden
+                    className={`pointer-events-none absolute inset-x-3.5 bottom-0 h-0.5 origin-left rounded-full bg-nav transition-transform duration-200 ${
+                      isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                    }`}
+                  />
                 </Link>
 
                 {showDropdown && (

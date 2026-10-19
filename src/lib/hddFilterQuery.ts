@@ -49,10 +49,11 @@ export function buildHddFilterCounts(
     if (!filter.options || filter.key === 'stockStatus' || filter.key === 'brand' || filter.type === 'range') {
       continue;
     }
-    counts[filter.key] = {};
+    const bucket: Record<string, number> = {};
+    counts[filter.key] = bucket;
     const dbCounts = specValuesByKey[filter.key] || [];
     for (const option of filter.options) {
-      counts[filter.key][option.value] = dbCounts
+      bucket[option.value] = dbCounts
         .filter((row) => row.value.toLowerCase() === option.value.toLowerCase())
         .reduce((sum, row) => sum + row.count, 0);
     }

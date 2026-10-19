@@ -8,6 +8,8 @@ import { ZodError } from 'zod';
 import { WATCH_FILTER_KEYS } from '@/lib/watchFilters';
 import { GADGET_FILTER_KEYS, findGadgetLeaf } from '@/lib/gadgetCatalog';
 import { MONITOR_FILTER_KEYS } from '@/lib/monitorFilters';
+import { ROUTER_FILTER_KEYS } from '@/lib/routerFilters';
+import { UPS_FILTER_KEYS } from '@/lib/upsCatalog';
 
 /**
  * GET /api/products
@@ -154,7 +156,7 @@ async function getAvailableFilters(categorySlug?: string, brandSlug?: string) {
   });
 
   // Get filterable specifications
-  let specifications = [];
+  let specifications: unknown[] = [];
   if (categorySlug) {
     const category = await prisma.category.findUnique({
       where: { slug: categorySlug },
@@ -207,6 +209,8 @@ async function getAvailableFilters(categorySlug?: string, brandSlug?: string) {
     categorySlug === 'watch' ||
     categorySlug === 'gadget' ||
     categorySlug === 'monitor' ||
+    categorySlug === 'router' ||
+    categorySlug === 'ups' ||
     findGadgetLeaf(categorySlug)
   ) {
     const keys =
@@ -214,7 +218,11 @@ async function getAvailableFilters(categorySlug?: string, brandSlug?: string) {
         ? [...WATCH_FILTER_KEYS]
         : categorySlug === 'monitor'
           ? [...MONITOR_FILTER_KEYS]
-          : [...GADGET_FILTER_KEYS, ...WATCH_FILTER_KEYS];
+          : categorySlug === 'router'
+            ? [...ROUTER_FILTER_KEYS]
+            : categorySlug === 'ups'
+              ? [...UPS_FILTER_KEYS]
+              : [...GADGET_FILTER_KEYS, ...WATCH_FILTER_KEYS];
     const rows = await prisma.productSpecification.findMany({
       where: {
         product: where,

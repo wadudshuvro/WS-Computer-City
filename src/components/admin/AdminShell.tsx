@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
-import { LayoutGrid, Package, FolderTree, Tag, Home, LogOut, Menu, ShoppingBag, BadgePercent } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { LayoutGrid, Package, FolderTree, Tag, Home, LogOut, Menu, ShoppingBag, BadgePercent, MessageSquare } from 'lucide-react';
 
 interface AdminShellProps {
   children: React.ReactNode;
@@ -16,6 +17,7 @@ interface AdminShellProps {
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutGrid, exact: true },
   { href: '/admin/orders', label: 'Orders', icon: ShoppingBag, exact: false },
+  { href: '/admin/feedback', label: 'Issues', icon: MessageSquare, exact: false },
   { href: '/admin/products', label: 'Products', icon: Package, exact: false },
   { href: '/admin/top-deals', label: 'Top Deals', icon: BadgePercent, exact: true },
   { href: '/admin/menus', label: 'Menus', icon: Menu, exact: false },
@@ -25,6 +27,16 @@ const navItems = [
 
 export function AdminShell({ children, title, subtitle, breadcrumbs, actions }: AdminShellProps) {
   const pathname = usePathname();
+  const [openIssues, setOpenIssues] = useState(0);
+
+  useEffect(() => {
+    fetch('/api/admin/feedback')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (json?.openCount != null) setOpenIssues(json.openCount);
+      })
+      .catch(() => undefined);
+  }, [pathname]);
 
   const isActive = (href: string, exact: boolean) => {
     if (exact) return pathname === href;
@@ -37,9 +49,9 @@ export function AdminShell({ children, title, subtitle, breadcrumbs, actions }: 
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f9fc] flex">
-      {/* Sidebar */}
-      <aside className="w-56 bg-[#1e2a3b] text-white flex flex-col shrink-0">
+    <div className="h-screen bg-[#f7f9fc] flex overflow-hidden">
+      {/* Sidebar stays on screen while the product list scrolls */}
+      <aside className="w-56 h-full bg-[#1e2a3b] text-white flex flex-col shrink-0 overflow-y-auto">
         <div className="px-5 py-5 border-b border-white/10">
           <p className="text-xs uppercase tracking-widest text-blue-300 font-semibold">LogicBay BD</p>
           <p className="text-lg font-bold mt-1">Admin CMS</p>
@@ -57,7 +69,10 @@ export function AdminShell({ children, title, subtitle, breadcrumbs, actions }: 
               }`}
             >
               <Icon className="w-4 h-4" />
-              {label}
+              <span className="flex-1">{label}</span>
+              {href === '/admin/feedback' && openIssues > 0 && (
+                <span className="rounded-full bg-orange-500 px-1.5 text-[11px] font-semibold text-white">{openIssues}</span>
+              )}
             </Link>
           ))}
         </nav>
@@ -81,8 +96,8 @@ export function AdminShell({ children, title, subtitle, breadcrumbs, actions }: 
       </aside>
 
       {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-white border-b border-gray-200 px-8 py-5">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0">
+        <header className="bg-white border-b border-gray-200 px-8 py-5 shrink-0">
           {breadcrumbs && breadcrumbs.length > 0 && (
             <nav className="flex items-center gap-2 text-sm text-gray-500 mb-2">
               {breadcrumbs.map((crumb, i) => (
@@ -108,7 +123,7 @@ export function AdminShell({ children, title, subtitle, breadcrumbs, actions }: 
           </div>
         </header>
 
-        <main className="flex-1 px-8 py-6 overflow-auto">{children}</main>
+        <main className="flex-1 px-8 py-6 overflow-y-auto">{children}</main>
       </div>
     </div>
   );

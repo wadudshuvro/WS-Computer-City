@@ -81,6 +81,8 @@ model Category {
   slug        String   @unique
   description String?  @db.Text
   image       String?
+  metaTitle   String?
+  metaDescription String? @db.Text
   parentId    String?
   level       Int      @default(0) // 0=root, 1=sub, 2=sub-sub, etc.
   order       Int      @default(0) // for sorting
@@ -175,6 +177,20 @@ model Product {
   isActive         Boolean       @default(true)
   /// Homepage Top Deals order. Null means the product is not in that carousel.
   topDealOrder     Int?
+
+  /// Exact Star Tech product URL. Empty means the price sync skips this product.
+  sourceUrl        String?
+  /// Last Star Tech selling price read, in whole taka, before the price rule.
+  sourcePrice      Int?
+  priceRule        PriceRule    @default(MATCH)
+  priceRuleValue   Decimal?     @db.Decimal(10, 2)
+  priceSyncStatus  PriceSyncStatus @default(IDLE)
+  priceFlagReason  String?
+  /// Optional barcode. Only shown in schema and the Merchant feed when set.
+  gtin          String?
+  /// Optional manufacturer part number.
+  mpn           String?
+  priceSyncLogs    PriceSyncLog[]
   
   // Timestamps
   createdAt        DateTime      @default(now())
@@ -198,7 +214,71 @@ model Product {
   @@index([topDealOrder])
   @@index([isActive, categoryId, price])
   @@index([isActive, stockStatus])
+  @@index([priceSyncStatus])
   @@map("products")
+}
+
+enum PriceRule {
+  MATCH
+  MINUS_FIXED
+  MINUS_PERCENT
+}
+
+enum PriceSyncStatus {
+  IDLE
+  UPDATED
+  UNCHANGED
+  FLAGGED
+  ERROR
+}
+
+model PriceSyncRun {
+  id        String   @id @default(cuid())
+  startedAt DateTime @default(now())
+  finishedAt DateTime?
+  dryRun    Boolean  @default(false)
+  updated   Int      @default(0)
+  unchanged Int      @default(0)
+  flagged   Int      @default(0)
+  failed    Int      @default(0)
+  stoppedReason String?
+  logs      PriceSyncLog[]
+
+  @@index([startedAt])
+  @@map("price_sync_runs")
+}
+
+model PriceSyncLog {
+  id          String          @id @default(cuid())
+  runId       String
+  productId   String
+  productName String
+  oldPrice    Int?
+  newPrice    Int?
+  sourcePrice Int?
+  rule        String
+  status      PriceSyncStatus
+  reason      String?
+  createdAt   DateTime        @default(now())
+
+  run     PriceSyncRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  product Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([runId])
+  @@index([productId])
+  @@index([status])
+  @@map("price_sync_logs")
+}
+
+/// Old product paths that must 301 to the current canonical URL.
+model ProductRedirect {
+  id        String   @id @default(cuid())
+  fromPath  String   @unique
+  toPath    String
+  createdAt DateTime @default(now())
+
+  @@index([fromPath])
+  @@map("product_redirects")
 }
 
 enum StockStatus {
@@ -460,4 +540,22 @@ model MenuItem {
   @@index([isVisible])
   @@index([slug])
   @@map("menu_items")
+}
+
+/// A shopper report about a problem on the site.
+model SiteMessage {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String
+  email     String?
+  subject   String
+  details   String   @db.Text
+  pageUrl   String?
+  status    String   @default("OPEN")
+  solvedAt  DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([status])
+  @@map("site_messages")
 }

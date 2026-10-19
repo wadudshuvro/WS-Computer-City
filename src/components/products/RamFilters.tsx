@@ -42,7 +42,7 @@ export function RamFilters({
   return (
     <ProductSidebarFilters
       filters={filters}
-      contextKey={`desktop-ram-${filterContext.hideBrand ? 'brand' : 'all'}`}
+      contextKey={`ram-${filterContext.kind || 'desktop'}-${filterContext.hideBrand ? 'brand' : 'all'}`}
       priceRange={priceRange}
       filterCounts={filterCounts}
       preserveParamKeys={['category', 'sub', 'type', 'brand']}

@@ -70,10 +70,22 @@ const baseProductSchema = z.object({
   metaTitle: z.string().max(120).optional().nullable(),
   metaDescription: z.string().max(320).optional().nullable(),
   metaKeywords: z.string().optional().nullable(),
+  gtin: z.string().max(14).optional().nullable(),
+  mpn: z.string().max(80).optional().nullable(),
 
   // Features
   isFeatured: z.boolean().default(false),
   isActive: z.boolean().default(true),
+
+  sourceUrl: z
+    .string()
+    .trim()
+    .url('Source URL must be a full https URL')
+    .optional()
+    .nullable()
+    .or(z.literal('')),
+  priceRule: z.enum(['MATCH', 'MINUS_FIXED', 'MINUS_PERCENT']).optional(),
+  priceRuleValue: z.number().nonnegative().optional().nullable(),
 
   // Nested
   images: z.array(productImageSchema).min(1, 'At least one image is required'),
@@ -126,6 +138,11 @@ export const productFilterSchema = z.object({
   page: z.number().int().positive().default(1),
   limit: z.number().int().min(1).max(48).default(20),
   specs: z.record(z.string()).optional(), // Dynamic specification filters
+});
+
+/** CMS lists need a larger page than the storefront. */
+export const adminProductFilterSchema = productFilterSchema.extend({
+  limit: z.number().int().min(1).max(100).default(20),
 });
 
 // Type exports

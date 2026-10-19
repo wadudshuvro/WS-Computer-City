@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Product, Brand, Category, ProductImage } from '@prisma/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { productPath } from '@/lib/seo/catalogSeo';
 import { canPurchase } from '@/lib/purchaseStatus';
 
 type ProductWithRelations = Product & {
@@ -26,7 +27,7 @@ export function ProductCard({ product }: ProductCardProps) {
     : 0;
 
   return (
-    <Link href={`/products/${product.slug}`}>
+    <Link href={productPath(product.category.slug, product.slug)}>
       <div className="group relative overflow-hidden rounded-lg border bg-card p-4 transition-all hover:shadow-lg">
         {/* Stock Badge */}
         <div className="absolute right-2 top-2 z-10">

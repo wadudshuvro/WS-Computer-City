@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authorizeAdmin, isAdminActor } from '@/lib/auth/guard';
 import { getServerSession } from 'next-auth';
 import { ProductService } from '@/services/product.service';
-import { createProductSchema, productFilterSchema } from '@/lib/validations/product.schema';
+import { adminProductFilterSchema, createProductSchema } from '@/lib/validations/product.schema';
 import { revalidatePath } from 'next/cache';
 import { ZodError } from 'zod';
 
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
       limit: searchParams.get('limit') ? Number(searchParams.get('limit')) : 20,
     };
 
-    const validated = productFilterSchema.parse(filters);
+    const validated = adminProductFilterSchema.parse(filters);
 
     // Get products - include child category products
     const result = await ProductService.getFilteredWithChildren(validated);
@@ -117,6 +117,12 @@ export async function POST(req: NextRequest) {
 
     // Create product
     const product = await ProductService.create(validated);
+    if (!product) {
+      return NextResponse.json(
+        { error: { code: 'CREATE_FAILED', message: 'Product could not be created' } },
+        { status: 500 }
+      );
+    }
 
     // Revalidate relevant pages
     revalidatePath('/products');

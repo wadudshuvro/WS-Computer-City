@@ -141,9 +141,10 @@ export function buildRamFilterCounts(
   specValuesByKey: Record<string, { value: string; count: number }[]>,
   stockCounts: Record<string, number>,
   brandCounts: Record<string, number>,
-  hideBrand = false
+  hideBrand = false,
+  kind: 'desktop' | 'laptop' = 'desktop'
 ): Record<string, Record<string, number>> {
-  const ramFilters = getRamFilters({ hideBrand });
+  const ramFilters = getRamFilters({ hideBrand, kind });
   const counts: Record<string, Record<string, number>> = {
     stockStatus: stockCounts,
     brand: brandCounts,

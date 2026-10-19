@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { slugChangeRedirects } from '@/lib/seo/catalogSeo';
 import { CreateProductDTO, UpdateProductDTO, ProductFilterDTO } from '@/lib/validations/product.schema';
 import { Prisma } from '@prisma/client';
 
@@ -22,14 +23,17 @@ function appendListingSpecFilters(
 
   const textEntries = Object.entries(specs).filter(([key]) => KEYBOARD_TEXT_KEYS.has(key));
   const watchEntries = Object.entries(specs).filter(
-    ([key]) => WATCH_SPEC_KEYS.has(key) || key.startsWith('gd_') || key.startsWith('mon_')
+    ([key]) =>
+      WATCH_SPEC_KEYS.has(key) || key.startsWith('gd_') || key.startsWith('mon_') || key.startsWith('rt_') || key.startsWith('ups_')
   );
   const specEntries = Object.entries(specs).filter(
     ([key]) =>
       !KEYBOARD_TEXT_KEYS.has(key) &&
       !WATCH_SPEC_KEYS.has(key) &&
       !key.startsWith('gd_') &&
-      !key.startsWith('mon_')
+      !key.startsWith('mon_') &&
+      !key.startsWith('rt_') &&
+      !key.startsWith('ups_')
   );
 
   const extra: Prisma.ProductWhereInput[] = [];
@@ -120,7 +124,7 @@ export class ProductService {
 
     while (currentId) {
       ids.push(currentId);
-      const category = await tx.category.findUnique({
+      const category: { parentId: string | null } | null = await tx.category.findUnique({
         where: { id: currentId },
         select: { parentId: true },
       });
@@ -224,8 +228,13 @@ export class ProductService {
           metaTitle: data.metaTitle,
           metaDescription: data.metaDescription,
           metaKeywords: data.metaKeywords,
+          gtin: data.gtin || null,
+          mpn: data.mpn || null,
           isFeatured: data.isFeatured,
           isActive: data.isActive,
+          sourceUrl: data.sourceUrl || null,
+          ...(data.priceRule ? { priceRule: data.priceRule } : {}),
+          priceRuleValue: data.priceRuleValue == null ? null : new Prisma.Decimal(data.priceRuleValue),
           publishedAt: new Date(),
         },
       });
@@ -288,6 +297,10 @@ export class ProductService {
    */
   static async update(id: string, data: UpdateProductDTO) {
     return await prisma.$transaction(async (tx) => {
+      const previous = await tx.product.findUnique({
+        where: { id },
+        select: { slug: true, category: { select: { slug: true } } },
+      });
       // Update main product data — use !== undefined so legitimate values (incl. null clears) apply
       const product = await tx.product.update({
         where: { id },
@@ -313,10 +326,40 @@ export class ProductService {
           ...(data.metaTitle !== undefined && { metaTitle: data.metaTitle }),
           ...(data.metaDescription !== undefined && { metaDescription: data.metaDescription }),
           ...(data.metaKeywords !== undefined && { metaKeywords: data.metaKeywords }),
+          ...(data.gtin !== undefined && { gtin: data.gtin || null }),
+          ...(data.mpn !== undefined && { mpn: data.mpn || null }),
           ...(data.isFeatured !== undefined && { isFeatured: data.isFeatured }),
           ...(data.isActive !== undefined && { isActive: data.isActive }),
+          ...(data.sourceUrl !== undefined && { sourceUrl: data.sourceUrl || null }),
+          ...(data.priceRule !== undefined && { priceRule: data.priceRule }),
+          ...(data.priceRuleValue !== undefined && {
+            priceRuleValue: data.priceRuleValue == null ? null : new Prisma.Decimal(data.priceRuleValue),
+          }),
         },
       });
+
+      if (previous && data.slug && data.slug !== previous.slug) {
+        let categorySlug = previous.category.slug;
+        if (data.categoryId) {
+          const nextCategory = await tx.category.findUnique({
+            where: { id: data.categoryId },
+            select: { slug: true },
+          });
+          if (nextCategory) categorySlug = nextCategory.slug;
+        }
+        for (const redirect of slugChangeRedirects({
+          previousCategorySlug: previous.category.slug,
+          previousSlug: previous.slug,
+          nextCategorySlug: categorySlug,
+          nextSlug: data.slug,
+        })) {
+          await tx.productRedirect.upsert({
+            where: { fromPath: redirect.fromPath },
+            update: { toPath: redirect.toPath },
+            create: { fromPath: redirect.fromPath, toPath: redirect.toPath },
+          });
+        }
+      }
 
       // Update images if provided
       if (data.images) {

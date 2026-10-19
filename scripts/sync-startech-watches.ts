@@ -11,6 +11,7 @@ import { PrismaClient, StockStatus } from '@prisma/client';
 import { ProductService } from '../src/services/product.service';
 import { WATCH_BRANDS, WATCH_LISTING_URL, watchListingHref } from '../src/lib/watchCatalog';
 import { loadEnvValue } from './load-env';
+import { parseSpecGroups } from './lib/specHtml';
 
 process.env.DATABASE_URL = loadEnvValue('DATABASE_URL');
 const prisma = new PrismaClient();
@@ -134,25 +135,6 @@ function pageCount(html: string): number {
   const total = Number(/Showing\s+\d+\s+to\s+\d+\s+of\s+(\d+)/i.exec(html)?.[1] || 0);
   if (total > 0) return Math.ceil(total / 90);
   return 1;
-}
-
-function parseSpecGroups(html: string): { title: string; rows: { name: string; value: string }[] }[] {
-  const start = html.indexOf('id="specification"');
-  if (start < 0) return [];
-  const end = html.indexOf('</section>', start);
-  const block = html.slice(start, end > start ? end : start + 30000);
-  const groups: { title: string; rows: { name: string; value: string }[] }[] = [];
-  for (const part of block.split(/<thead>/i).slice(1)) {
-    const title = stripTags(/heading-row[^>]*>([\s\S]*?)<\/td>/i.exec(part)?.[1] || '');
-    const rows: { name: string; value: string }[] = [];
-    for (const row of part.matchAll(/<td\s+class="name">([\s\S]*?)<\/td>\s*<td\s+class="value">([\s\S]*?)<\/td>/gi)) {
-      const name = stripTags(row[1] || '');
-      const value = stripTags(row[2] || '');
-      if (name && value) rows.push({ name, value });
-    }
-    if (title && rows.length > 0) groups.push({ title, rows });
-  }
-  return groups;
 }
 
 function parseDescription(html: string): string | null {

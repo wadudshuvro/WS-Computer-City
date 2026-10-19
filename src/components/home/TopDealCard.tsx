@@ -33,7 +33,7 @@ export function TopDealCard({ product }: { product: TopDealProduct }) {
       <Link href={`/products/${product.slug}`} className="flex flex-1 flex-col">
         <div className="mb-2 flex h-28 items-center justify-center">
           {product.imageUrl ? (
-            <img src={product.imageUrl} alt="" className="max-h-28 max-w-full object-contain" />
+            <img src={product.imageUrl} alt="" loading="lazy" decoding="async" className="max-h-28 max-w-full object-contain" />
           ) : (
             <span className="text-xs text-gray-400">No image</span>
           )}

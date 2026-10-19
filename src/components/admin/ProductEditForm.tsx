@@ -18,6 +18,7 @@ import {
 } from '@/lib/componentBrandConfig';
 import { AdminProductImagesEditor } from '@/components/admin/AdminProductImagesEditor';
 import { resolveAdminListSlug } from '@/lib/adminCategoryConfig';
+import SpecTableEditor from '@/components/admin/SpecTableEditor';
 
 interface Category {
   id: string;
@@ -68,8 +69,15 @@ interface Product {
   metaTitle: string | null;
   metaDescription: string | null;
   metaKeywords: string | null;
+  gtin?: string | null;
+  mpn?: string | null;
   isFeatured: boolean;
   isActive: boolean;
+  sourceUrl?: string | null;
+  priceRule?: 'MATCH' | 'MINUS_FIXED' | 'MINUS_PERCENT';
+  priceRuleValue?: number | string | null;
+  priceSyncStatus?: string;
+  priceFlagReason?: string | null;
   category: {
     id: string;
     name: string;
@@ -146,8 +154,13 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
     metaTitle: product.metaTitle || '',
     metaDescription: product.metaDescription || '',
     metaKeywords: product.metaKeywords || '',
+    gtin: product.gtin || '',
+    mpn: product.mpn || '',
     isFeatured: product.isFeatured,
     isActive: product.isActive,
+    sourceUrl: product.sourceUrl || '',
+    priceRule: product.priceRule || 'MATCH',
+    priceRuleValue: product.priceRuleValue != null ? String(product.priceRuleValue) : '',
   });
 
   // Initialize images from product
@@ -169,10 +182,16 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
     return specs;
   });
 
+  const specTableDefId =
+    product.specifications.find((spec) => spec.specificationDefinition.key === 'spec_table')
+      ?.specificationDefinition.id ?? null;
+
   // Category specifications
   const [categorySpecifications, setCategorySpecifications] = useState<Record<string, string | string[]>>(() => {
     const catSpecs: Record<string, string | string[]> = {};
     product.specifications.forEach(spec => {
+      // The grouped specification table is edited (and saved) by id in its own section.
+      if (spec.specificationDefinition.key === 'spec_table') return;
       const value = spec.value;
       // Check if it's a comma-separated list (multiselect)
       if (value.includes(', ')) {
@@ -420,6 +439,11 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
         metaTitle: formData.metaTitle || null,
         metaDescription: formData.metaDescription || null,
         metaKeywords: formData.metaKeywords || null,
+        gtin: formData.gtin || null,
+        mpn: formData.mpn || null,
+        sourceUrl: formData.sourceUrl.trim() || null,
+        priceRule: formData.priceRule,
+        priceRuleValue: formData.priceRuleValue ? Number(formData.priceRuleValue) : null,
         images: images
           .filter((img) => img.url)
           .map((img) => ({
@@ -815,6 +839,22 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
         </div>
       )}
 
+      {/* Specification table shown on the product page (grouped, one detail per line) */}
+      {specTableDefId && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-gray-900">Specification Table</h2>
+            <p className="text-sm text-gray-500">
+              Shown on the product page under Specification. Each line in a value box is one line on the site.
+            </p>
+          </div>
+          <SpecTableEditor
+            value={specifications[specTableDefId] ?? ''}
+            onChange={(next) => handleSpecChange(specTableDefId, next)}
+          />
+        </div>
+      )}
+
       {/* ========== SECTION 4: Pricing & Stock ========== */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center gap-3 mb-6">
@@ -898,6 +938,54 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
             </p>
           </div>
 
+          <div className="md:col-span-3">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Star Tech product URL</label>
+            <input
+              type="url"
+              name="sourceUrl"
+              value={formData.sourceUrl}
+              onChange={handleInputChange}
+              placeholder="https://www.startech.com.bd/..."
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Leave empty to keep this price manual. The nightly sync only updates products with a URL.
+            </p>
+            {product.priceFlagReason && (
+              <p className="text-sm text-amber-700 mt-2">
+                Last sync: {product.priceSyncStatus || 'flagged'} — {product.priceFlagReason}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Price rule</label>
+            <select
+              name="priceRule"
+              value={formData.priceRule}
+              onChange={handleInputChange}
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            >
+              <option value="MATCH">Match Star Tech</option>
+              <option value="MINUS_FIXED">Minus a fixed amount</option>
+              <option value="MINUS_PERCENT">Minus a percent</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Rule amount</label>
+            <input
+              type="number"
+              name="priceRuleValue"
+              value={formData.priceRuleValue}
+              onChange={handleInputChange}
+              placeholder={formData.priceRule === 'MINUS_PERCENT' ? 'Percent' : 'Taka'}
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              min="0"
+              step="0.01"
+            />
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Stock Quantity</label>
             <input
@@ -955,6 +1043,11 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
             <p className="text-sm text-gray-500">Optimize for search engines</p>
           </div>
         </div>
+        {!formData.shortDescription.trim() && !formData.description.trim() && (
+          <p className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            Thin content. Add a unique short description and specifications. Do not paste another store’s text.
+          </p>
+        )}
         
         <div className="space-y-6">
           <div>
@@ -981,6 +1074,28 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
               maxLength={160}
             />
             <p className="text-xs text-gray-500 mt-1">{formData.metaDescription.length}/160 characters</p>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">GTIN</label>
+              <input
+                type="text"
+                name="gtin"
+                value={formData.gtin}
+                onChange={handleInputChange}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">MPN</label>
+              <input
+                type="text"
+                name="mpn"
+                value={formData.mpn}
+                onChange={handleInputChange}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3"
+              />
+            </div>
           </div>
 
           <div>

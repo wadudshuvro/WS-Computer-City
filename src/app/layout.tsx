@@ -23,9 +23,6 @@ export const metadata: Metadata = {
     locale: 'en_BD',
     type: 'website',
   },
-  alternates: {
-    canonical: '/',
-  },
   robots: {
     index: true,
     follow: true,
@@ -40,6 +37,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className={`${inter.className} font-sans`} suppressHydrationWarning>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){function clean(node){if(!node||node.nodeType!==1||!node.attributes)return;for(var i=node.attributes.length-1;i>=0;i--){var name=node.attributes[i].name;if(name.indexOf('bis_')===0)node.removeAttribute(name);}}function walk(root){if(!root||root.nodeType!==1)return;clean(root);var nodes=root.querySelectorAll('*');for(var i=0;i<nodes.length;i++)clean(nodes[i]);}walk(document.documentElement);var observer=new MutationObserver(function(records){for(var i=0;i<records.length;i++){var record=records[i];if(record.type==='attributes')clean(record.target);else if(record.addedNodes){for(var j=0;j<record.addedNodes.length;j++)walk(record.addedNodes[j]);}}});observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true});setTimeout(function(){observer.disconnect();},5000);})();`,
+          }}
+        />
         <StorefrontChrome>{children}</StorefrontChrome>
       </body>
     </html>

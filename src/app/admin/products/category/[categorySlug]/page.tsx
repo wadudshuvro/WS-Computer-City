@@ -25,17 +25,37 @@ export default function CategoryProductsPage() {
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
-      const query = new URLSearchParams({
-        category: categorySlug,
-        limit: '100',
-        sort: 'updated',
-      });
-      if (search) query.set('search', search);
+      const pageSize = 100;
+      const collected: AdminProduct[] = [];
+      let page = 1;
+      let totalCount = 0;
 
-      const res = await fetch(`/api/admin/products?${query}`);
-      const data = await res.json();
-      setProducts(data.data || []);
-      setTotal(data.pagination?.total ?? data.data?.length ?? 0);
+      for (;;) {
+        const query = new URLSearchParams({
+          category: categorySlug,
+          limit: String(pageSize),
+          sort: 'updated',
+          page: String(page),
+        });
+        if (search) query.set('search', search);
+
+        const res = await fetch(`/api/admin/products?${query}`);
+        const data = await res.json();
+        if (!res.ok) {
+          setProducts([]);
+          setTotal(0);
+          return;
+        }
+
+        const batch: AdminProduct[] = data.data || [];
+        totalCount = data.pagination?.total ?? batch.length;
+        collected.push(...batch);
+        if (collected.length >= totalCount || batch.length === 0) break;
+        page += 1;
+      }
+
+      setProducts(collected);
+      setTotal(totalCount);
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {

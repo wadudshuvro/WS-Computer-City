@@ -49,6 +49,12 @@ export function resolveStorefrontCategoryHref(slug: string, parentSlug?: string 
     case 'hdd':
     case 'hard-disk-drive':
       return '/products?category=components&sub=hdd';
+    case 'portable-hdd':
+    case 'portable-hard-disk-drive':
+      return '/products?category=components&sub=portable-hdd';
+    case 'portable-hdd':
+    case 'portable-hard-disk-drive':
+      return '/products?category=components&sub=portable-hdd';
     case 'ssd':
     case 'nvme':
     case 'storage':

@@ -134,7 +134,7 @@ export async function GET(req: NextRequest) {
         _min: { price: true },
         _max: { price: true },
       }),
-      getFilterCounts(sub, type),
+      getFilterCounts(sub, type, brands[0] || null),
     ]);
 
     const formattedProducts = products.map((product) => ({
@@ -193,17 +193,21 @@ export async function GET(req: NextRequest) {
 
 async function getFilterCounts(
   sub?: string | null,
-  type?: string | null
+  type?: string | null,
+  brand?: string | null
 ): Promise<Record<string, Record<string, number>>> {
   try {
     const baseWhere: Prisma.ProductWhereInput = {
       isActive: true,
       ...(await buildCasingCategoryWhere(sub, type)),
     };
+    const scopedWhere: Prisma.ProductWhereInput = brand
+      ? { ...baseWhere, brand: { slug: brand } }
+      : baseWhere;
 
     const stockCountsRaw = await prisma.product.groupBy({
       by: ['stockStatus'],
-      where: baseWhere,
+      where: scopedWhere,
       _count: true,
     });
 
@@ -239,7 +243,7 @@ async function getFilterCounts(
         by: ['value'],
         where: {
           specificationDefinition: { key },
-          product: baseWhere,
+          product: scopedWhere,
         },
         _count: true,
       });

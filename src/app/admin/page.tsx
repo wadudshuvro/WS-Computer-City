@@ -2,10 +2,16 @@
 
 import Link from 'next/link';
 import { AdminShell } from '@/components/admin/AdminShell';
-import { Package, FolderTree, Tag, ArrowRight, Menu, ShoppingBag } from 'lucide-react';
+import { Package, FolderTree, Tag, ArrowRight, Menu, ShoppingBag, MessageSquare } from 'lucide-react';
 
 export default function AdminPage() {
   const cards = [
+    {
+      title: 'Issues',
+      description: 'Reports from the public form. Mark each one solved when you have fixed it.',
+      icon: MessageSquare,
+      links: [{ label: 'Review issues', href: '/admin/feedback' }],
+    },
     {
       title: 'Orders',
       description: 'Customer COD checkout submissions and contact details',

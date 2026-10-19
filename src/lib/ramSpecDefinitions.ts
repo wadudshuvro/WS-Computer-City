@@ -77,6 +77,35 @@ export const RAM_SPEED_OPTIONS = [
 
 export const RAM_TYPE_OPTIONS = ['DDR3', 'DDR4', 'DDR5'];
 
+export const LAPTOP_RAM_BRANDS = [
+  { slug: 'team', label: 'TEAM' },
+  { slug: 'colorful', label: 'Colorful' },
+  { slug: 'adata', label: 'Adata' },
+  { slug: 'transcend', label: 'Transcend' },
+  { slug: 'g-skill', label: 'G.Skill' },
+  { slug: 'kingston', label: 'Kingston' },
+  { slug: 'lexar', label: 'Lexar' },
+  { slug: 'corsair', label: 'Corsair' },
+  { slug: 'pny', label: 'PNY' },
+  { slug: 'twinmos', label: 'TwinMOS' },
+  { slug: 'ocpc', label: 'OCPC' },
+  { slug: 'netac', label: 'Netac' },
+  { slug: 'samsung', label: 'Samsung' },
+] as const;
+
+export const LAPTOP_RAM_SIZE_OPTIONS = ['4GB', '8GB', '16GB', '32GB'] as const;
+
+export const LAPTOP_RAM_SPEED_OPTIONS = [
+  '1600 MHz',
+  '2400 MHz',
+  '2666 MHz',
+  '3200 MHz',
+  '4800 MHz',
+  '5200 MHz',
+  '5600 MHz',
+  '6000 MHz',
+] as const;
+
 export const RAM_SIZE_OPTIONS = ['4GB', '8GB', '16GB', '24GB', '32GB', '48GB', '64GB', '128GB'];
 
 export const RAM_FEATURE_OPTIONS = ['ARGB', 'RGB RAM', 'Heatsink'];

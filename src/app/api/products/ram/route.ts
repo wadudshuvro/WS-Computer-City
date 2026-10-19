@@ -131,7 +131,7 @@ export async function GET(req: NextRequest) {
         _min: { price: true },
         _max: { price: true },
       }),
-      getFilterCounts(sub, type, brands[0] || null),
+      getFilterCounts(sub, type, brands[0] || null, sub === 'laptop-ram' ? 'laptop' : 'desktop'),
     ]);
 
     const formattedProducts = products.map((product) => ({
@@ -191,7 +191,8 @@ export async function GET(req: NextRequest) {
 async function getFilterCounts(
   sub?: string | null,
   type?: string | null,
-  brand?: string | null
+  brand?: string | null,
+  kind: 'desktop' | 'laptop' = 'desktop'
 ): Promise<Record<string, Record<string, number>>> {
   try {
     const baseWhere: Prisma.ProductWhereInput = {
@@ -256,7 +257,7 @@ async function getFilterCounts(
       }));
     }
 
-    return buildRamFilterCounts(specValuesByKey, stockCounts, brandCounts, Boolean(brand));
+    return buildRamFilterCounts(specValuesByKey, stockCounts, brandCounts, Boolean(brand), kind);
   } catch (error) {
     console.error('Error getting RAM filter counts:', error);
     return {};

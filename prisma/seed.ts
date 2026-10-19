@@ -1312,9 +1312,7 @@ async function main() {
   console.log('');
   console.log('🎉 Database seeded successfully!');
   console.log('');
-  console.log('📝 Admin Login Credentials:');
-  console.log('   Email:', admin.email);
-  console.log('   Password: admin123');
+  console.log('Admin login: use the account created above (password from ADMIN_INITIAL_PASSWORD).');
   console.log('');
   console.log('🔗 Next steps:');
   console.log('   1. Start dev server: npm run dev');

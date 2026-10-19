@@ -22,9 +22,11 @@ export async function GET(req: NextRequest) {
     });
 
     const tree = enrichMenuWithBrandFlyouts(buildMenuTree(rows, true));
-    return NextResponse.json({
-      data: tree.length > 0 ? tree : enrichMenuWithBrandFlyouts(FALLBACK_MENU_TREE),
-    });
+    return NextResponse.json(
+      { data: tree.length > 0 ? tree : enrichMenuWithBrandFlyouts(FALLBACK_MENU_TREE) },
+      // The menu rarely changes; let browsers/CDNs reuse it instead of re-downloading ~230 KB on every page load.
+      { headers: { 'Cache-Control': 'public, max-age=60, stale-while-revalidate=300' } }
+    );
   } catch (error) {
     console.error('Error fetching menus:', error);
     return NextResponse.json({

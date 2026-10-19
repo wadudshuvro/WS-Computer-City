@@ -13,7 +13,14 @@ export default function CatalogSpecificationTable({ getSpecValue }: CatalogSpeci
     const raw = getSpecValue('spec_table');
     if (raw) {
       const parsed = JSON.parse(raw) as SpecGroup[];
-      if (Array.isArray(parsed)) groups = parsed.filter((group) => group?.title && group.rows?.length);
+      if (Array.isArray(parsed)) {
+        groups = parsed
+          .map((group) => ({
+            ...group,
+            rows: (group?.rows ?? []).filter((row) => row?.name?.trim() && row?.value?.trim()),
+          }))
+          .filter((group) => group.title && group.rows.length);
+      }
     }
   } catch {
     groups = [];
@@ -45,8 +52,10 @@ export default function CatalogSpecificationTable({ getSpecValue }: CatalogSpeci
             <tbody>
               {group.rows.map((row) => (
                 <tr key={`${group.title}-${row.name}`} className="border-t border-gray-100">
-                  <td className="w-2/5 px-4 py-2.5 bg-gray-50 text-gray-600 align-top">{row.name}</td>
-                  <td className="px-4 py-2.5 text-gray-900">{row.value}</td>
+                  <td className="w-1/3 px-4 py-2.5 bg-gray-50 text-gray-600 align-top">{row.name}</td>
+                  <td className="px-4 py-2.5 align-top leading-relaxed text-gray-900 whitespace-pre-line">
+                    {row.value}
+                  </td>
                 </tr>
               ))}
             </tbody>

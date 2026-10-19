@@ -13,8 +13,14 @@ export type GamingMenuItem = {
   hideArrow?: boolean;
 };
 
+/**
+ * Keyboard and Mouse already live under Accessories; Headphone is hidden for now.
+ * The catalog leaves and products stay in place, only the Gaming dropdown skips them.
+ */
+export const GAMING_MENU_HIDDEN_SLUGS = new Set(['gaming-keyboard', 'gaming-mouse', 'gaming-headphone']);
+
 export const GAMING_MENU_ITEMS: GamingMenuItem[] = [
-  ...GAMING_LEAVES.map((leaf) => ({
+  ...GAMING_LEAVES.filter((leaf) => !GAMING_MENU_HIDDEN_SLUGS.has(leaf.slug)).map((leaf) => ({
     name: leaf.name,
     slug: leaf.slug,
     href: catalogLeafHref(leaf),

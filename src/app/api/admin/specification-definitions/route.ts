@@ -8,7 +8,7 @@ async function getCategoryAncestorIds(categoryId: string): Promise<string[]> {
 
   while (currentId) {
     ids.push(currentId);
-    const category = await prisma.category.findUnique({
+    const category: { parentId: string | null } | null = await prisma.category.findUnique({
       where: { id: currentId },
       select: { parentId: true },
     });

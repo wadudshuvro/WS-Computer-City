@@ -1,39 +1,32 @@
 import Link from 'next/link';
+import type { HomeTopCategory } from '@/lib/homeCategories';
 
-const categories = [
-  { name: 'Smartphone', icon: '📱', slug: 'smartphone' },
-  { name: 'Laptop', icon: '💻', slug: 'laptop' },
-  { name: 'Air Conditioner', icon: '❄️', slug: 'air-conditioner' },
-  { name: 'Desktop', icon: '🖥️', slug: 'desktop' },
-  { name: 'Processor', icon: '🔧', slug: 'processor' },
-  { name: 'Motherboard', icon: '🔌', slug: 'motherboard' },
-  { name: 'SSD', icon: '💾', slug: 'ssd' },
-  { name: 'Graphics Card', icon: '🎮', slug: 'graphics-card' },
-  { name: 'RAM', icon: '🧠', slug: 'ram' },
-  { name: 'Television', icon: '📺', slug: 'television' },
-  { name: 'Router', icon: '📡', slug: 'router' },
-  { name: 'Monitor', icon: '🖥️', slug: 'monitor' },
-  { name: 'Gaming Chair', icon: '🪑', slug: 'gaming-chair' },
-  { name: 'Power Supply', icon: '⚡', slug: 'power-supply' },
-  { name: 'Printer', icon: '🖨️', slug: 'printer' },
-  { name: 'Geyser', icon: '🚿', slug: 'geyser' },
-];
+export function CategoryGrid({ categories }: { categories: HomeTopCategory[] }) {
+  if (categories.length === 0) return null;
 
-export function CategoryGrid() {
   return (
-    <section className="border-b border-border bg-background py-4">
+    <section className="bg-background py-8">
       <div className="container mx-auto">
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 md:gap-3 lg:grid-cols-8">
+        <h2 className="mb-5 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+          Top <span className="bg-gradient-to-r from-blue-900 to-blue-500 bg-clip-text text-transparent">Categories</span>
+        </h2>
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7">
           {categories.map((category) => (
             <Link
-              key={category.slug}
-              href={`/products?category=${category.slug}`}
-              className="group flex flex-col items-center justify-center rounded-lg border border-border bg-card p-3 text-center shadow-card transition-colors hover:border-primary/40 hover:bg-muted/40"
+              key={category.name}
+              href={category.href}
+              className="group flex h-36 flex-col items-center justify-center gap-3 rounded-lg bg-[#f1f1f5] px-2 text-center transition-all hover:-translate-y-0.5 hover:bg-[#e8e8f0] hover:shadow-md md:h-40"
             >
-              <span className="mb-1.5 text-2xl leading-none" aria-hidden>
-                {category.icon}
+              <span className="flex h-16 w-16 items-center justify-center md:h-20 md:w-20">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={category.imageUrl ?? ''}
+                  alt={category.name}
+                  loading="lazy"
+                  className="max-h-full max-w-full object-contain mix-blend-multiply transition-transform group-hover:scale-105"
+                />
               </span>
-              <span className="text-xs font-medium leading-snug text-foreground group-hover:text-primary">
+              <span className="text-xs font-medium leading-snug text-slate-800 group-hover:text-blue-700 md:text-sm">
                 {category.name}
               </span>
             </Link>

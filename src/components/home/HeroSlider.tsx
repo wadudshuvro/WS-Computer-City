@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -157,6 +158,19 @@ export function HeroSlider() {
                 </Button>
               </CardContent>
             </Card>
+
+            <Link
+              href="/feedback"
+              className="flex flex-col justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-800 p-4 text-white"
+            >
+              <h3 className="mb-1 text-base font-semibold leading-snug">Report a problem</h3>
+              <p className="mb-3 text-xs leading-relaxed text-white/85">
+                Tell us if a page, product, or order is not working.
+              </p>
+              <span className="inline-flex w-fit rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold">
+                Send a message
+              </span>
+            </Link>
           </div>
         </div>
       </div>

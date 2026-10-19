@@ -5,14 +5,18 @@ import { credentialsRateLimit } from '@/lib/auth/loginLimit';
 
 const handler = NextAuth(authOptions);
 
-export { handler as GET };
+type AuthContext = { params: Promise<{ nextauth: string[] }> };
 
-export async function POST(req: NextRequest) {
+export function GET(req: NextRequest, context: AuthContext) {
+  return handler(req, context);
+}
+
+export async function POST(req: NextRequest, context: AuthContext) {
   if (req.nextUrl.pathname.includes('callback/credentials')) {
     const text = await req.clone().text();
     const email = new URLSearchParams(text).get('email')?.toLowerCase().trim();
     const blocked = await credentialsRateLimit(req.nextUrl.pathname, req.headers, email);
     if (blocked) return blocked;
   }
-  return handler(req);
+  return handler(req, context);
 }

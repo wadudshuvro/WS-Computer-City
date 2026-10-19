@@ -167,6 +167,37 @@ await prisma.user.create({
 
 ---
 
+## Price sync
+
+Selling prices stay aligned with a stored Star Tech product URL. Products with an empty URL are left alone. The job reads the selling price and stock only. A source move larger than 15% is flagged and not published.
+
+```bash
+npm run prices:link
+npm run prices:sync -- --dry-run --limit 3
+npm run prices:sync
+```
+
+`prices:link` fills empty URLs from the product slug (`https://www.startech.com.bd/{slug}`). It does not match names. Flagged rows are listed on Admin → Products.
+
+On this PC the database is local, so schedule the job with Windows Task Scheduler at 02:00:
+
+`npx tsx scripts/sync-startech-prices.ts`
+
+Working directory: the project folder. On a Linux host, use cron:
+
+```
+0 2 * * * cd /path/to/project && npx tsx scripts/sync-startech-prices.ts
+0 2 * * 0 cd /path/to/project && npx tsx scripts/sync-startech-prices.ts
+```
+
+The second line is the weekly alternative. `FIRST_RUN_REQUIRES_REVIEW` in `src/lib/priceSync/applyPriceRule.ts` is false, so the first successful read is saved.
+
+## Search
+
+Product pages live at `/{category-slug}/{product-slug}`. Old `/products/{slug}` addresses redirect there. Category pages live at `/{category-slug}`. Filter, sort, and campaign query strings on `/products` are `noindex`. The XML sitemap is `/sitemap.xml`. The Google Merchant feed is `/feeds/google-merchant.xml`.
+
+---
+
 ## 📖 Documentation
 
 - **[API Structure](docs/API_STRUCTURE.md)** - Complete API documentation

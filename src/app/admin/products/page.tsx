@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { Plus } from 'lucide-react';
 import { AdminShell } from '@/components/admin/AdminShell';
 import { CategoryContentGrid } from '@/components/admin/CategoryContentGrid';
-import { Plus } from 'lucide-react';
+import { PriceSyncSummary } from '@/components/admin/PriceSyncSummary';
 
 export default function AdminProductsPage() {
   return (
@@ -24,6 +25,7 @@ export default function AdminProductsPage() {
         </Link>
       }
     >
+      <PriceSyncSummary />
       <CategoryContentGrid />
     </AdminShell>
   );

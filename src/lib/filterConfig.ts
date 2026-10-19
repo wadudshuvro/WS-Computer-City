@@ -9,6 +9,9 @@ import {
   RAM_SIZE_OPTIONS,
   RAM_SPEED_OPTIONS,
   RAM_TYPE_OPTIONS,
+  LAPTOP_RAM_BRANDS,
+  LAPTOP_RAM_SIZE_OPTIONS,
+  LAPTOP_RAM_SPEED_OPTIONS,
 } from '@/lib/ramSpecDefinitions';
 import {
   MOTHERBOARD_AMD_SOCKETS,
@@ -45,6 +48,12 @@ import {
   HDD_SPEED_OPTIONS,
   HDD_TYPE_OPTIONS,
 } from '@/lib/hddSpecDefinitions';
+import {
+  PORTABLE_HDD_BRANDS,
+  PORTABLE_HDD_CAPACITY_OPTIONS,
+  PORTABLE_HDD_MATERIAL_OPTIONS,
+  PORTABLE_HDD_WEIGHT_OPTIONS,
+} from '@/lib/portableHddSpecDefinitions';
 import {
   SSD_BRANDS,
   SSD_CAPACITY_FILTER_OPTIONS,
@@ -607,13 +616,15 @@ const ramFeaturesFilter: FilterDefinition = {
 /** When a top brand pill is active, hide Brands — Star Tech G.Skill pattern. */
 export type RamFilterContext = {
   hideBrand: boolean;
+  kind?: 'desktop' | 'laptop';
 };
 
 export function resolveRamFilterContext(opts: {
   brand?: string | null;
+  kind?: 'desktop' | 'laptop';
 }): RamFilterContext {
   const brand = (opts.brand || '').trim().toLowerCase();
-  return { hideBrand: Boolean(brand) };
+  return { hideBrand: Boolean(brand), kind: opts.kind || 'desktop' };
 }
 
 export function getRamFilters(
@@ -622,17 +633,33 @@ export function getRamFilters(
   const ctx: RamFilterContext =
     typeof context === 'boolean' ? { hideBrand: context } : context;
 
-  // Star Tech order when brand scoped: Price → Availability → Capacity → Memory Type → BUS Speed → Other Feature
+  const laptop = ctx.kind === 'laptop';
   const filters: FilterDefinition[] = [
     priceRangeFilter,
     ramStockStatusFilter,
   ];
 
   if (!ctx.hideBrand) {
-    filters.push(ramBrandFilter);
+    filters.push(
+      laptop
+        ? {
+            ...ramBrandFilter,
+            options: LAPTOP_RAM_BRANDS.map((b) => ({ value: b.slug, label: b.label })),
+          }
+        : ramBrandFilter
+    );
   }
 
-  filters.push(ramSizeFilter, ramTypeFilter, ramSpeedFilter, ramFeaturesFilter);
+  filters.push(
+    laptop
+      ? { ...ramSizeFilter, options: LAPTOP_RAM_SIZE_OPTIONS.map((s) => ({ value: s, label: s })) }
+      : ramSizeFilter,
+    laptop ? { ...ramTypeFilter, name: 'Type' } : ramTypeFilter,
+    laptop
+      ? { ...ramSpeedFilter, options: LAPTOP_RAM_SPEED_OPTIONS.map((s) => ({ value: s, label: s })) }
+      : ramSpeedFilter
+  );
+  if (!laptop) filters.push(ramFeaturesFilter);
 
   return filters;
 }
@@ -930,6 +957,49 @@ export function getHddFilters(hideBrand = false): FilterDefinition[] {
   ];
 }
 
+const portableHddBrandFilter: FilterDefinition = {
+  key: 'brand',
+  name: 'Brand',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: PORTABLE_HDD_BRANDS.map((brand) => ({ value: brand.slug, label: brand.label })),
+};
+
+const portableHddCapacityFilter: FilterDefinition = {
+  key: 'capacity',
+  name: 'Capacity',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: PORTABLE_HDD_CAPACITY_OPTIONS.map((value) => ({ value, label: value })),
+};
+
+const portableHddWeightFilter: FilterDefinition = {
+  key: 'weight',
+  name: 'Weight',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: PORTABLE_HDD_WEIGHT_OPTIONS.map((value) => ({ value, label: value })),
+};
+
+const portableHddMaterialFilter: FilterDefinition = {
+  key: 'external_material',
+  name: 'External Material',
+  type: 'checkbox',
+  defaultExpanded: true,
+  options: PORTABLE_HDD_MATERIAL_OPTIONS.map((value) => ({ value, label: value })),
+};
+
+export function getPortableHddFilters(hideBrand = false): FilterDefinition[] {
+  return [
+    priceRangeFilter,
+    hddStockStatusFilter,
+    ...(hideBrand ? [] : [portableHddBrandFilter]),
+    portableHddCapacityFilter,
+    portableHddWeightFilter,
+    portableHddMaterialFilter,
+  ];
+}
+
 const ssdStockStatusFilter: FilterDefinition = {
   key: 'stockStatus',
   name: 'Availability',
@@ -1103,11 +1173,11 @@ const casingSpecialFeatureFilter: FilterDefinition = {
   options: CASING_SPECIAL_FEATURE_OPTIONS.map((v) => ({ value: v, label: v })),
 };
 
-export function getCasingFilters(): FilterDefinition[] {
+export function getCasingFilters(opts?: { hideBrand?: boolean }): FilterDefinition[] {
   return [
     priceRangeFilter,
     casingStockStatusFilter,
-    casingBrandFilter,
+    ...(opts?.hideBrand ? [] : [casingBrandFilter]),
     casingColorFilter,
     casingTypeFilter,
     casingMotherboardTypeFilter,

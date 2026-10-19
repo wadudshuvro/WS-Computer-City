@@ -14,6 +14,7 @@ import { ComponentsOverviewFilters } from '@/components/products/ComponentsOverv
 import { CatalogListingFilters } from '@/components/products/CatalogListingFilters';
 import { WatchListingFilters } from '@/components/products/WatchListingFilters';
 import { MonitorListingFilters } from '@/components/products/MonitorListingFilters';
+import { RouterListingFilters } from '@/components/products/RouterListingFilters';
 import { canPurchase } from '@/lib/purchaseStatus';
 import {
   COMPONENT_OVERVIEW_PILLS,
@@ -26,9 +27,11 @@ import { getGpuListingCardLines } from '@/lib/gpuSpecDefinitions';
 import { getMotherboardListingCardLines } from '@/lib/motherboardPdpDisplay';
 import { getRamListingCardLines } from '@/lib/ramPdpDisplay';
 import { RAM_SPEC_FILTER_KEYS } from '@/lib/ramFilterMappings';
-import { RAM_BRANDS } from '@/lib/ramSpecDefinitions';
+import { LAPTOP_RAM_BRANDS, RAM_BRANDS } from '@/lib/ramSpecDefinitions';
 import { PSU_BRANDS } from '@/lib/psuSpecDefinitions';
 import { HDD_BRANDS } from '@/lib/hddSpecDefinitions';
+import { PortableHddFilters } from '@/components/products/PortableHddFilters';
+import { PORTABLE_HDD_BRANDS } from '@/lib/portableHddSpecDefinitions';
 import { SSD_BRANDS } from '@/lib/ssdSpecDefinitions';
 import { CASING_BRANDS } from '@/lib/casingSpecDefinitions';
 import { CPU_COOLER_BRANDS, getCpuCoolerListingCardLines } from '@/lib/cpuCoolerSpecDefinitions';
@@ -36,7 +39,12 @@ import { MOTHERBOARD_BRANDS } from '@/lib/componentBrandConfig';
 import { ACCESSORIES_BRAND_FLYOUTS } from '@/lib/accessoriesBrandMenu';
 import { GAMING_BRAND_FLYOUTS } from '@/lib/gamingMenu';
 import { findGadgetLeaf, gadgetNestedLeaves } from '@/lib/gadgetCatalog';
+import { WATCH_BRANDS } from '@/lib/watchCatalog';
 import { MONITOR_BRANDS, MONITOR_TYPE_FILTERS } from '@/lib/monitorCatalog';
+import { ROUTER_BRANDS } from '@/lib/routerCatalog';
+import { ROUTER_FILTER_KEYS } from '@/lib/routerFilters';
+import { UpsListingFilters } from '@/components/products/UpsListingFilters';
+import { UPS_BRANDS, UPS_FILTER_KEYS } from '@/lib/upsCatalog';
 import {
   catalogGroupHref,
   catalogLeafHref,
@@ -163,6 +171,10 @@ function ProductsPageContent() {
   const isWatchCategory =
     categoryParam === 'watch' || (categoryParam === 'gadget' && subCategory === 'watch');
   const isMonitorCategory = categoryParam === 'monitor';
+  const isRouterCategory =
+    categoryParam === 'router' || (categoryParam === 'networking' && subCategory === 'router');
+  const isUpsCategory =
+    categoryParam === 'ups' || (categoryParam === 'power' && subCategory === 'ups');
   const catalogGroup: CatalogGroup | null =
     (categoryParam === 'accessories' || categoryParam === 'gaming' || categoryParam === 'gadget') &&
     !isWatchCategory
@@ -198,6 +210,7 @@ function ProductsPageContent() {
 
   const ramFilterContext = resolveRamFilterContext({
     brand: isRamCategory ? brandParam || null : null,
+    kind: subCategory === 'laptop-ram' ? 'laptop' : 'desktop',
   });
 
   // Power Supply category
@@ -212,6 +225,11 @@ function ProductsPageContent() {
     subCategory === 'hard-disk-drive' ||
     categoryParam === 'hdd' ||
     categoryParam === 'hard-disk-drive';
+
+  const isPortableHddCategory =
+    subCategory === 'portable-hdd' ||
+    subCategory === 'portable-hard-disk-drive' ||
+    categoryParam === 'portable-hdd';
 
   /** Show All Component — Star Tech–style overview (no sub) */
   const isComponentsOverview = categoryParam === 'components' && !subCategory;
@@ -229,11 +247,11 @@ function ProductsPageContent() {
   }, [isProcessorCategory]);
 
   useEffect(() => {
-    if (!isSsdCategory || searchParams.has('stockStatus')) return;
+    if ((!isSsdCategory && !isRouterCategory && !isUpsCategory) || searchParams.has('stockStatus')) return;
     const params = new URLSearchParams(searchParams.toString());
     params.set('stockStatus', 'IN_STOCK');
     router.replace(`/products?${params.toString()}`, { scroll: false });
-  }, [isSsdCategory, searchQuery, router, searchParams]);
+  }, [isSsdCategory, isRouterCategory, isUpsCategory, searchQuery, router, searchParams]);
 
   useEffect(() => {
     fetchProducts();
@@ -257,8 +275,18 @@ function ProductsPageContent() {
         params.set('sort', 'price_asc');
       }
 
-      if (isSsdCategory && !params.get('stockStatus')) {
+      if ((isSsdCategory || isRouterCategory || isUpsCategory) && !params.get('stockStatus')) {
         params.set('stockStatus', 'IN_STOCK');
+      }
+
+      if (isRouterCategory) {
+        params.set('category', 'router');
+        params.delete('sub');
+      }
+
+      if (isUpsCategory) {
+        params.set('category', 'ups');
+        params.delete('sub');
       }
 
       if (isMonitorCategory) {
@@ -307,6 +335,8 @@ function ProductsPageContent() {
                 ? `/api/products/psu?${params.toString()}`
                 : isHddCategory
                   ? `/api/products/hdd?${params.toString()}`
+                : isPortableHddCategory
+                  ? `/api/products/portable-hdd?${params.toString()}`
                 : isSsdCategory
                   ? `/api/products/ssd?${params.toString()}`
                   : isCasingCategory
@@ -443,6 +473,34 @@ function ProductsPageContent() {
     router.push(`/products?${params.toString()}`);
   };
 
+  const handleRouterBrandClick = (brandSlug: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (params.get('brand') === brandSlug) {
+      params.delete('brand');
+    } else {
+      params.set('brand', brandSlug);
+    }
+    params.set('category', 'networking');
+    params.set('sub', 'router');
+    ROUTER_FILTER_KEYS.forEach((key) => params.delete(key));
+    params.set('page', '1');
+    router.push(`/products?${params.toString()}`);
+  };
+
+  const handleUpsBrandClick = (brandSlug: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (params.get('brand') === brandSlug) {
+      params.delete('brand');
+    } else {
+      params.set('brand', brandSlug);
+    }
+    params.set('category', 'power');
+    params.set('sub', 'ups');
+    UPS_FILTER_KEYS.forEach((key) => params.delete(key));
+    params.set('page', '1');
+    router.push(`/products?${params.toString()}`);
+  };
+
   const handleMonitorBrandClick = (brandSlug: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (params.get('brand') === brandSlug) {
@@ -538,6 +596,20 @@ function ProductsPageContent() {
     router.push(`/products?${params.toString()}`);
   };
 
+  const handlePortableHddBrandClick = (brandSlug: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const current = params.get('brand');
+    if (current === brandSlug) params.delete('brand');
+    else params.set('brand', brandSlug);
+    params.delete('capacity');
+    params.delete('weight');
+    params.delete('external_material');
+    params.set('page', '1');
+    params.set('sub', 'portable-hdd');
+    if (!params.has('category')) params.set('category', 'components');
+    router.push(`/products?${params.toString()}`);
+  };
+
   const handleSsdBrandClick = (brandSlug: string) => {
     const params = new URLSearchParams(searchParams.toString());
     const current = params.get('brand');
@@ -566,6 +638,9 @@ function ProductsPageContent() {
     }
     params.set('page', '1');
     params.set('sub', 'computer-case');
+    ['color', 'case_type', 'motherboard_type', 'side_panel', 'psu_included', 'special_features'].forEach((key) =>
+      params.delete(key)
+    );
     if (!params.has('category')) {
       params.set('category', 'components');
     }
@@ -634,10 +709,12 @@ function ProductsPageContent() {
     if (isComponentsOverview) return 'Computer Components Price in Bangladesh';
     if (isProcessorCategory) return 'Processor Price in Bangladesh';
     if (isGpuCategory) return 'Graphics Card Price In BD 2026';
+    if (isRamCategory && subCategory === 'laptop-ram') return 'Laptop RAM Price in Bangladesh';
     if (isRamCategory) return 'Desktop RAM Price in Bangladesh';
     if (isMotherboardCategory) return 'Motherboard Price in Bangladesh';
     if (isPsuCategory) return 'Power Supply Price in Bangladesh';
     if (isHddCategory) return 'Hard Disk Price in Bangladesh';
+    if (isPortableHddCategory) return 'Portable Hard Disk Price in Bangladesh';
     if (isSsdCategory) return 'SSD Price in Bangladesh 2026';
     if (isCasingCategory) return 'Computer Casing Price in Bangladesh';
     if (isCpuCoolerCategory) return 'CPU Cooler Price in Bangladesh';
@@ -655,6 +732,8 @@ function ProductsPageContent() {
       return activeCatalogLeaf ? `${activeCatalogLeaf.name} Price in Bangladesh` : 'Gadget';
     }
     if (isWatchCategory) return 'Smart Watch Price in Bangladesh';
+    if (isRouterCategory) return 'Router Price in Bangladesh';
+    if (isUpsCategory) return 'UPS Price in Bangladesh';
     if (isMonitorCategory) {
       return MONITOR_TYPE_FILTERS[subCategory || '']?.title || 'Monitor Price in Bangladesh';
     }
@@ -666,10 +745,12 @@ function ProductsPageContent() {
     if (isComponentsOverview) return 'Component';
     if (isProcessorCategory) return 'Processor';
     if (isGpuCategory) return 'Graphics Card';
+    if (isRamCategory && subCategory === 'laptop-ram') return 'Laptop RAM';
     if (isRamCategory) return 'Desktop RAM';
     if (isMotherboardCategory) return 'Motherboard';
     if (isPsuCategory) return 'Power Supply';
     if (isHddCategory) return 'Hard Disk Drive';
+    if (isPortableHddCategory) return 'Portable Hard Disk Drive';
     if (isSsdCategory) return 'SSD';
     if (isCasingCategory) return 'Casing';
     if (isCpuCoolerCategory) return 'CPU Cooler';
@@ -677,6 +758,8 @@ function ProductsPageContent() {
     if (catalogGroup === 'gaming') return activeCatalogLeaf?.name || 'Gaming';
     if (catalogGroup === 'gadget') return activeCatalogLeaf?.name || 'Gadget';
     if (isWatchCategory) return 'Smart Watch';
+    if (isRouterCategory) return 'Router';
+    if (isUpsCategory) return 'UPS';
     if (isMonitorCategory) return subCategory ? MONITOR_TYPE_FILTERS[subCategory]?.title.replace(' Price in Bangladesh', '') || 'Monitor' : 'Monitor';
     return 'Products';
   };
@@ -703,17 +786,27 @@ function ProductsPageContent() {
     if (isMonitorCategory && brandParam) {
       return MONITOR_BRANDS.find((brand) => brand.slug === brandParam)?.label ?? brandParam;
     }
+    if (isRouterCategory && brandParam) {
+      return ROUTER_BRANDS.find((brand) => brand.slug === brandParam)?.label ?? brandParam;
+    }
+    if (isUpsCategory && brandParam) {
+      return UPS_BRANDS.find((brand) => brand.slug === brandParam)?.label ?? brandParam;
+    }
     if (isMotherboardCategory && brandParam) {
       return MOTHERBOARD_BRANDS.find((b) => b.slug === brandParam)?.label ?? null;
     }
     if (isRamCategory && brandParam) {
-      return RAM_BRANDS.find((b) => b.slug === brandParam)?.label ?? null;
+      const brands = subCategory === 'laptop-ram' ? LAPTOP_RAM_BRANDS : RAM_BRANDS;
+      return brands.find((b) => b.slug === brandParam)?.label ?? null;
     }
     if (isPsuCategory && brandParam) {
       return PSU_BRANDS.find((b) => b.slug === brandParam)?.label ?? null;
     }
     if (isHddCategory && brandParam) {
       return HDD_BRANDS.find((b) => b.slug === brandParam)?.label ?? null;
+    }
+    if (isPortableHddCategory && brandParam) {
+      return PORTABLE_HDD_BRANDS.find((b) => b.slug === brandParam)?.label ?? null;
     }
     if (isSsdCategory && brandParam) {
       return SSD_BRANDS.find((b) => b.slug === brandParam)?.label ?? null;
@@ -764,6 +857,8 @@ function ProductsPageContent() {
       params.set('sub', 'power-supply');
     } else if (isHddCategory) {
       params.set('sub', 'hdd');
+    } else if (isPortableHddCategory) {
+      params.set('sub', 'portable-hdd');
     } else if (isSsdCategory) {
       params.set('sub', 'ssd');
     } else if (isCasingCategory) {
@@ -834,6 +929,36 @@ function ProductsPageContent() {
                   <span className="text-gray-900 font-medium">Smart Watch</span>
                 )}
               </>
+            ) : isUpsCategory ? (
+              <>
+                <Link href="/products?category=power" className="text-gray-500 hover:text-blue-600">
+                  Power
+                </Link>
+                <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
+                {activeBrandFilterLabel ? (
+                  <>
+                    <Link href="/products?category=power&sub=ups" className="text-gray-500 hover:text-blue-600">
+                      UPS
+                    </Link>
+                    <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
+                    <span className="text-gray-900 font-medium">{activeBrandFilterLabel}</span>
+                  </>
+                ) : (
+                  <span className="text-gray-900 font-medium">UPS</span>
+                )}
+              </>
+            ) : isRouterCategory ? (
+              activeBrandFilterLabel ? (
+                <>
+                  <Link href="/products?category=networking&sub=router" className="text-gray-500 hover:text-blue-600">
+                    Router
+                  </Link>
+                  <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
+                  <span className="text-gray-900 font-medium">{activeBrandFilterLabel}</span>
+                </>
+              ) : (
+                <span className="text-gray-900 font-medium">Router</span>
+              )
             ) : isMonitorCategory ? (
               activeBrandFilterLabel ? (
                 <>
@@ -882,7 +1007,7 @@ function ProductsPageContent() {
         <div className="max-w-[1400px] mx-auto px-4 py-6">
           <h1
             className={`text-2xl font-bold mb-2 ${
-              isComponentsOverview || isProcessorCategory || isCatalogCategory || isWatchCategory || isMonitorCategory
+              isComponentsOverview || isProcessorCategory || isCatalogCategory || isWatchCategory || isMonitorCategory || isRouterCategory || isUpsCategory
                 ? 'text-blue-600'
                 : 'text-gray-900'
             }`}
@@ -1006,13 +1131,13 @@ function ProductsPageContent() {
           {isRamCategory && (
             <>
               <p className="text-sm text-gray-600 max-w-4xl mb-4">
-                Desktop RAM Price in BD 2026 begins at BDT 1,500/- and can go up to BDT 45,000/- depending on the brand,
-                capacity, and speed. LogicBay BD offers DDR4 and DDR5 desktop memory from leading brands including
-                Kingston, Corsair, G.SKILL, Team, and more.
+                {subCategory === 'laptop-ram'
+                  ? 'Laptop RAM Price in Bangladesh starts from SO-DIMM modules for notebooks. Filter by brand, capacity, DDR type, and bus speed.'
+                  : 'Desktop RAM Price in BD 2026 begins at BDT 1,500/- and can go up to BDT 45,000/- depending on the brand, capacity, and speed. LogicBay BD offers DDR4 and DDR5 desktop memory from leading brands including Kingston, Corsair, G.SKILL, Team, and more.'}
               </p>
 
               <div className="flex flex-wrap gap-2 mt-4">
-                {RAM_BRANDS.map((brand) => {
+                {(subCategory === 'laptop-ram' ? LAPTOP_RAM_BRANDS : RAM_BRANDS).map((brand) => {
                   const isActive = brandParam === brand.slug;
                   return (
                     <button
@@ -1108,6 +1233,33 @@ function ProductsPageContent() {
                       key={brand.slug}
                       type="button"
                       onClick={() => handleHddBrandClick(brand.slug)}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                        isActive
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600'
+                      }`}
+                    >
+                      {brand.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {isPortableHddCategory && (
+            <>
+              <p className="text-sm text-gray-600 max-w-4xl mb-4">
+                Portable Hard Disk Price in Bangladesh covers external drives. Filter by brand, capacity, weight, and case material.
+              </p>
+              <div className="flex flex-wrap gap-2 mt-4">
+                {PORTABLE_HDD_BRANDS.map((brand) => {
+                  const isActive = brandParam === brand.slug;
+                  return (
+                    <button
+                      key={brand.slug}
+                      type="button"
+                      onClick={() => handlePortableHddBrandClick(brand.slug)}
                       className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
                         isActive
                           ? 'bg-blue-600 text-white border-blue-600'
@@ -1226,6 +1378,62 @@ function ProductsPageContent() {
                       key={brand.slug}
                       type="button"
                       onClick={() => handleWatchBrandClick(brand.slug)}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                        isActive
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600'
+                      }`}
+                    >
+                      {brand.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {isUpsCategory && (
+            <>
+              <p className="text-sm text-gray-600 max-w-4xl">
+                UPS Price in Bangladesh. Choose a brand, then filter by Volt Ampere (VA), load capacity in
+                watts, and body material.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {UPS_BRANDS.map((brand) => {
+                  const isActive = brandParam === brand.slug;
+                  return (
+                    <button
+                      key={brand.slug}
+                      type="button"
+                      onClick={() => handleUpsBrandClick(brand.slug)}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                        isActive
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600'
+                      }`}
+                    >
+                      {brand.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {isRouterCategory && (
+            <>
+              <p className="text-sm text-gray-600 max-w-4xl">
+                Router Price in Bangladesh. Choose a brand, then filter by type, Wi-Fi standard, speed,
+                bands, LAN ports, and features.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {ROUTER_BRANDS.map((brand) => {
+                  const isActive = brandParam === brand.slug;
+                  return (
+                    <button
+                      key={brand.slug}
+                      type="button"
+                      onClick={() => handleRouterBrandClick(brand.slug)}
                       className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
                         isActive
                           ? 'bg-blue-600 text-white border-blue-600'
@@ -1372,6 +1580,27 @@ function ProductsPageContent() {
             </div>
           )}
 
+          {isUpsCategory && (
+            <div className="hidden lg:block w-[280px] flex-shrink-0">
+              <UpsListingFilters
+                priceRange={priceRange}
+                filterCounts={filterCounts}
+                contextKey="ups"
+              />
+            </div>
+          )}
+
+          {isRouterCategory && (
+            <div className="hidden lg:block w-[280px] flex-shrink-0">
+              <RouterListingFilters
+                priceRange={priceRange}
+                filterCounts={filterCounts}
+                hideBrand={Boolean(brandParam)}
+                contextKey={`router-${brandParam || 'all'}`}
+              />
+            </div>
+          )}
+
           {isMonitorCategory && (
             <div className="hidden lg:block w-[280px] flex-shrink-0">
               <MonitorListingFilters
@@ -1435,6 +1664,12 @@ function ProductsPageContent() {
             </div>
           )}
 
+          {isPortableHddCategory && (
+            <div className="hidden lg:block w-[280px] flex-shrink-0">
+              <PortableHddFilters priceRange={priceRange} filterCounts={filterCounts} hideBrand={Boolean(brandParam)} />
+            </div>
+          )}
+
           {isSsdCategory && (
             <div className="hidden lg:block w-[280px] flex-shrink-0">
               <SsdFilters priceRange={priceRange} filterCounts={filterCounts} hideBrand={Boolean(brandParam)} />
@@ -1443,7 +1678,7 @@ function ProductsPageContent() {
 
           {isCasingCategory && (
             <div className="hidden lg:block w-[280px] flex-shrink-0">
-              <CasingFilters priceRange={priceRange} filterCounts={filterCounts} />
+              <CasingFilters priceRange={priceRange} filterCounts={filterCounts} hideBrand={Boolean(brandParam)} />
             </div>
           )}
 
@@ -1462,11 +1697,14 @@ function ProductsPageContent() {
             isMotherboardCategory ||
             isPsuCategory ||
             isHddCategory ||
+            isPortableHddCategory ||
             isSsdCategory ||
             isCasingCategory ||
             isCpuCoolerCategory ||
             isWatchCategory ||
-            isMonitorCategory) && (
+            isMonitorCategory ||
+            isRouterCategory ||
+            isUpsCategory) && (
             <button
               onClick={() => setShowMobileFilters(true)}
               className="lg:hidden fixed bottom-4 left-4 z-40 bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2"
@@ -1485,11 +1723,14 @@ function ProductsPageContent() {
             isMotherboardCategory ||
             isPsuCategory ||
             isHddCategory ||
+            isPortableHddCategory ||
             isSsdCategory ||
             isCasingCategory ||
             isCpuCoolerCategory ||
             isWatchCategory ||
-            isMonitorCategory) &&
+            isMonitorCategory ||
+            isRouterCategory ||
+            isUpsCategory) &&
             showMobileFilters && (
             <div className="lg:hidden fixed inset-0 z-[150] bg-black/50">
               <div className="absolute right-0 top-0 bottom-0 w-[320px] bg-white overflow-y-auto">
@@ -1551,11 +1792,14 @@ function ProductsPageContent() {
                 {isHddCategory && (
                   <HddFilters priceRange={priceRange} filterCounts={filterCounts} hideBrand={Boolean(brandParam)} />
                 )}
+                {isPortableHddCategory && (
+                  <PortableHddFilters priceRange={priceRange} filterCounts={filterCounts} hideBrand={Boolean(brandParam)} />
+                )}
                 {isSsdCategory && (
                   <SsdFilters priceRange={priceRange} filterCounts={filterCounts} hideBrand={Boolean(brandParam)} />
                 )}
                 {isCasingCategory && (
-                  <CasingFilters priceRange={priceRange} filterCounts={filterCounts} />
+                  <CasingFilters priceRange={priceRange} filterCounts={filterCounts} hideBrand={Boolean(brandParam)} />
                 )}
                 {isCpuCoolerCategory && (
                   <CpuCoolerFilters priceRange={priceRange} filterCounts={filterCounts} />
@@ -1566,6 +1810,21 @@ function ProductsPageContent() {
                     filterCounts={filterCounts}
                     hideBrand={Boolean(brandParam)}
                     contextKey={`watch-mobile-${brandParam || 'all'}`}
+                  />
+                )}
+                {isUpsCategory && (
+                  <UpsListingFilters
+                    priceRange={priceRange}
+                    filterCounts={filterCounts}
+                    contextKey="ups-mobile"
+                  />
+                )}
+                {isRouterCategory && (
+                  <RouterListingFilters
+                    priceRange={priceRange}
+                    filterCounts={filterCounts}
+                    hideBrand={Boolean(brandParam)}
+                    contextKey={`router-mobile-${brandParam || 'all'}`}
                   />
                 )}
                 {isMonitorCategory && (
@@ -1775,6 +2034,8 @@ function ProductsPageContent() {
                             <img
                               src={primaryImage.url}
                               alt={primaryImage.alt || product.name}
+                              loading="lazy"
+                              decoding="async"
                               className="h-full w-full object-contain p-3 group-hover:scale-105 transition-transform duration-300"
                             />
                           ) : (
@@ -1796,7 +2057,7 @@ function ProductsPageContent() {
 
                         {/* Product Info */}
                         <div className="flex flex-1 flex-col p-3">
-                          <Link href={`/products/${product.slug}`}>
+                          <Link href={product.category?.slug ? `/${product.category.slug}/${product.slug}` : `/products/${product.slug}`}>
                             <h3 className="mb-2 min-h-[2.5rem] text-sm font-semibold text-gray-900 line-clamp-2 transition-colors hover:text-blue-600">
                               {product.name}
                             </h3>
@@ -1864,6 +2125,8 @@ function ProductsPageContent() {
                             <img
                               src={primaryImage.url}
                               alt={primaryImage.alt || product.name}
+                              loading="lazy"
+                              decoding="async"
                               className="w-full h-full object-contain p-4"
                             />
                           ) : (
@@ -1883,7 +2146,7 @@ function ProductsPageContent() {
                         {/* Product Info */}
                         <div className="flex-1 p-4 flex flex-col justify-between">
                           <div>
-                            <Link href={`/products/${product.slug}`}>
+                            <Link href={product.category?.slug ? `/${product.category.slug}/${product.slug}` : `/products/${product.slug}`}>
                               <h3 className="font-medium text-gray-900 mb-2 hover:text-blue-600 transition-colors">
                                 {product.name}
                               </h3>
