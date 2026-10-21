@@ -3,6 +3,8 @@
  * Smart Watch is already imported; this script only reparents that category.
  * Run: npx tsx scripts/sync-startech-gadgets.ts
  */
+import { stripSourceFromHtml } from './lib/stripSourceMentions';
+import { SOURCE_SITE } from '../src/lib/priceSync/fetchSourcePrice';
 import fs from 'fs';
 import path from 'path';
 import { PrismaClient, StockStatus } from '@prisma/client';
@@ -369,7 +371,7 @@ async function importCard(card: Card, categoryId: string, filters: GadgetLeaf['f
     null;
   const features = parseKeyFeatures(html);
   const featureLines = features.length > 0 ? features : card.features;
-  const description = parseDescription(html);
+  const description = stripSourceFromHtml(parseDescription(html));
   const availability = /property="product:availability"[^>]*content="([^"]+)"/i.exec(html)?.[1] || '';
   const stockStatus: StockStatus = /out of stock/i.test(availability) || card.outOfStock
     ? 'OUT_OF_STOCK'
@@ -499,7 +501,7 @@ async function main() {
     }
     let firstHtml = '';
     try {
-      firstHtml = await fetchText(`${leaf.startechUrl}?limit=90`);
+      firstHtml = await fetchText(`${SOURCE_SITE}${leaf.sourcePath}?limit=90`);
     } catch (error) {
       console.log(`SKIP category ${leaf.slug}: ${(error as Error).message}`);
       continue;
@@ -507,7 +509,7 @@ async function main() {
     const pages = Math.min(pageCount(firstHtml), 80);
     console.log(`\n${leaf.name}: ${pages} page(s)`);
     for (let page = 1; page <= pages; page++) {
-      const html = page === 1 ? firstHtml : await fetchText(`${leaf.startechUrl}?limit=90&page=${page}`);
+      const html = page === 1 ? firstHtml : await fetchText(`${SOURCE_SITE}${leaf.sourcePath}?limit=90&page=${page}`);
       for (const card of parseListing(html)) {
         try {
           const result = await importCard(card, categoryId, leaf.filters);

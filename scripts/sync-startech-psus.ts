@@ -2,6 +2,7 @@
  * Import Star Tech power supplies: photos, price, specification table, description, warranty, and filter facets.
  * Run: npx tsx scripts/sync-startech-psus.ts
  */
+import { stripSourceFromHtml } from './lib/stripSourceMentions';
 import fs from 'fs';
 import path from 'path';
 import { PrismaClient, StockStatus } from '@prisma/client';
@@ -325,7 +326,7 @@ async function importCard(card: Card, categoryId: string) {
       .find((row) => /warranty/i.test(row.name))?.value || null;
   const features = parseKeyFeatures(html);
   const featureLines = features.length > 0 ? features : card.features;
-  const description = parseDescription(html);
+  const description = stripSourceFromHtml(parseDescription(html));
   const availability = /property="product:availability"[^>]*content="([^"]+)"/i.exec(html)?.[1] || '';
   const stockStatus: StockStatus =
     /out of stock/i.test(availability) || card.outOfStock

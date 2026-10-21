@@ -77,7 +77,7 @@ export const GPU_SPEC_DEFINITIONS: GpuSpecDefinitionSeed[] = [
     isRequired: true,
     order: 4,
     placeholder: 'e.g., 550 MHz',
-    helpText: 'Shown on listing cards (Star Tech-style Engine Clock line)',
+    helpText: 'Shown on listing cards (Engine Clock line)',
   },
   {
     key: 'memory_clock',

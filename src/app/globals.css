@@ -136,3 +136,12 @@
     @apply text-xs font-medium leading-normal text-muted-foreground;
   }
 }
+
+@keyframes hero-progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}

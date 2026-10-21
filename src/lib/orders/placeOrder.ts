@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { getDeliveryFee, DeliveryMethodId } from '@/lib/cart/delivery';
-import { sendOrderEmail } from '@/lib/launch/mail';
+import { sendAdminOrderEmail, sendOrderEmail } from '@/lib/launch/mail';
 
 export type PlaceOrderInput = {
   firstName: string;
@@ -133,6 +133,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlacedOrder> {
               })),
             },
           },
+          include: { items: true },
         });
       } catch (error) {
         if ((error as { code?: string }).code === 'P2002' && attempt < 2) {
@@ -160,12 +161,44 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlacedOrder> {
     throw error;
   }
 
-  await sendOrderEmail({
-    to: input.email,
-    orderNumber: created.orderNumber,
-    total: Number(created.total),
-    firstName: input.firstName,
-  });
+  // The order is already saved. Email problems must never fail the checkout.
+  // Wait for the emails at most 8s so the customer is never kept on the checkout page.
+  await Promise.race([
+    new Promise((resolve) => setTimeout(resolve, 8000)),
+    Promise.allSettled([
+    sendAdminOrderEmail({
+      orderNumber: created.orderNumber,
+      placedAt: created.createdAt,
+      firstName: created.firstName,
+      lastName: created.lastName,
+      mobile: created.mobile,
+      email: created.email,
+      address: created.address,
+      upazila: created.upazila,
+      district: created.district,
+      deliveryMethod: created.deliveryMethod,
+      paymentMethod: created.paymentMethod,
+      comment: created.comment,
+      items: created.items.map((item) => ({
+        productName: item.productName,
+        productSku: item.productSku,
+        variantLabel: item.variantLabel,
+        quantity: item.quantity,
+        unitPrice: Number(item.unitPrice),
+        lineTotal: Number(item.lineTotal),
+      })),
+      subtotal: Number(created.subtotal),
+      deliveryFee: Number(created.deliveryFee),
+      total: Number(created.total),
+    }),
+    sendOrderEmail({
+      to: input.email,
+      orderNumber: created.orderNumber,
+      total: Number(created.total),
+      firstName: input.firstName,
+    }),
+    ]),
+  ]);
 
   return {
     id: created.id,

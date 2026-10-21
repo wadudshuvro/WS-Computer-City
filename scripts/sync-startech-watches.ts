@@ -5,6 +5,7 @@
  *
  * Run: npx tsx scripts/sync-startech-watches.ts
  */
+import { stripSourceFromHtml } from './lib/stripSourceMentions';
 import fs from 'fs';
 import path from 'path';
 import { PrismaClient, StockStatus } from '@prisma/client';
@@ -315,7 +316,7 @@ async function importCard(card: Card, categoryId: string) {
     null;
   const features = parseKeyFeatures(html);
   const featureLines = features.length > 0 ? features : card.features;
-  const description = parseDescription(html);
+  const description = stripSourceFromHtml(parseDescription(html));
   const availability = /property="product:availability"[^>]*content="([^"]+)"/i.exec(html)?.[1] || '';
   const stockStatus: StockStatus = /out of stock/i.test(availability) || card.outOfStock
     ? 'OUT_OF_STOCK'

@@ -5,6 +5,8 @@
  *
  * Run: npx tsx scripts/sync-startech-accessories-gaming.ts
  */
+import { stripSourceFromHtml } from './lib/stripSourceMentions';
+import { SOURCE_SITE } from '../src/lib/priceSync/fetchSourcePrice';
 import fs from 'fs';
 import path from 'path';
 import { PrismaClient, StockStatus } from '@prisma/client';
@@ -334,7 +336,7 @@ async function importCard(card: Card, categoryId: string, folder: string) {
       .find((row) => row.name.toLowerCase() === 'warranty')?.value || null;
   const features = parseKeyFeatures(html);
   const featureLines = features.length > 0 ? features : card.features;
-  const description = parseDescription(html);
+  const description = stripSourceFromHtml(parseDescription(html));
   const availability = /property="product:availability"[^>]*content="([^"]+)"/i.exec(html)?.[1] || '';
   const stockStatus: StockStatus = /out of stock/i.test(availability) || card.outOfStock
     ? 'OUT_OF_STOCK'
@@ -449,7 +451,7 @@ async function main() {
   for (const leaf of LEAVES) {
     const categoryId = await ensureCategory(leaf, parents[leaf.group].id);
     await ensureWarrantyDef(categoryId);
-    const firstUrl = `${leaf.startechUrl}?limit=90`;
+    const firstUrl = `${SOURCE_SITE}${leaf.sourcePath}?limit=90`;
     let firstHtml = '';
     try {
       firstHtml = await fetchText(firstUrl);
@@ -460,7 +462,7 @@ async function main() {
     const pages = Math.min(pageCount(firstHtml), 80);
     console.log(`\n${leaf.name}: ${pages} page(s)`);
     for (let page = 1; page <= pages; page++) {
-      const html = page === 1 ? firstHtml : await fetchText(`${leaf.startechUrl}?limit=90&page=${page}`);
+      const html = page === 1 ? firstHtml : await fetchText(`${SOURCE_SITE}${leaf.sourcePath}?limit=90&page=${page}`);
       const cards = parseListing(html);
       for (const card of cards) {
         try {

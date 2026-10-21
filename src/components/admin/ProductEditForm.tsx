@@ -939,13 +939,13 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
           </div>
 
           <div className="md:col-span-3">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Star Tech product URL</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Source product URL</label>
             <input
               type="url"
               name="sourceUrl"
               value={formData.sourceUrl}
               onChange={handleInputChange}
-              placeholder="https://www.startech.com.bd/..."
+              placeholder="https://..."
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
             />
             <p className="text-xs text-gray-500 mt-1">
@@ -966,7 +966,7 @@ export default function ProductEditForm({ product }: ProductEditFormProps) {
               onChange={handleInputChange}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500"
             >
-              <option value="MATCH">Match Star Tech</option>
+              <option value="MATCH">Match source price</option>
               <option value="MINUS_FIXED">Minus a fixed amount</option>
               <option value="MINUS_PERCENT">Minus a percent</option>
             </select>

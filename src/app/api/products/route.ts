@@ -10,6 +10,7 @@ import { GADGET_FILTER_KEYS, findGadgetLeaf } from '@/lib/gadgetCatalog';
 import { MONITOR_FILTER_KEYS } from '@/lib/monitorFilters';
 import { ROUTER_FILTER_KEYS } from '@/lib/routerFilters';
 import { UPS_FILTER_KEYS } from '@/lib/upsCatalog';
+import { toPublicProduct } from '@/lib/publicProduct';
 
 /**
  * GET /api/products
@@ -62,7 +63,7 @@ export async function GET(req: NextRequest) {
     );
 
     return NextResponse.json({
-      data: result.products,
+      data: result.products.map(toPublicProduct),
       pagination: result.pagination,
       filters: availableFilters,
     });

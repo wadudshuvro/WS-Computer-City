@@ -6,6 +6,7 @@ import { HomeShowcases } from '@/components/home/HomeShowcases';
 import { getTopDeals } from '@/lib/topDeals';
 import { getHomeShowcases } from '@/lib/homeShowcases';
 import { getHomeTopCategories } from '@/lib/homeCategories';
+import { getHeroSlides } from '@/lib/homeHero';
 import { siteName } from '@/lib/launch/site';
 import { organizationJsonLd } from '@/lib/seo/catalogSeo';
 
@@ -20,10 +21,11 @@ export const metadata: Metadata = {
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const [topDeals, showcases, topCategories] = await Promise.all([
+  const [topDeals, showcases, topCategories, heroSlides] = await Promise.all([
     getTopDeals(),
     getHomeShowcases(),
     getHomeTopCategories(),
+    getHeroSlides(),
   ]);
 
   return (
@@ -33,7 +35,7 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
       />
       <main className="flex flex-col">
-        <HeroSlider />
+        <HeroSlider slides={heroSlides} />
         <CategoryGrid categories={topCategories} />
         <TopDeals products={topDeals} />
         <HomeShowcases sections={showcases} />

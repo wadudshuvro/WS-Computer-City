@@ -1,179 +1,227 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useCallback, useState } from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import type { HeroSlide } from '@/lib/homeHero';
+import { ReportProblemCard } from '@/components/home/ReportProblemCard';
 
-const slides = [
-  {
-    id: 1,
-    title: 'Free Delivery',
-    subtitle: 'On all orders',
-    bgColor: 'from-slate-800 via-[#1e2636] to-[#1a1f2e]',
-    image: '📦',
+const AUTOPLAY_MS = 6000;
+
+const THEMES: Record<HeroSlide['theme'], { bg: string; glow: string; accent: string; chip: string }> = {
+  sky: {
+    bg: 'from-[#07111f] via-[#0b2545] to-[#0e4a7a]',
+    glow: 'bg-sky-400/30',
+    accent: 'text-sky-300',
+    chip: 'bg-sky-400/15 text-sky-200 ring-sky-300/30',
   },
-  {
-    id: 2,
-    title: 'B2B Reseller',
-    subtitle: 'Special offers',
-    bgColor: 'from-teal-700 via-teal-800 to-[#1a1f2e]',
-    image: '🤝',
+  violet: {
+    bg: 'from-[#12082b] via-[#2b1066] to-[#5b21b6]',
+    glow: 'bg-fuchsia-400/25',
+    accent: 'text-fuchsia-300',
+    chip: 'bg-fuchsia-400/15 text-fuchsia-100 ring-fuchsia-300/30',
   },
-  {
-    id: 3,
-    title: 'Latest Products',
-    subtitle: 'Best prices in Bangladesh',
-    bgColor: 'from-cyan-700 via-sky-800 to-[#152238]',
-    image: '💰',
+  teal: {
+    bg: 'from-[#031c1b] via-[#064643] to-[#0f766e]',
+    glow: 'bg-emerald-300/25',
+    accent: 'text-emerald-300',
+    chip: 'bg-emerald-300/15 text-emerald-100 ring-emerald-200/30',
   },
-];
+  ember: {
+    bg: 'from-[#240c0e] via-[#6b1d1d] to-[#b4400f]',
+    glow: 'bg-orange-300/25',
+    accent: 'text-orange-300',
+    chip: 'bg-orange-300/15 text-orange-100 ring-orange-200/30',
+  },
+  indigo: {
+    bg: 'from-[#0b1026] via-[#1b2250] to-[#3730a3]',
+    glow: 'bg-indigo-300/25',
+    accent: 'text-indigo-300',
+    chip: 'bg-indigo-300/15 text-indigo-100 ring-indigo-200/30',
+  },
+};
 
-export function HeroSlider() {
-  const [currentSlide, setCurrentSlide] = useState(0);
+export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
+  const [current, setCurrent] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const count = slides.length;
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
+  const go = useCallback((index: number) => setCurrent((index + count) % count), [count]);
 
   return (
-    <section className="relative overflow-hidden bg-muted">
+    <section className="relative bg-muted">
       <div className="container mx-auto py-4">
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-3 lg:gap-4">
-          {/* Main hero */}
-          <div className="relative h-[260px] overflow-hidden rounded-lg sm:h-[280px] lg:col-span-2">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-4">
+          {count > 0 && (
             <div
-              className="absolute inset-0 flex transition-transform duration-500 ease-in-out"
-              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+              className="relative h-[520px] overflow-hidden rounded-2xl shadow-lg sm:h-[440px] lg:h-[380px]"
+              onMouseEnter={() => setPaused(true)}
+              onMouseLeave={() => setPaused(false)}
+              onFocusCapture={() => setPaused(true)}
+              onBlurCapture={() => setPaused(false)}
+              role="region"
+              aria-roledescription="carousel"
+              aria-label="Featured categories"
             >
-              {slides.map((slide) => (
-                <div
-                  key={slide.id}
-                  className={`flex min-w-full items-center justify-center bg-gradient-to-r p-6 text-white ${slide.bgColor}`}
-                >
-                  <div className="max-w-md text-center">
-                    <div className="mb-3 text-4xl" aria-hidden>
-                      {slide.image}
+              {slides.map((slide, index) => {
+                const theme = THEMES[slide.theme];
+                const active = index === current;
+                return (
+                  <div
+                    key={slide.id}
+                    aria-hidden={!active}
+                    className={`absolute inset-0 bg-gradient-to-br ${theme.bg} transition-opacity duration-700 ${
+                      active ? 'z-10 opacity-100' : 'pointer-events-none z-0 opacity-0'
+                    }`}
+                  >
+                    {/* soft light + fine grid, no stock artwork */}
+                    <div className={`absolute -right-10 top-0 h-80 w-80 rounded-full blur-3xl ${theme.glow}`} />
+                    <div className="absolute -bottom-24 left-1/3 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
+                    <div
+                      className="absolute inset-0 opacity-[0.07]"
+                      style={{
+                        backgroundImage:
+                          'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)',
+                        backgroundSize: '44px 44px',
+                      }}
+                    />
+
+                    <div className="relative flex h-full flex-col gap-4 p-5 sm:p-7 lg:flex-row lg:items-center lg:gap-6 lg:p-9">
+                      <div
+                        className={`max-w-md shrink-0 text-white transition-all duration-700 lg:w-[42%] ${
+                          active ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                        }`}
+                      >
+                        <span className={`text-xs font-semibold uppercase tracking-[0.18em] ${theme.accent}`}>
+                          {slide.eyebrow}
+                        </span>
+                        <h2 className="mt-2 text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl lg:text-[2rem]">
+                          {slide.title}
+                        </h2>
+                        <p className="mt-2 text-sm leading-relaxed text-white/75">{slide.blurb}</p>
+
+                        <div className="mt-4 flex flex-wrap gap-2 text-xs">
+                          <span className={`rounded-full px-3 py-1 font-medium ring-1 ${theme.chip}`}>
+                            From {slide.fromPrice}
+                          </span>
+                          <span className={`rounded-full px-3 py-1 font-medium ring-1 ${theme.chip}`}>
+                            {slide.inStock} in stock
+                          </span>
+                        </div>
+
+                        <Link
+                          href={slide.href}
+                          tabIndex={active ? 0 : -1}
+                          className="group mt-5 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-md transition hover:gap-3 hover:bg-orange-50"
+                        >
+                          {slide.cta}
+                          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                        </Link>
+                      </div>
+
+                      {/* real products from this category */}
+                      <div className="flex min-h-0 flex-1 items-center justify-center gap-3 sm:gap-4">
+                        {slide.products.map((product, i) => (
+                          <Link
+                            key={product.href}
+                            href={product.href}
+                            tabIndex={active ? 0 : -1}
+                            style={{ transitionDelay: active ? `${150 + i * 120}ms` : '0ms' }}
+                            className={`group flex w-[31%] max-w-[200px] flex-col rounded-xl bg-white p-2.5 text-slate-900 shadow-xl ring-1 ring-black/5 transition-all duration-700 hover:-translate-y-2 hover:shadow-2xl ${
+                              active ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+                            } ${i === 1 ? 'lg:-translate-y-4 lg:hover:-translate-y-6' : ''}`}
+                          >
+                            <span className="flex h-24 items-center justify-center overflow-hidden rounded-lg bg-slate-50 sm:h-32 lg:h-36">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={product.imageUrl}
+                                alt={product.name}
+                                loading={index === 0 ? 'eager' : 'lazy'}
+                                decoding="async"
+                                className="max-h-full max-w-full object-contain p-1 transition-transform duration-300 group-hover:scale-105"
+                              />
+                            </span>
+                            <span className="mt-2 line-clamp-2 min-h-[2rem] text-[11px] font-medium leading-snug sm:text-xs">
+                              {product.name}
+                            </span>
+                            <span className="mt-1 flex items-baseline gap-1.5">
+                              <span className="text-sm font-bold text-red-600">{product.price}</span>
+                              {product.oldPrice && (
+                                <span className="text-[10px] text-slate-400 line-through">{product.oldPrice}</span>
+                              )}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
                     </div>
-                    <h2 className="mb-1 text-2xl font-semibold leading-snug tracking-tight text-white">
-                      {slide.title}
-                    </h2>
-                    <p className="mb-4 text-sm text-white/85">{slide.subtitle}</p>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="default"
-                      className="bg-white text-sidebar hover:bg-white/90"
-                    >
-                      Shop Now
-                    </Button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
+
+              {count > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => go(current - 1)}
+                    aria-label="Previous slide"
+                    className="absolute right-14 top-3 z-20 hidden h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur transition hover:bg-white/30 sm:flex"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => go(current + 1)}
+                    aria-label="Next slide"
+                    className="absolute right-4 top-3 z-20 hidden h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur transition hover:bg-white/30 sm:flex"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+
+                  {/* category tabs with autoplay progress */}
+                  <div className="absolute inset-x-0 bottom-0 z-20 flex gap-1.5 bg-gradient-to-t from-black/40 to-transparent px-4 pb-3 pt-6">
+                    {slides.map((slide, index) => (
+                      <button
+                        key={slide.id}
+                        type="button"
+                        onClick={() => go(index)}
+                        aria-label={`Show ${slide.eyebrow}`}
+                        aria-current={index === current}
+                        className="group min-w-0 flex-1 text-left"
+                      >
+                        <span className="block h-1 overflow-hidden rounded-full bg-white/25">
+                          <span
+                            key={`${index === current}-${current}`}
+                            className="block h-full rounded-full bg-white"
+                            onAnimationEnd={() => go(current + 1)}
+                            style={
+                              index === current
+                                ? {
+                                    animation: `hero-progress ${AUTOPLAY_MS}ms linear forwards`,
+                                    animationPlayState: paused ? 'paused' : 'running',
+                                  }
+                                : { width: index < current ? '100%' : '0%' }
+                            }
+                          />
+                        </span>
+                        <span
+                          className={`mt-1.5 hidden truncate text-[11px] font-medium transition-colors sm:block ${
+                            index === current ? 'text-white' : 'text-white/60 group-hover:text-white/90'
+                          }`}
+                        >
+                          {slide.eyebrow}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
+          )}
 
-            <Button
-              type="button"
-              variant="secondary"
-              size="icon"
-              onClick={prevSlide}
-              aria-label="Previous slide"
-              className="absolute left-3 top-1/2 h-8 w-8 -translate-y-1/2 bg-white/90 text-foreground hover:bg-white"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              size="icon"
-              onClick={nextSlide}
-              aria-label="Next slide"
-              className="absolute right-3 top-1/2 h-8 w-8 -translate-y-1/2 bg-white/90 text-foreground hover:bg-white"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-
-            <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
-              {slides.map((_, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => setCurrentSlide(index)}
-                  aria-label={`Go to slide ${index + 1}`}
-                  className={`h-1.5 rounded-full transition-all ${
-                    currentSlide === index ? 'w-4 bg-white' : 'w-1.5 bg-white/50'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Side panels */}
-          <div className="flex flex-col gap-3">
-            <Card className="flex flex-1 flex-col justify-center border-0 bg-gradient-to-br from-[#2d3548] to-sidebar text-white shadow-none">
-              <CardContent className="p-4">
-                <h3 className="mb-1 text-base font-semibold leading-snug text-white">Banani Branch</h3>
-                <p className="mb-2 text-xs leading-relaxed text-white/75">
-                  Concord Colosseum, 156 Kemal Ataturk Ave, Dhaka 1213
-                </p>
-                <p className="mb-3 text-xs text-white/70">
-                  01324294311 · 01322921936 · 01701663681
-                </p>
-                <Button
-                  type="button"
-                  size="sm"
-                  className="h-8 bg-teal-600 text-white hover:bg-teal-700"
-                >
-                  Get direction
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="flex flex-1 flex-col justify-center border-0 bg-gradient-to-br from-teal-700 to-sidebar text-white shadow-none">
-              <CardContent className="p-4">
-                <h3 className="mb-1 text-base font-semibold leading-snug text-white">B2B / Reseller</h3>
-                <p className="mb-3 text-xs leading-relaxed text-white/80">
-                  Special pricing for bulk orders
-                </p>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  className="h-8 border-white/25 bg-white/10 text-white hover:bg-white/20 hover:text-white"
-                >
-                  Learn more
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Link
-              href="/feedback"
-              className="flex flex-col justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-800 p-4 text-white"
-            >
-              <h3 className="mb-1 text-base font-semibold leading-snug">Report a problem</h3>
-              <p className="mb-3 text-xs leading-relaxed text-white/85">
-                Tell us if a page, product, or order is not working.
-              </p>
-              <span className="inline-flex w-fit rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold">
-                Send a message
-              </span>
-            </Link>
-          </div>
+          <ReportProblemCard className="lg:h-[380px]" />
         </div>
       </div>
+
     </section>
   );
 }

@@ -7,7 +7,7 @@ export type GadgetBrand = { slug: string; label: string };
 export type GadgetLeaf = {
   name: string;
   slug: string;
-  startechUrl: string;
+  sourcePath: string;
   parentSlug?: string;
   brands: GadgetBrand[];
   filters: FilterDefinition[];
@@ -53,11 +53,8 @@ function filterKey(groupName: string): string {
 }
 
 function hrefSlug(href: string): string {
-  try {
-    return new URL(href).pathname.split('/').filter(Boolean).pop() || '';
-  } catch {
-    return '';
-  }
+  const path = href.replace(/^https?:\/\/[^/]+/i, '').split(/[?#]/)[0] ?? '';
+  return path.split('/').filter(Boolean).pop() || '';
 }
 
 const scrapedPages = scraped as ScrapedPage[];
@@ -66,24 +63,24 @@ function pageBySlug(slug: string): ScrapedPage | undefined {
   return scrapedPages.find((page) => page.slug === slug);
 }
 
-const TOP_LEAVES: { name: string; slug: string; startechUrl: string }[] = [
-  { name: 'Smart Watch', slug: 'watch', startechUrl: 'https://www.startech.com.bd/gadget/smart-watch' },
-  { name: 'Smart Band', slug: 'smart-band', startechUrl: 'https://www.startech.com.bd/smart-band' },
-  { name: 'Earphone', slug: 'earphone', startechUrl: 'https://www.startech.com.bd/earphone' },
-  { name: 'Earbuds', slug: 'earbuds', startechUrl: 'https://www.startech.com.bd/earbuds' },
-  { name: 'Neckband', slug: 'neckband', startechUrl: 'https://www.startech.com.bd/neckband' },
-  { name: 'Smart Ring', slug: 'smart-ring', startechUrl: 'https://www.startech.com.bd/smart-ring' },
-  { name: 'Smart Glasses', slug: 'smart-glasses', startechUrl: 'https://www.startech.com.bd/smart-glasses' },
-  { name: 'Power Bank', slug: 'power-bank', startechUrl: 'https://www.startech.com.bd/power-bank' },
-  { name: 'Car Charger', slug: 'car-charger', startechUrl: 'https://www.startech.com.bd/car-charger' },
-  { name: 'TV Box', slug: 'tv-box', startechUrl: 'https://www.startech.com.bd/tv-box' },
-  { name: 'Health Monitor', slug: 'health-monitor', startechUrl: 'https://www.startech.com.bd/health-monitor' },
-  { name: 'Studio Equipment', slug: 'studio-equipment', startechUrl: 'https://www.startech.com.bd/studio-equipment' },
-  { name: 'Drones', slug: 'drone', startechUrl: 'https://www.startech.com.bd/drone' },
-  { name: 'Gimbal', slug: 'gimbal', startechUrl: 'https://www.startech.com.bd/gimbal' },
-  { name: 'Calculator', slug: 'calculator', startechUrl: 'https://www.startech.com.bd/calculator' },
-  { name: 'Stream Deck', slug: 'stream-deck', startechUrl: 'https://www.startech.com.bd/stream-deck' },
-  { name: 'Power Tools', slug: 'power-tools', startechUrl: 'https://www.startech.com.bd/power-tools' },
+const TOP_LEAVES: { name: string; slug: string; sourcePath: string }[] = [
+  { name: 'Smart Watch', slug: 'watch', sourcePath: '/gadget/smart-watch' },
+  { name: 'Smart Band', slug: 'smart-band', sourcePath: '/smart-band' },
+  { name: 'Earphone', slug: 'earphone', sourcePath: '/earphone' },
+  { name: 'Earbuds', slug: 'earbuds', sourcePath: '/earbuds' },
+  { name: 'Neckband', slug: 'neckband', sourcePath: '/neckband' },
+  { name: 'Smart Ring', slug: 'smart-ring', sourcePath: '/smart-ring' },
+  { name: 'Smart Glasses', slug: 'smart-glasses', sourcePath: '/smart-glasses' },
+  { name: 'Power Bank', slug: 'power-bank', sourcePath: '/power-bank' },
+  { name: 'Car Charger', slug: 'car-charger', sourcePath: '/car-charger' },
+  { name: 'TV Box', slug: 'tv-box', sourcePath: '/tv-box' },
+  { name: 'Health Monitor', slug: 'health-monitor', sourcePath: '/health-monitor' },
+  { name: 'Studio Equipment', slug: 'studio-equipment', sourcePath: '/studio-equipment' },
+  { name: 'Drones', slug: 'drone', sourcePath: '/drone' },
+  { name: 'Gimbal', slug: 'gimbal', sourcePath: '/gimbal' },
+  { name: 'Calculator', slug: 'calculator', sourcePath: '/calculator' },
+  { name: 'Stream Deck', slug: 'stream-deck', sourcePath: '/stream-deck' },
+  { name: 'Power Tools', slug: 'power-tools', sourcePath: '/power-tools' },
 ];
 
 function filtersFor(slug: string): FilterDefinition[] {
@@ -112,7 +109,7 @@ function nestedFor(parentSlug: string): GadgetLeaf[] {
     .map((child) => ({
       name: child.name,
       slug: hrefSlug(child.href),
-      startechUrl: child.href,
+      sourcePath: child.href,
       parentSlug,
       brands: [],
       filters: [],
